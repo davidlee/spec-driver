@@ -34,16 +34,16 @@ Create `supekku:spec.requirements@v1` block infrastructure: parser module, metad
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `spec_requirements.py` extracts and renders blocks correctly
-- [ ] `spec_requirements_metadata.py` validates all field constraints
-- [ ] Cross-field invariant (ID prefix ↔ kind) enforced
-- [ ] Duplicate ID detection working
-- [ ] Duplicate block detection working
-- [ ] Tolerated aliases (`FR`/`NF`/`NFR`) canonicalize correctly
-- [ ] Schema registered in block schema registry
-- [ ] All 11 VTs passing (VT-140-001 through -008, -027, -028)
-- [ ] `just lint` clean on new files
-- [ ] `just pylint-files` clean on new files
+- [x] `spec_requirements.py` extracts and renders blocks correctly
+- [x] `spec_requirements_metadata.py` validates all field constraints
+- [x] Cross-field invariant (ID prefix ↔ kind) enforced
+- [x] Duplicate ID detection working
+- [x] Duplicate block detection working
+- [x] Tolerated aliases (`FR`/`NF`/`NFR`) canonicalize correctly
+- [x] Schema registered in block schema registry
+- [x] All 11 VTs passing (VT-140-001 through -008, -027, -028)
+- [x] `just lint` clean on new files
+- [x] `just pylint-files` clean on new files
 
 ## 5. Verification
 
@@ -73,13 +73,13 @@ Commands: `just test`, `just lint`, `just pylint-files supekku/scripts/lib/block
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Create `spec_requirements.py` — constants, dataclass, extract, render | [P] | Follow verification.py pattern |
-| [ ] | 1.2 | Create `spec_requirements_metadata.py` — BlockMetadata, validator, wrapper | [P] | Follow verification_metadata.py + spec_metadata.py pattern |
-| [ ] | 1.3 | Write extraction tests (VT-140-001, -002a, -002b, -028) | | After 1.1 |
-| [ ] | 1.4 | Write metadata/validation tests (VT-140-003, -004, -005, -006, -027) | | After 1.2 |
-| [ ] | 1.5 | Write renderer test (VT-140-007) | | After 1.1 |
-| [ ] | 1.6 | Write schema registration test (VT-140-008) | | After 1.1 |
-| [ ] | 1.7 | Lint pass on new files | | After all |
+| [x] | 1.1 | Create `spec_requirements.py` — constants, dataclass, extract, render | [P] | Follow verification.py pattern |
+| [x] | 1.2 | Create `spec_requirements_metadata.py` — BlockMetadata, validator, wrapper | [P] | Follow verification_metadata.py + spec_metadata.py pattern |
+| [x] | 1.3 | Write extraction tests (VT-140-001, -002a, -002b, -028) | | After 1.1 |
+| [x] | 1.4 | Write metadata/validation tests (VT-140-003, -004, -005, -006, -027) | | After 1.2 |
+| [x] | 1.5 | Write renderer test (VT-140-007) | | After 1.1 |
+| [x] | 1.6 | Write schema registration test (VT-140-008) | | After 1.1 |
+| [x] | 1.7 | Lint pass on new files | | After all |
 
 ### Task Details
 

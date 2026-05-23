@@ -9,6 +9,9 @@ import typer
 
 from spec_driver.presentation.cli import constants as cli_constants
 from spec_driver.presentation.cli.admin.migrate import migrate as migrate_cmd
+from spec_driver.presentation.cli.admin.migrate_requirements import (
+  migrate_requirements as migrate_requirements_cmd,
+)
 from supekku.cli import backfill, compact, regenerate_templates, resolve
 
 app = typer.Typer(help="Workspace maintenance commands", no_args_is_help=True)
@@ -25,6 +28,10 @@ app.command(
   cli_constants.ADMIN_MIGRATE,
   help="Schema-version migration orchestrator (DE-137; DR-137 §5.6).",
 )(migrate_cmd)
+app.command(
+  "migrate-requirements",
+  help="Migrate prose requirements to structured block (DE-140).",
+)(migrate_requirements_cmd)
 
 
 @app.command()

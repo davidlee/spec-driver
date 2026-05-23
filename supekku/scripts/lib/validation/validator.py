@@ -31,6 +31,10 @@ from supekku.scripts.lib.blocks.spec_metadata import (
   SPEC_DECISIONS_VALIDATOR,
   SPEC_HYPOTHESES_VALIDATOR,
 )
+from supekku.scripts.lib.blocks.spec_requirements import extract_spec_requirements
+from supekku.scripts.lib.blocks.spec_requirements_metadata import (
+  SPEC_REQUIREMENTS_VALIDATOR,
+)
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.enums import get_enum_values
@@ -205,6 +209,9 @@ class WorkspaceValidator:
     # Spec block schema validation (DE-139 P04)
     self._validate_spec_blocks()
 
+    # Spec requirements block validation (DE-140 P03)
+    self._validate_spec_requirements_blocks()
+
     # Kind-aware frontmatter validation (DE-112)
     memory_dir = get_memory_dir(self.workspace.root)
     backlog_dir = get_backlog_dir(self.workspace.root)
@@ -343,6 +350,74 @@ class WorkspaceValidator:
             accept_tolerated=self.accept_tolerated,
           ):
             self._block_issue(spec.id, label, err)
+
+  def _validate_spec_requirements_blocks(self) -> None:
+    """Validate per-spec requirements block schemas (DE-140 P03).
+
+    Follows ``_validate_spec_blocks`` pattern: extract → schema validate →
+    semantic checks. Adds spec field cross-validation and strict-mode
+    trimmed-empty/blank-item rejection per DR-140 §7.
+    """
+    for spec in self.workspace.specs.all_specs():
+      body = spec.body
+      try:
+        block = extract_spec_requirements(body)
+      except ValueError as exc:
+        self._error(spec.id, f"spec.requirements block extraction failed: {exc}")
+        continue
+      if block is None:
+        continue
+      for err in SPEC_REQUIREMENTS_VALIDATOR.validate(
+        block.data,
+        strict=self.strict,
+        accept_tolerated=self.accept_tolerated,
+      ):
+        self._block_issue(spec.id, "spec.requirements", err)
+      spec_value = block.data.get("spec", "")
+      if spec_value and spec_value != spec.id:
+        self._error(
+          spec.id,
+          f"spec.requirements: spec field '{spec_value}' "
+          f"does not match artifact ID '{spec.id}'",
+        )
+      if self.strict:
+        self._check_strict_content_requirements(spec.id, block.data)
+
+  def _check_strict_content_requirements(
+    self,
+    artifact: str,
+    data: dict[str, Any],
+  ) -> None:
+    """Reject trimmed-empty description and blank acceptance_criteria (VT-140-022)."""
+    requirements = data.get("requirements")
+    if not isinstance(requirements, list):
+      return
+    for idx, entry in enumerate(requirements):
+      if not isinstance(entry, dict):
+        continue
+      desc = entry.get("description", "")
+      if isinstance(desc, str) and not desc.strip():
+        self._error(
+          artifact,
+          f"spec.requirements: requirements[{idx}].description "
+          f"is trimmed-empty (strict mode)",
+        )
+      criteria = entry.get("acceptance_criteria")
+      if isinstance(criteria, list):
+        if not criteria:
+          self._error(
+            artifact,
+            f"spec.requirements: requirements[{idx}].acceptance_criteria "
+            f"is empty (strict mode)",
+          )
+        else:
+          for ci, item in enumerate(criteria):
+            if isinstance(item, str) and not item.strip():
+              self._error(
+                artifact,
+                f"spec.requirements: requirements[{idx}]."
+                f"acceptance_criteria[{ci}] is blank (strict mode)",
+              )
 
   def _block_issue(self, artifact: str, block_label: str, err: Any) -> None:
     """Dispatch a block ValidationError into a ValidationIssue at its severity."""

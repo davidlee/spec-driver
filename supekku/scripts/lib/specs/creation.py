@@ -17,6 +17,7 @@ from supekku.scripts.lib.blocks.relationships import (
   render_spec_hypotheses_block,
   render_spec_relationships_block,
 )
+from supekku.scripts.lib.blocks.spec_requirements import render_spec_requirements_block
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.events import record_artifact
@@ -150,6 +151,7 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
       }
     ],
   )
+  spec_requirements_block = render_spec_requirements_block(next_id)
   spec_concerns_block = render_spec_concerns_block(next_id)
   spec_hypotheses_block = render_spec_hypotheses_block(next_id)
   spec_decisions_block = render_spec_decisions_block(next_id)
@@ -164,6 +166,7 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
     spec_relationships_block=spec_relationships_block,
     spec_capabilities_block=spec_capabilities_block,
     spec_verification_block=spec_verification_block,
+    spec_requirements_block=spec_requirements_block,
     spec_concerns_block=spec_concerns_block,
     spec_hypotheses_block=spec_hypotheses_block,
     spec_decisions_block=spec_decisions_block,

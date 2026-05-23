@@ -214,6 +214,12 @@ class TemplateBlockVariablesTest(unittest.TestCase):
     ):
       assert f"{{{{ {var} }}}}" in content, f"missing {var}"
 
+  def test_spec_template_has_requirements_block_variable(self):
+    """VT-140-020: template includes spec_requirements_block placeholder."""
+    template_path = get_package_templates_dir() / "spec.md"
+    content = template_path.read_text(encoding="utf-8")
+    assert "{{ spec_requirements_block }}" in content, "missing spec_requirements_block"
+
 
 class CreateSpecBlocksTest(unittest.TestCase):
   """VT-DE139-CREATE-001: created spec emits all block placeholders."""
@@ -238,6 +244,7 @@ class CreateSpecBlocksTest(unittest.TestCase):
       "{{ spec_relationships_block }}\n\n"
       "{{ spec_capabilities_block }}\n\n"
       "{{ spec_verification_block }}\n\n"
+      "{{ spec_requirements_block }}\n\n"
       "{{ spec_concerns_block }}\n\n"
       "{{ spec_hypotheses_block }}\n\n"
       "{{ spec_decisions_block }}\n\n"
@@ -259,12 +266,59 @@ class CreateSpecBlocksTest(unittest.TestCase):
     assert "supekku:spec.hypotheses@v1" in content
     assert "supekku:spec.decisions@v1" in content
 
+  def test_created_spec_contains_requirements_block(self):
+    """VT-140-019: spec creation emits empty requirements block (DEC-140-14)."""
+    self._setup_repo_with_blocks_template()
+    result = create_spec("Widget Parser", CreateSpecOptions(spec_type="tech"))
+    content = result.spec_path.read_text(encoding="utf-8")
+    assert "supekku:spec.requirements@v1" in content
+    assert "requirements: []" in content
+
   def test_created_spec_has_no_packages(self):
     self._setup_repo_with_blocks_template()
     result = create_spec("Widget Parser", CreateSpecOptions(spec_type="tech"))
-    _, body = load_markdown_file(result.spec_path)
     fm, _ = load_markdown_file(result.spec_path)
     assert "packages" not in fm
+
+
+class SpecRequirementsEmptyBlockTest(unittest.TestCase):
+  """VT-140-030: scaffolded spec with empty block creates no registry entries."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def test_empty_requirements_block_produces_no_records(self):
+    """Empty requirements block in created spec yields zero registry entries."""
+    from supekku.scripts.lib.blocks.spec_requirements import (  # noqa: PLC0415
+      extract_spec_requirements,
+    )
+
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    templates = get_templates_dir(root)
+    templates.mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
+    (templates / "spec.md").write_text(
+      "# {{ spec_id }} – {{ name }}\n\n"
+      "{{ spec_requirements_block }}\n\n"
+      "## Body\n",
+      encoding="utf-8",
+    )
+    os.chdir(root)
+
+    result = create_spec("Empty Reqs", CreateSpecOptions(spec_type="tech"))
+    content = result.spec_path.read_text(encoding="utf-8")
+
+    block = extract_spec_requirements(content)
+    assert block is not None, "requirements block should be present"
+    reqs = block.data.get("requirements", [])
+    assert reqs == [], f"expected empty requirements list, got {reqs}"
 
 
 if __name__ == "__main__":

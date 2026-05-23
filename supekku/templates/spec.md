@@ -47,6 +47,8 @@ updated: "{{ today }}"
 
 ## 3. Responsibilities & Requirements
 
+{{ spec_requirements_block }}
+
 ### Capability Overview
 
 Expand each capability from the `supekku:spec.capabilities@v1` YAML block above, describing concrete behaviors and linking to specific functional/non-functional requirements.

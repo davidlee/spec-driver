@@ -88,6 +88,8 @@
             profile = "specDev";
             extraPkgs = projectPkgs;
             inherit workspaceDeps;
+            useOpEnv = false;
+            passApiKeysFromEnv = true;
           };
           jailed-pi-research = jailLib.makeJailedPi {
             name = "pi-research";

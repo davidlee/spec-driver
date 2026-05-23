@@ -1,0 +1,3 @@
+adapter    = "jailed-pi"
+flake_attr = "jailed-pi"
+pinned     = false

@@ -19,10 +19,8 @@ from .lifecycle import (
 from .models import RequirementRecord, SyncStats
 from .parser import (
   _is_requirement_like_line,
-  _load_breakout_metadata,
-  _records_from_content,
-  _records_from_frontmatter,
   _validate_extraction,
+  records_from_spec,
 )
 from .sync import (
   _apply_audit_relations,
@@ -164,7 +162,7 @@ class RequirementsRegistry:
     if spec_registry:
       for spec in spec_registry.all_specs():
         records = list(
-          _records_from_frontmatter(
+          records_from_spec(
             spec.id,
             spec.frontmatter,
             spec.body,
@@ -193,9 +191,8 @@ class RequirementsRegistry:
         spec_id = str(frontmatter.get("id", "")).strip()
         if not spec_id or spec_id in yielded_ids:
           continue
-        breakout_meta = _load_breakout_metadata(spec_file)
         records = list(
-          _records_from_content(
+          records_from_spec(
             spec_id,
             frontmatter,
             body,
@@ -206,14 +203,6 @@ class RequirementsRegistry:
         )
         extracted_uids = set()
         for record in records:
-          meta = breakout_meta.get(record.uid, {})
-          if meta:
-            if "tags" in meta:
-              record.tags = sorted(set(record.tags) | set(meta["tags"]))
-            if "ext_id" in meta:
-              record.ext_id = meta["ext_id"]
-            if "ext_url" in meta:
-              record.ext_url = meta["ext_url"]
           _upsert_record(self.records, record, seen, stats)
           extracted_uids.add(record.uid)
         spec_extractions[spec_id] = extracted_uids

@@ -8,6 +8,10 @@ import sys
 from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.blocks.spec_requirements import extract_spec_requirements
+from supekku.scripts.lib.blocks.spec_requirements_metadata import (
+  validate_spec_requirements,
+)
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 from .lifecycle import STATUS_PENDING
@@ -16,6 +20,7 @@ from .models import RequirementRecord, SyncStats
 if TYPE_CHECKING:
   from pathlib import Path
 
+  from supekku.scripts.lib.blocks.spec_requirements import SpecRequirementsBlock
   from supekku.scripts.lib.specs.registry import SpecRegistry
 
 logger = logging.getLogger(__name__)
@@ -192,6 +197,162 @@ def _records_from_frontmatter(
         record.ext_id = meta["ext_id"]
       if "ext_url" in meta:
         record.ext_url = meta["ext_url"]
+    yield record
+
+
+_KIND_ALIAS_MAP = {"FR": "functional", "NF": "non-functional", "NFR": "non-functional"}
+
+
+def _canonicalize_kind_value(raw: str) -> str:
+  """Resolve kind aliases to canonical values."""
+  return _KIND_ALIAS_MAP.get(raw, raw)
+
+
+def _relative_path(spec_path: Path, repo_root: Path) -> str:
+  """Return spec_path relative to repo_root, or absolute if outside."""
+  try:
+    return spec_path.relative_to(repo_root).as_posix()
+  except ValueError:
+    return spec_path.as_posix()
+
+
+def _record_from_block_entry(
+  entry: dict[str, Any],
+  spec_id: str,
+  path: str,
+) -> RequirementRecord | None:
+  """Build a RequirementRecord from a single block entry, or None."""
+  req_id = entry.get("id")
+  if not req_id:
+    return None
+  tags = entry.get("tags", [])
+  if not isinstance(tags, list):
+    tags = []
+  return RequirementRecord(
+    uid=f"{spec_id}.{req_id}",
+    label=req_id,
+    title=entry.get("title", ""),
+    specs=[spec_id],
+    primary_spec=spec_id,
+    kind=_canonicalize_kind_value(entry.get("kind", "functional")),
+    category=entry.get("category"),
+    status=entry.get("lifecycle", STATUS_PENDING),
+    tags=sorted(str(t) for t in tags if str(t).strip()),
+    path=path,
+    source_kind="block",
+    source_type="spec",
+  )
+
+
+def _records_from_block(
+  spec_id: str,
+  block: SpecRequirementsBlock,
+  spec_path: Path,
+  repo_root: Path,
+  stats: SyncStats | None = None,
+) -> Iterator[RequirementRecord]:
+  """Build RequirementRecords from an extracted spec requirements block."""
+  errors = validate_spec_requirements(block, spec_id=spec_id)
+  if errors:
+    for err in errors:
+      logger.warning("Spec %s block validation: %s", spec_id, err)
+    if stats:
+      stats.warnings += len(errors)
+
+  requirements = block.data.get("requirements", [])
+  if not isinstance(requirements, list):
+    return
+
+  path = _relative_path(spec_path, repo_root)
+  for entry in requirements:
+    if not isinstance(entry, dict):
+      continue
+    record = _record_from_block_entry(entry, spec_id, path)
+    if record is not None:
+      yield record
+
+
+def _try_extract_block(
+  body: str,
+  spec_id: str,
+  stats: SyncStats | None,
+) -> SpecRequirementsBlock | None:
+  """Try block extraction; log and return None on failure."""
+  try:
+    return extract_spec_requirements(body)
+  except ValueError as exc:
+    logger.warning(
+      "Spec %s: malformed requirements block, falling back to regex: %s",
+      spec_id,
+      exc,
+    )
+    if stats:
+      stats.warnings += 1
+    return None
+
+
+def _apply_breakout_metadata(
+  record: RequirementRecord,
+  breakout_meta: dict[str, dict[str, Any]],
+) -> None:
+  """Merge breakout metadata into a record in-place."""
+  meta = breakout_meta.get(record.uid, {})
+  if not meta:
+    return
+  if "tags" in meta:
+    record.tags = sorted(set(record.tags) | set(meta["tags"]))
+  if "ext_id" in meta:
+    record.ext_id = meta["ext_id"]
+  if "ext_url" in meta:
+    record.ext_url = meta["ext_url"]
+
+
+def records_from_spec(
+  spec_id: str,
+  frontmatter: Any,
+  body: str,
+  spec_path: Path,
+  repo_root: Path,
+  *,
+  stats: SyncStats | None = None,
+) -> Iterator[RequirementRecord]:
+  """Extract requirements — block-first, regex fallback.
+
+  Public API replacing _records_from_frontmatter() for new callers.
+  """
+  data = getattr(frontmatter, "data", frontmatter)
+  mapping = dict(data) if isinstance(data, Mapping) else {}
+  mapping.setdefault("id", spec_id)
+
+  fm_defs = _has_frontmatter_requirement_definitions(mapping)
+  if fm_defs:
+    logger.info(
+      "Spec %s at %s: frontmatter 'requirements:' array "
+      "(%d entries) will not be indexed.",
+      spec_id,
+      spec_path.name,
+      len(fm_defs),
+    )
+    if stats:
+      stats.warnings += 1
+
+  block = _try_extract_block(body, spec_id, stats)
+  breakout_meta = _load_breakout_metadata(spec_path)
+
+  if block is not None:
+    records = _records_from_block(
+      spec_id, block, spec_path, repo_root, stats=stats
+    )
+  else:
+    records = _records_from_content(
+      spec_id, mapping, body, spec_path, repo_root, stats=stats
+    )
+
+  for record in records:
+    if not record.source_kind:
+      record.source_kind = "prose"
+      record.source_type = "spec"
+    _apply_breakout_metadata(record, breakout_meta)
     yield record
 
 

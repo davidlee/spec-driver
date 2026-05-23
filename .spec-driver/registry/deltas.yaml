@@ -13425,8 +13425,10 @@ deltas:
         delta: DE-136
         phase: IP-136-P02
         status: completed
-      - id: IP-136-P03
+      - plan: IP-136
+        delta: DE-136
         phase: IP-136-P03
+        status: in-progress
       - id: IP-136-P04
         phase: IP-136-P04
   DE-137:
@@ -13602,11 +13604,11 @@ deltas:
         status: completed
   DE-139:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Spec artefact metadata propagation: PROD+SPEC blocks, taxonomy
       strict, list enrichment (DE-136 child)'
     slug: spec_artefact_metadata_propagation_prod_spec_blocks_taxonomy_strict_list_enrichment_de_136_child
-    updated: '2026-05-09'
+    updated: '2026-05-22'
     path: .spec-driver/deltas/DE-139-spec_artefact_metadata_propagation_prod_spec_blocks_taxonomy_strict_list_enrichment_de_136_child/DE-139.md
     applies_to:
       specs:
@@ -13643,6 +13645,50 @@ deltas:
       attributes:
         nature: "Unit/assembly category distinction \u2014 strict enforcement here\
           \ closes the gap"
+    plan:
+      id: IP-139
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-139
+        delta: DE-139
+        revision_links:
+          aligns_with:
+          - DR-139
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          - SPEC-116
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          - PROD-004.FR-003
+          dependencies: []
+        phases:
+        - id: IP-139-P01
+        - id: IP-139-P02
+        - id: IP-139-P03
+        - id: IP-139-P04
+      phases:
+      - plan: IP-139
+        delta: DE-139
+        phase: IP-139-P01
+        status: in-progress
+      - plan: IP-139
+        delta: DE-139
+        phase: IP-139-P02
+        status: in-progress
+      - plan: IP-139
+        delta: DE-139
+        phase: IP-139-P03
+        status: draft
+      - plan: IP-139
+        delta: DE-139
+        phase: IP-139-P04
+        status: draft
   DE-140:
     kind: delta
     status: draft

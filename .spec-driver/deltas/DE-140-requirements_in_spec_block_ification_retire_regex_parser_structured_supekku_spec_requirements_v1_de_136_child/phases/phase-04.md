@@ -4,7 +4,7 @@ slug: "140-requirements_in_spec_block_ification_retire_regex_parser_structured_s
 name: "IP-140 Phase 04 — Migration"
 created: "2026-05-23"
 updated: "2026-05-23"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-140
 delta: DE-140
@@ -36,18 +36,18 @@ Implement interactive per-spec migration from prose-format requirements (`- **FR
 
 ## 4. Exit Criteria / Done When
 
-- [ ] Migration module in `spec_driver/migrations/spec_requirements/` with frozen-local constants
-- [ ] DEC-138-12 isolation verified (zero supekku imports in migration module)
-- [ ] `spec-driver admin migrate-requirements <SPEC-ID>` CLI command wired
-- [ ] `--dry-run` mode shows proposed block without writes or prompts
-- [ ] Guard: refuses if spec already has a `spec.requirements` block
-- [ ] Parsed requirements rendered as valid `supekku:spec.requirements@v1` block
-- [ ] Block inserted after frontmatter, before first heading
-- [ ] Post-write validation catches malformed output, atomic revert on failure
-- [ ] Drift ledger entries written for unparseable requirements and placeholders
-- [ ] All 5 VAs passing (VA-140-001 through VA-140-005)
-- [ ] `just lint` clean on modified files
-- [ ] `just pylint-files` clean on modified files
+- [x] Migration module in `spec_driver/migrations/spec_requirements/` with frozen-local constants
+- [x] DEC-138-12 isolation verified (zero supekku imports in migration module)
+- [x] `spec-driver admin migrate-requirements <SPEC-ID>` CLI command wired
+- [x] `--dry-run` mode shows proposed block without writes or prompts
+- [x] Guard: refuses if spec already has a `spec.requirements` block
+- [x] Parsed requirements rendered as valid `supekku:spec.requirements@v1` block
+- [x] Block inserted after frontmatter, before first heading
+- [x] Post-write validation catches malformed output, atomic revert on failure
+- [x] Drift ledger entries written for unparseable requirements and placeholders
+- [x] All 5 VAs passing (VA-140-001 through VA-140-005)
+- [x] `just lint` clean on modified files
+- [x] `just pylint-files` clean on modified files
 
 ## 5. Verification
 
@@ -74,14 +74,14 @@ Commands: `just test`, `just lint`, `just pylint-files spec_driver/migrations/sp
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 4.1 | Create migration module with frozen-local constants + transform | | Core logic |
-| [ ] | 4.2 | Implement guard (block-already-present detection) | [P] | After 4.1 |
-| [ ] | 4.3 | Implement dry-run mode (preview proposed block) | [P] | After 4.1 |
-| [ ] | 4.4 | Implement write mode with post-write validation + revert | | After 4.1 |
-| [ ] | 4.5 | Implement drift ledger entry creation | [P] | After 4.1 |
-| [ ] | 4.6 | Wire CLI command `admin migrate-requirements` | | After 4.1–4.5 |
-| [ ] | 4.7 | Write tests covering all 5 VAs | | After 4.1–4.6 |
-| [ ] | 4.8 | Lint pass on all modified files | | After 4.7 |
+| [x] | 4.1 | Create migration module with frozen-local constants + transform | | Core logic |
+| [x] | 4.2 | Implement guard (block-already-present detection) | [P] | After 4.1 |
+| [x] | 4.3 | Implement dry-run mode (preview proposed block) | [P] | After 4.1 |
+| [x] | 4.4 | Implement write mode with post-write validation + revert | | After 4.1 |
+| [x] | 4.5 | Implement drift ledger entry creation | [P] | After 4.1 |
+| [x] | 4.6 | Wire CLI command `admin migrate-requirements` | | After 4.1–4.5 |
+| [x] | 4.7 | Write tests covering all 5 VAs | | 24 + 2 lockstep |
+| [x] | 4.8 | Lint pass on all modified files | | Ruff clean, pylint 9.79 |
 
 ### Task Details
 
@@ -124,22 +124,25 @@ Commands: `just test`, `just lint`, `just pylint-files spec_driver/migrations/sp
 
 | Risk | Mitigation | Status |
 |------|------------|--------|
-| Frozen regex drifts from runtime parser | Lockstep test comparing frozen vs `parser._REQUIREMENT_LINE` pattern string | |
-| Interactive prompts not testable | Non-interactive core; interactive layer thin and tested via mock stdin | |
-| Drift ledger ID collision | Sequential allocation from max existing DL-NNN | |
+| Frozen regex drifts from runtime parser | Lockstep test comparing frozen vs `parser._REQUIREMENT_LINE` pattern string | mitigated |
+| Interactive prompts not testable | Non-interactive core; interactive layer thin and tested via mock stdin | deferred |
+| Drift ledger ID collision | Sequential allocation from max existing DL-NNN | mitigated |
 
 ## 9. Decisions & Outcomes
 
-- Folder named `spec_requirements/` (no version prefix) — not a batch step, orchestrator skips it silently.
-- Interactive flow deferred to thin CLI layer (task 4.6). Migration module is pure transform + I/O.
-- Non-interactive first: get transform/dry-run/write working, add interactive review after core works.
+- Folder named `spec_requirements/` (no version prefix) — not a batch step, orchestrator skips it silently. DR-140 tension ("discovered by orchestrator") resolved: organization without discovery.
+- Lockstep test placed in `supekku/scripts/lib/requirements/parser_lockstep_test.py` — import-linter contract forbids supekku imports from `spec_driver.migrations.*`.
+- `_report_result()` extracted from CLI command to stay under pylint too-many-locals threshold.
+- Interactive review flow (accept/edit/skip/quit) deferred — VAs don't require it, core transform is solid.
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- Import-linter `Migrations isolation` contract covers ALL files under `spec_driver.migrations.*` including tests. Test files cannot import from `supekku` — cross-cutting tests must live outside the package.
+- `_is_requirement_like_line()` in the migration module recreates the detection regexes locally. Not ideal but necessary for isolation.
+- Block insertion logic (`_insert_block`) works correctly with existing blocks between frontmatter and first heading — block is appended after them.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes in notes.md
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (26/26 tests, 5678 regression)
+- [x] Hand-off notes in notes.md

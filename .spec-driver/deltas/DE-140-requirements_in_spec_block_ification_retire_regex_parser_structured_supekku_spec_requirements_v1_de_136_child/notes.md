@@ -135,3 +135,49 @@ DE-140 implements `supekku:spec.requirements@v1` — structured YAML blocks repl
 - DEC-140-14: template emits *empty* requirements block, not sample FR-001.
 - P02's `_records_from_frontmatter()` is still importable (not deleted) for backward compatibility with existing tests, but new code should use `records_from_spec()`.
 
+## P04 — Migration
+
+### Done
+
+- **Task 4.1**: `spec_driver/migrations/spec_requirements/migration.py` — frozen-local constants (marker, schema, lifecycle values, kind aliases, `_REQUIREMENT_LINE` regex), `_parse_requirements()`, `_render_block()`, `_insert_block()`, `migrate_spec()` (pure transform), `apply_migration()` (file I/O + post-write validation + revert).
+- **Task 4.2**: `has_requirements_block()` guard — refuses if block already present.
+- **Task 4.3**: Dry-run mode via `apply_migration(..., dry_run=True)` — returns result without writing.
+- **Task 4.4**: Write mode with post-write validation. `_validate_written_block()` checks block parseable, spec field correct, requirements array present. On failure: atomic revert to original content.
+- **Task 4.5**: `write_drift_ledger()` creates DL-NNN files with sequential ID allocation. Drift kinds: `requirement_unparseable`, `description_placeholder`, `acceptance_placeholder`.
+- **Task 4.6**: `spec_driver/presentation/cli/admin/migrate_requirements.py` — wired as `spec-driver admin migrate-requirements <SPEC-ID> [--dry-run]`. Registered in `supekku/cli/admin.py`.
+- **Task 4.7**: 24 tests in `migration_test.py` + 2 lockstep tests in `parser_lockstep_test.py`. All 5 VAs covered.
+- **Task 4.8**: Ruff clean. Pylint 9.79/10 (only `import-outside-toplevel` — established CLI pattern).
+
+### Verification
+
+- 26/26 tests passing. 5678/5678 full regression passing.
+- Ruff: zero warnings.
+- Pylint: no new messages beyond established CLI import pattern.
+- Import-linter: all 3 contracts KEPT (Migrations isolation verified).
+- Dry-run tested on real corpus (PROD-004): 10 requirements correctly detected.
+
+### Adaptations
+
+- **Folder naming**: Used `spec_requirements/` (no version prefix) instead of DR-140's `v0N_spec_requirements/`. The batch orchestrator's folder pattern (`v<M>_<m>_<p>_<N>_<slug>`) would have forced a `step` instance, but this is NOT a batch step. Non-matching name means orchestrator silently skips.
+- **Lockstep test location**: Moved to `supekku/scripts/lib/requirements/parser_lockstep_test.py` because import-linter's `Migrations isolation` contract forbids supekku imports from `spec_driver.migrations.*` — test importing the runtime parser pattern would break the contract.
+- **Interactive flow deferred**: DR-140 §6 describes full interactive review (accept/edit/skip/quit). P04 implements non-interactive core (transform + dry-run + write). VAs don't require interactive flow. Interactive review can be added to the CLI layer later.
+- **`_report_result()` extracted** from CLI command to stay under pylint's too-many-locals threshold.
+
+### Status
+
+- Committed: `5045d42c`
+- Phase sheet + code committed together per doctrine.
+- Full regression: 5678 passed, 0 failures.
+
+### Worktree State
+
+- Clean for DE-140. Only pre-existing `flake.nix` modification remains.
+- All `.spec-driver` changes committed promptly per doctrine.
+
+### Advice for P05
+
+- P05 (Strict Flip & Integration) depends on P02 + P03 + P04 — all now complete.
+- P05 needs: strict-mode parser behavior (no fallback), operational guard blocking schema_version bump on unmigrated files, E2E tests, VH-001/VH-002 attestation.
+- Migration lockstep test now exists at `supekku/scripts/lib/requirements/parser_lockstep_test.py` — if runtime parser regex changes, this test will catch the drift.
+- Interactive flow for migration command is thin CLI work if wanted — core transform logic is already solid.
+

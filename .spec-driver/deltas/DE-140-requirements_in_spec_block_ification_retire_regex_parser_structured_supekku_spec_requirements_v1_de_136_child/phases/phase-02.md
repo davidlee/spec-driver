@@ -33,16 +33,16 @@ Wire `extract_spec_requirements()` into the requirement parser so block-sourced 
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `records_from_spec()` public API exists in parser.py
-- [ ] Block-first path: block present → records from block, no regex
-- [ ] Regex fallback: no block → existing regex path
-- [ ] `source_kind` set to `"block"` or `"prose"` per path
-- [ ] Breakout metadata merge runs regardless of source
-- [ ] RequirementRecord field mapping correct (lifecycle→status, kind canonicalized, UID derived)
-- [ ] Registry calls `records_from_spec()` instead of `_records_from_frontmatter()`
-- [ ] All 8 VTs passing (VT-140-009 through -014, -025, -026)
-- [ ] Existing requirement tests still pass (regression)
-- [ ] `just lint` clean on modified files
+- [x] `records_from_spec()` public API exists in parser.py
+- [x] Block-first path: block present → records from block, no regex
+- [x] Regex fallback: no block → existing regex path
+- [x] `source_kind` set to `"block"` or `"prose"` per path
+- [x] Breakout metadata merge runs regardless of source
+- [x] RequirementRecord field mapping correct (lifecycle→status, kind canonicalized, UID derived)
+- [x] Registry calls `records_from_spec()` instead of `_records_from_frontmatter()`
+- [x] All 8 VTs passing (VT-140-009 through -014, -025, -026)
+- [x] Existing requirement tests still pass (regression)
+- [x] `just lint` clean on modified files
 
 ## 5. Verification
 
@@ -69,12 +69,12 @@ Commands: `just test`, `just lint`, `just pylint-files supekku/scripts/lib/requi
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 2.1 | Add `records_from_spec()` to parser.py — block-first with regex fallback | | Core change |
-| [ ] | 2.2 | Wire registry.py to call `records_from_spec()` | | After 2.1 |
-| [ ] | 2.3 | Write parser tests (VT-140-009, -010, -011, -012, -013, -014) | | After 2.1 |
-| [ ] | 2.4 | Write edge case tests (VT-140-025, -026) | | After 2.1 |
-| [ ] | 2.5 | Regression check — existing tests pass | | After all |
-| [ ] | 2.6 | Lint pass on modified files | | After all |
+| [x] | 2.1 | Add `records_from_spec()` to parser.py — block-first with regex fallback | | Core change |
+| [x] | 2.2 | Wire registry.py to call `records_from_spec()` | | After 2.1 |
+| [x] | 2.3 | Write parser tests (VT-140-009, -010, -011, -012, -013, -014) | | After 2.1 |
+| [x] | 2.4 | Write edge case tests (VT-140-025, -026) | | After 2.1 |
+| [x] | 2.5 | Regression check — existing tests pass | | After all |
+| [x] | 2.6 | Lint pass on modified files | | After all |
 
 ### Task Details
 

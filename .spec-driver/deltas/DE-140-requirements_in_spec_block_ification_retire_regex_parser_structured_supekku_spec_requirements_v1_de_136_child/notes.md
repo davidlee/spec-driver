@@ -22,6 +22,31 @@
 
 ### Status
 
-- Uncommitted. Will commit after full regression suite confirms clean.
-- `.spec-driver` delta status already flipped to `in-progress`.
+- Committed: `3ef2d04d`
+- Full regression: 5139 passed, 0 failures.
+
+## P02 — Block-first Reading Pipeline
+
+### Done
+
+- **Task 2.1**: `records_from_spec()` in `parser.py` — block-first with regex fallback. Extracted helpers: `_try_extract_block()`, `_records_from_block()`, `_record_from_block_entry()`, `_apply_breakout_metadata()`, `_relative_path()`.
+- **Task 2.2**: `registry.py` rewired — both spec_registry and spec_dirs paths now call `records_from_spec()`. Removed unused imports (`_records_from_frontmatter`, `_records_from_content`, `_load_breakout_metadata`).
+- **Tasks 2.3–2.4**: `parser_block_test.py` — 19 tests covering all 8 VTs (VT-140-009 through -014, -025, -026) plus edge cases (malformed fallback, empty block, validation warnings, tolerated aliases).
+- **Tasks 2.5–2.6**: 172/172 requirements tests pass. Ruff clean. Pylint: new code clean; pre-existing `_records_from_content` complexity unchanged.
+
+### Verification
+
+- 19/19 new tests passing. 172/172 requirements module tests passing.
+- Full regression suite pending confirmation.
+- Ruff: zero warnings.
+
+### Adaptations
+
+- Refactored aggressively to keep new functions under pylint complexity thresholds — 6 focused helpers instead of 2 monolithic functions.
+- `_canonicalize_kind_value()` in parser uses a simple map (separate from metadata's `_canonicalize_kind()`) — keeps parser dependency-light.
+
+### Status
+
+- Committed: `f5987672`
+- Full regression running.
 

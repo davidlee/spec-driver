@@ -48,5 +48,63 @@
 ### Status
 
 - Committed: `f5987672`
-- Full regression running.
+- Full regression: pending (was clean at P01; requirements module 172/172 pass).
+
+## New Agent Instructions
+
+### Context
+
+DE-140 implements `supekku:spec.requirements@v1` — structured YAML blocks replacing regex-based requirement parsing. Part of DE-136 umbrella program.
+
+**Completed**: P01 (block infrastructure), P02 (reading pipeline).
+**Remaining**: P03, P04, P05. P03 and P04 can run in parallel. P05 depends on all three.
+
+### Required Reading
+
+1. **Delta**: `.spec-driver/deltas/DE-140-requirements_in_spec_block_ification_retire_regex_parser_structured_supekku_spec_requirements_v1_de_136_child/DE-140.md`
+2. **Design Revision**: `DR-140.md` in same directory — §7 (Validation & Strict Flip) for P03, §6 (Migration) for P04
+3. **IP**: `IP-140.md` in same directory — phase overview, VT assignments, dependency graph
+4. **This file** for P01/P02 execution context
+
+### Key Files (P01/P02 output — available for import)
+
+- `supekku/scripts/lib/blocks/spec_requirements.py` — `extract_spec_requirements()`, `render_spec_requirements_block()`, `REQUIREMENTS_MARKER`
+- `supekku/scripts/lib/blocks/spec_requirements_metadata.py` — `validate_spec_requirements()`, `SPEC_REQUIREMENTS_METADATA`
+- `supekku/scripts/lib/requirements/parser.py` — `records_from_spec()` (new public API)
+- `supekku/scripts/lib/requirements/registry.py` — already wired to `records_from_spec()`
+
+### P03 — Validation & Template (6 VTs)
+
+- **Scope**: Wire `_validate_spec_requirements_blocks()` in `WorkspaceValidator`, update `specs/creation.py` to emit empty block, update spec template
+- **DR reference**: DR-140 §7 (WorkspaceValidator Wiring)
+- **Key files to modify**: `supekku/scripts/lib/validation/validator.py`, `supekku/scripts/lib/specs/creation.py`, `supekku/templates/spec.md`
+- **VTs**: VT-140-015, -016, -019, -020, -022, -030
+- **Phase sheet**: needs creation via `spec-driver create phase`
+
+### P04 — Migration (5 VAs)
+
+- **Scope**: Interactive per-spec migration step in `spec_driver/migrations/`
+- **DR reference**: DR-140 §6 (Migration) — DEC-138-12 isolation constraint is critical
+- **Key constraint**: migration module imports only stdlib + `_helpers` + `_protocol` + pyyaml. Frozen-local constants. Zero supekku imports.
+- **VAs**: VA-140-001 through -005
+- **Phase sheet**: needs creation via `spec-driver create phase`
+
+### Relevant Memories
+
+- `mem.fact.spec-driver.status-enums` — canonical lifecycle enums
+- `mem.concept.spec-driver.requirement-lifecycle` — requirement lifecycle guidance
+- `mem.fact.yaml.strenum-serialization` — StrEnum .value at YAML boundaries
+- `mem.pattern.architecture.migration-principles` — migration isolation patterns from DE-125
+
+### Worktree State
+
+- Clean for DE-140. Only pre-existing `flake.nix` modification remains.
+- All `.spec-driver` changes committed promptly per doctrine.
+
+### Advice
+
+- P03 is simpler (validation wiring follows established patterns in `validator.py`). P04 is more complex (migration isolation, interactive flow, drift ledger).
+- For P04, study existing migration steps in `spec_driver/migrations/` before writing — the isolation constraint (DEC-138-12) is strict and easy to violate.
+- DEC-140-14: template emits *empty* requirements block, not sample FR-001.
+- P02's `_records_from_frontmatter()` is still importable (not deleted) for backward compatibility with existing tests, but new code should use `records_from_spec()`.
 

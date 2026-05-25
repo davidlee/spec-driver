@@ -366,6 +366,11 @@ class WorkspaceValidator:
         self._error(spec.id, f"spec.requirements block extraction failed: {exc}")
         continue
       if block is None:
+        if self.strict:
+          self._error(
+            spec.id,
+            "spec.requirements block missing (strict mode)",
+          )
         continue
       for err in SPEC_REQUIREMENTS_VALIDATOR.validate(
         block.data,
@@ -815,4 +820,28 @@ def validate_workspace(
   return validator.validate()
 
 
-__all__ = ["ValidationIssue", "WorkspaceValidator", "validate_workspace"]
+def check_requirements_migration_complete(
+  workspace: Workspace,
+) -> list[str]:
+  """Return IDs of specs/prods missing a ``spec.requirements`` block.
+
+  Used as an operational guard (DEC-140-13): the strict flip must not
+  proceed while any spec/prod artifact lacks a requirements block.
+  """
+  unmigrated: list[str] = []
+  for spec in workspace.specs.all_specs():
+    try:
+      block = extract_spec_requirements(spec.body)
+    except ValueError:
+      block = None
+    if block is None:
+      unmigrated.append(spec.id)
+  return unmigrated
+
+
+__all__ = [
+  "ValidationIssue",
+  "WorkspaceValidator",
+  "check_requirements_migration_complete",
+  "validate_workspace",
+]

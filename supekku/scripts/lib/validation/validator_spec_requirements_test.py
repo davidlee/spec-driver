@@ -1,4 +1,4 @@
-"""Tests for spec requirements block validation in WorkspaceValidator (DE-140 P03)."""
+"""Spec requirements block validation in WorkspaceValidator (DE-140)."""
 
 from __future__ import annotations
 
@@ -18,7 +18,10 @@ from supekku.scripts.lib.core.paths import (
 )
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.test_base import RepoTestCase
-from supekku.scripts.lib.validation.validator import validate_workspace
+from supekku.scripts.lib.validation.validator import (
+  check_requirements_migration_complete,
+  validate_workspace,
+)
 from supekku.scripts.lib.workspace import Workspace
 
 
@@ -359,3 +362,183 @@ class SpecRequirementsValidationTest(RepoTestCase):
       if i.artifact == "SPEC-809" and i.level == "error"
     ]
     assert len(req_errors) == 0
+
+
+class StrictMissingBlockTest(RepoTestCase):
+  """VT-140-017: strict mode — missing block → error."""
+
+  def _create_repo(self):
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def _write_spec_without_block(
+    self,
+    root,
+    spec_id: str,
+    *,
+    kind: str = "spec",
+  ) -> None:
+    if kind == "prod":
+      spec_dir = root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR / f"{spec_id}-sample"
+    else:
+      spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter: dict[str, Any] = {
+      "id": spec_id,
+      "slug": "sample",
+      "name": f"Sample {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": kind,
+    }
+    if kind == "spec":
+      frontmatter["category"] = "assembly"
+      frontmatter["c4_level"] = "component"
+    body = f"# {spec_id}\n\nNo requirements block here.\n"
+    dump_markdown_file_update(spec_path, frontmatter, body)
+
+  def test_strict_missing_block_errors(self) -> None:
+    """Strict mode: spec without requirements block produces error."""
+    root = self._create_repo()
+    self._write_spec_without_block(root, "SPEC-850")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
+    missing_errors = [
+      i for i in issues
+      if i.artifact == "SPEC-850"
+      and i.level == "error"
+      and "missing" in i.message.lower()
+    ]
+    assert len(missing_errors) >= 1
+
+  def test_non_strict_missing_block_no_error(self) -> None:
+    """Non-strict mode: spec without requirements block is tolerated."""
+    root = self._create_repo()
+    self._write_spec_without_block(root, "SPEC-851")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=False)
+    missing_errors = [
+      i for i in issues
+      if i.artifact == "SPEC-851"
+      and "missing" in i.message.lower()
+      and "spec.requirements" in i.message.lower()
+    ]
+    assert len(missing_errors) == 0
+
+  def test_strict_prod_missing_block_errors(self) -> None:
+    """Strict mode: PROD spec without block also errors."""
+    root = self._create_repo()
+    self._write_spec_without_block(root, "PROD-850", kind="prod")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
+    missing_errors = [
+      i for i in issues
+      if i.artifact == "PROD-850"
+      and i.level == "error"
+      and "missing" in i.message.lower()
+    ]
+    assert len(missing_errors) >= 1
+
+
+class OperationalGuardTest(RepoTestCase):
+  """VT-140-029: strict flip blocked when unmigrated files remain."""
+
+  def _create_repo(self):
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def _write_spec_with_block(self, root, spec_id: str) -> None:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter: dict[str, Any] = {
+      "id": spec_id,
+      "slug": "sample",
+      "name": f"Sample {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
+    }
+    block = render_spec_requirements_block(spec_id)
+    body = f"# {spec_id}\n\n{block}\n"
+    dump_markdown_file_update(spec_path, frontmatter, body)
+
+  def _write_spec_without_block(self, root, spec_id: str) -> None:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter: dict[str, Any] = {
+      "id": spec_id,
+      "slug": "sample",
+      "name": f"Sample {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
+    }
+    body = f"# {spec_id}\n\nNo block.\n"
+    dump_markdown_file_update(spec_path, frontmatter, body)
+
+  def test_all_migrated_returns_empty(self) -> None:
+    """Guard returns empty list when all specs have blocks."""
+    root = self._create_repo()
+    self._write_spec_with_block(root, "SPEC-900")
+    self._write_spec_with_block(root, "SPEC-901")
+    ws = Workspace(root)
+    unmigrated = check_requirements_migration_complete(ws)
+    assert unmigrated == []
+
+  def test_unmigrated_returns_ids(self) -> None:
+    """Guard returns IDs of specs without blocks."""
+    root = self._create_repo()
+    self._write_spec_with_block(root, "SPEC-900")
+    self._write_spec_without_block(root, "SPEC-901")
+    ws = Workspace(root)
+    unmigrated = check_requirements_migration_complete(ws)
+    assert "SPEC-901" in unmigrated
+    assert "SPEC-900" not in unmigrated
+
+  def test_no_specs_returns_empty(self) -> None:
+    """Guard returns empty list when workspace has no specs."""
+    root = self._create_repo()
+    ws = Workspace(root)
+    unmigrated = check_requirements_migration_complete(ws)
+    assert unmigrated == []
+
+  def test_malformed_block_counts_as_unmigrated(self) -> None:
+    """Spec with malformed requirements block is unmigrated."""
+    root = self._create_repo()
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-902-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-902.md"
+    frontmatter: dict[str, Any] = {
+      "id": "SPEC-902",
+      "slug": "sample",
+      "name": "Sample SPEC-902",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
+    }
+    body = (
+      "# SPEC-902\n\n"
+      f"```yaml {REQUIREMENTS_MARKER}\n"
+      "schema: [\n"
+      "  broken yaml\n"
+      "```\n"
+    )
+    dump_markdown_file_update(spec_path, frontmatter, body)
+    ws = Workspace(root)
+    unmigrated = check_requirements_migration_complete(ws)
+    assert "SPEC-902" in unmigrated

@@ -276,18 +276,33 @@ def _try_extract_block(
   body: str,
   spec_id: str,
   stats: SyncStats | None,
+  *,
+  strict: bool = False,
 ) -> SpecRequirementsBlock | None:
-  """Try block extraction; log and return None on failure."""
+  """Try block extraction; log and return None on failure.
+
+  When *strict*, extraction failure is an error (no regex fallback).
+  When tolerant, extraction failure is a warning and caller falls back.
+  """
   try:
     return extract_spec_requirements(body)
   except ValueError as exc:
-    logger.warning(
-      "Spec %s: malformed requirements block, falling back to regex: %s",
-      spec_id,
-      exc,
-    )
-    if stats:
-      stats.warnings += 1
+    if strict:
+      logger.error(
+        "Spec %s: malformed requirements block (strict — no fallback): %s",
+        spec_id,
+        exc,
+      )
+      if stats:
+        stats.warnings += 1
+    else:
+      logger.warning(
+        "Spec %s: malformed requirements block, falling back to regex: %s",
+        spec_id,
+        exc,
+      )
+      if stats:
+        stats.warnings += 1
     return None
 
 
@@ -315,10 +330,13 @@ def records_from_spec(
   repo_root: Path,
   *,
   stats: SyncStats | None = None,
+  strict: bool = False,
 ) -> Iterator[RequirementRecord]:
   """Extract requirements — block-first, regex fallback.
 
-  Public API replacing _records_from_frontmatter() for new callers.
+  When *strict* (post-flip): no block or extraction failure yields zero
+  records with no regex fallback.  When tolerant (pre-flip): extraction
+  failure falls back to regex.
   """
   data = getattr(frontmatter, "data", frontmatter)
   mapping = dict(data) if isinstance(data, Mapping) else {}
@@ -336,13 +354,15 @@ def records_from_spec(
     if stats:
       stats.warnings += 1
 
-  block = _try_extract_block(body, spec_id, stats)
+  block = _try_extract_block(body, spec_id, stats, strict=strict)
   breakout_meta = _load_breakout_metadata(spec_path)
 
   if block is not None:
     records = _records_from_block(
       spec_id, block, spec_path, repo_root, stats=stats
     )
+  elif strict:
+    return
   else:
     records = _records_from_content(
       spec_id, mapping, body, spec_path, repo_root, stats=stats

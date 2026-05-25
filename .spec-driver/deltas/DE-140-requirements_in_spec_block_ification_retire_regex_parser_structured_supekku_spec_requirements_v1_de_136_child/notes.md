@@ -181,3 +181,45 @@ DE-140 implements `supekku:spec.requirements@v1` — structured YAML blocks repl
 - Migration lockstep test now exists at `supekku/scripts/lib/requirements/parser_lockstep_test.py` — if runtime parser regex changes, this test will catch the drift.
 - Interactive flow for migration command is thin CLI work if wanted — core transform logic is already solid.
 
+## P05 — Strict Flip & Integration
+
+### Done
+
+- **Task 5.1**: `parser.py` — `records_from_spec()` gains `strict: bool = False` kwarg. `_try_extract_block()` gains `strict` kwarg. When strict + extraction failure: `logger.error()` (not warning), no regex fallback. When strict + no block: returns early, zero records.
+- **Task 5.2**: `validator.py` — `_validate_spec_requirements_blocks()`: when `self.strict` and `block is None`, emits error "spec.requirements block missing (strict mode)".
+- **Task 5.3**: `validator.py` — `check_requirements_migration_complete(workspace)` iterates all specs, returns IDs of those without valid requirements blocks. Malformed blocks count as unmigrated.
+- **Task 5.4**: `spec_driver/presentation/cli/admin/strict_flip_requirements.py` — `admin strict-flip-requirements` CLI command. Runs guard → if unmigrated, prints list + refuses (exit 3). If clean + `--dry-run`, reports ready. If clean, writes `[validation.strict_requirements] enabled = true` to workflow.toml.
+- **Task 5.5**: 8 parser strict tests (`parser_strict_test.py`) covering VT-140-021, -023, -024. 7 validator tests added to `validator_spec_requirements_test.py` covering VT-140-017 (3 tests) and VT-140-029 (4 tests). VT-140-018 already covered by P03 tests.
+- **Task 5.6**: Ruff clean. Pylint: no new messages beyond established patterns (import-outside-toplevel in CLI, too-many-arguments pre-existing in parser).
+
+### Verification
+
+- 8/8 parser strict tests passing. 18/18 validator spec requirements tests passing.
+- Full regression: 5189 passed, 0 failures.
+- Ruff: zero warnings.
+- Pylint: established patterns only (import-outside-toplevel in CLI per STD-001).
+
+### Design Decisions Made
+
+1. **Parser `strict` not auto-wired to config** — callers pass explicitly. The "flip" action is connecting config → registry → parser. This prevents runtime breakage on unmigrated workspaces.
+2. **Validator missing-block error gated on `self.strict`** — same gate as P03's content checks. Fires during `validate workspace --strict` or `validate file` with strict config.
+3. **Operational guard is a pure function** in `validator.py` — reusable by CLI command and potentially by validation pipeline.
+4. **Separate config section `[validation.strict_requirements]`** — `get_strict_map()` filters to artifact kinds only, so `spec_requirements` would be dropped. Separate section avoids touching the strict map machinery.
+5. **`SyncStats` has no `errors` field** — strict extraction failure increments `warnings` (log level is what distinguishes). Stats tracking is secondary to the zero-records behavior.
+
+### Adaptations
+
+- `get_strict_map()` in `config.py` uses `_registered_kinds()` to filter keys. Since `spec_requirements` is not an artifact kind, a separate config path (`[validation.strict_requirements]`) was used instead of modifying the kind-based strict map.
+- VT-140-018 was already fully tested by P03 (`test_strict_rejects_trimmed_empty_description`, `test_strict_rejects_blank_acceptance_criteria_items`, `test_strict_rejects_empty_acceptance_criteria_list`). No additional tests needed.
+
+### Status
+
+- Uncommitted. Phase sheet + code ready to commit.
+- `.spec-driver` changes pending commit with code per doctrine.
+
+### Follow-ups
+
+- **Config wiring**: Registry.sync() does not yet read `[validation.strict_requirements]` to pass `strict=True` to `records_from_spec()`. This is the actual "flip" — to be done after corpus migration completes.
+- **VH-140-001**: Interactive migration on real corpus — requires human attestation after running `admin migrate-requirements` on actual specs.
+- **VH-140-002**: Strict flip enforcement across corpus — requires human attestation after running `admin strict-flip-requirements` and confirming `validate workspace --strict` is clean.
+

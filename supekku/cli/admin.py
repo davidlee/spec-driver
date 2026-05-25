@@ -12,6 +12,9 @@ from spec_driver.presentation.cli.admin.migrate import migrate as migrate_cmd
 from spec_driver.presentation.cli.admin.migrate_requirements import (
   migrate_requirements as migrate_requirements_cmd,
 )
+from spec_driver.presentation.cli.admin.strict_flip_requirements import (
+  strict_flip_requirements as strict_flip_requirements_cmd,
+)
 from supekku.cli import backfill, compact, regenerate_templates, resolve
 
 app = typer.Typer(help="Workspace maintenance commands", no_args_is_help=True)
@@ -32,6 +35,10 @@ app.command(
   "migrate-requirements",
   help="Migrate prose requirements to structured block (DE-140).",
 )(migrate_requirements_cmd)
+app.command(
+  "strict-flip-requirements",
+  help="Activate strict requirements enforcement (DE-140, DEC-140-13).",
+)(strict_flip_requirements_cmd)
 
 
 @app.command()

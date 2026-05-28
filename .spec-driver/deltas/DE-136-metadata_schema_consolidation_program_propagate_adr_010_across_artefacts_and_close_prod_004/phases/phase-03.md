@@ -90,10 +90,10 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | Status | ID  | Description                                                              | Parallel? | Notes |
 | ------ | --- | ------------------------------------------------------------------------ | --------- | ----- |
 | [x]    | 3.1 | Confirm P03 entrance: foundations baseline + DE-138 closure receipt      | [ ]       | Confirmed 2026-05-22; baseline 9 issues (1 pre-existing, 8 audit-gate); DE-138 completed; DE-139 ready |
-| [ ]    | 3.2 | Drive DE-139 to `completed` (spec-kind; tech SPEC + PROD)                | [ ]       | DR-139 must author F-A PROD sub-table |
-| [ ]    | 3.3 | Confirm `workflow.toml` `[validation.strict].spec = true` flipped       | [ ]       | DE-139 close gate |
-| [ ]    | 3.4 | Drive DE-140 to `completed` (requirements-in-spec block-ification)       | [ ]       | Retire regex parser; `admin migrate-requirements` interactive |
-| [ ]    | 3.5 | Confirm `workflow.toml` `[validation.strict].requirement = true` flipped | [ ]       | DE-140 close gate |
+| [x]    | 3.2 | Drive DE-139 to `completed` (spec-kind; tech SPEC + PROD)                | [ ]       | Completed; 4 phases; audit deferred to DE-136 umbrella |
+| [x]    | 3.3 | Confirm `workflow.toml` `[validation.strict].spec = true` flipped       | [ ]       | Confirmed — `spec = true` + `schema_version spec = "0.10.0+003"` |
+| [x]    | 3.4 | Drive DE-140 to `completed` (requirements-in-spec block-ification)       | [ ]       | Completed; 5 phases; AUD-027 conformance audit completed |
+| [x]    | 3.5 | Confirm `workflow.toml` `[validation.strict].requirement = true` flipped | [ ]       | `[validation.strict_requirements]` flipped via DE-143 (bulk migration of 68 specs; separate config section per DEC-140-13 — requirements is feature-level, not kind-level) |
 | [ ]    | 3.6 | Drive DE-141 to `completed` (audit-kind; findings → block)               | [ ]       | F-C (`audit_window` optional) + F-D (per-finding outcome) honoured |
 | [ ]    | 3.7 | Confirm `workflow.toml` `[validation.strict].audit = true` flipped       | [ ]       | DE-141 close gate |
 | [ ]    | 3.8 | Drive DE-142 to `completed` (revision-kind; new metadata class)          | [ ]       | F-F coordination with DE-118 closed in DE-142 |
@@ -156,7 +156,9 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ### Sibling closure receipts
 
-_(one line per sibling as each completes)_
+- **DE-139** completed 2026-05-25; 4 phases; `[validation.strict].spec = true` flipped; audit deferred to DE-136 umbrella close
+- **DE-140** completed 2026-05-28; 5 phases; AUD-027 conformance audit (5 findings, all dispositioned); strict requirements flip deferred → DE-143
+- **DE-143** completed 2026-05-28; bulk migration of 68 specs to `spec.requirements@v1` blocks; `[validation.strict_requirements]` flipped; 25 drift ledgers (DL-050..DL-074)
 
 ## 11. Wrap-up Checklist
 

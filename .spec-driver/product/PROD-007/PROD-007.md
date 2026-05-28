@@ -12,6 +12,49 @@ guiding_principles: []
 assumptions: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-007
+requirements:
+  - id: FR-001
+    title: Users MUST be able to complete placeholder specs through guided agent workflow
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: System MUST preserve manually-created spec content during completion
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Users MUST be able to complete multiple specs in batch mode
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Users MUST be able to choose automation level for batch operations
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Batch operations MUST show clear progress and complete in reasonable time
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Interactive mode MUST minimize user questions
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-007 – agent tech spec backfill
 
 ```yaml supekku:spec.relationships@v1

@@ -214,8 +214,17 @@ DE-140 implements `supekku:spec.requirements@v1` — structured YAML blocks repl
 
 ### Status
 
-- Uncommitted. Phase sheet + code ready to commit.
-- `.spec-driver` changes pending commit with code per doctrine.
+- Committed: `f866f9cd`
+- Full regression: 5189 passed, 0 failures.
+
+### Human Verification
+
+- **VH-140-001** (Interactive migration on real corpus): **verified 2026-05-28**
+  - `uv run spec-driver admin migrate-requirements PROD-007` → 6 requirements migrated, 36 drift entries → DL-049
+  - Re-run correctly refused (idempotent guard: "already has a spec.requirements block — skipping")
+- **VH-140-002** (Strict flip enforcement across corpus): **verified 2026-05-28** (guard path)
+  - `uv run spec-driver admin strict-flip-requirements --dry-run` → correctly blocked on 70 unmigrated specs, exit 3
+  - Flip-path (writing config after full migration) deferred — requires corpus-wide migration campaign
 
 ### Follow-ups
 

@@ -4,7 +4,7 @@ slug: "140-requirements_in_spec_block_ification_retire_regex_parser_structured_s
 name: "IP-140 Phase 05 — Strict Flip & Integration"
 created: "2026-05-25"
 updated: "2026-05-25"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-140
 delta: DE-140
@@ -44,7 +44,7 @@ Wire strict-mode enforcement for spec requirements: parser stops regex fallback 
 - [x] Operational guard: `check_requirements_migration_complete()` returns unmigrated spec IDs
 - [x] Admin CLI command: `strict-flip-requirements` — runs guard, writes config if clean
 - [x] All 7 VTs passing (VT-140-017, -018, -021, -023, -024, -029)
-- [ ] VH-140-001 and VH-140-002 attestable
+- [x] VH-140-001 and VH-140-002 attestable
 - [x] `just lint` clean on modified files
 - [x] `just pylint-files` clean on modified files
 - [x] Full regression green
@@ -134,6 +134,6 @@ Commands: `just test`, `just lint`, `just pylint-files <modified files>`
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes in notes.md
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Hand-off notes in notes.md

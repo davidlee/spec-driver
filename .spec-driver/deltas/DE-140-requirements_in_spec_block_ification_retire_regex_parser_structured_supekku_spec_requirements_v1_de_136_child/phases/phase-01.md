@@ -4,7 +4,7 @@ slug: "140-requirements_in_spec_block_ification_retire_regex_parser_structured_s
 name: "IP-140 Phase 01 — Block Infrastructure"
 created: "2026-05-23"
 updated: "2026-05-23"
-status: draft
+status: completed
 kind: phase
 plan: IP-140
 delta: DE-140
@@ -133,6 +133,6 @@ Commands: `just test`, `just lint`, `just pylint-files supekku/scripts/lib/block
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to P02/P03/P04
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Hand-off notes to P02/P03/P04

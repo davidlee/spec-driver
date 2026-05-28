@@ -204,13 +204,16 @@ class TestMigrateSpec:
     assert not result.changed
     assert result.requirements_count == 0
 
-  def test_no_requirements_no_change(self):
+  def test_no_requirements_inserts_empty_block(self):
     text = (
       "---\nid: X\n---\n\n"
       "# Heading\n\nNo requirements here.\n"
     )
     result = migrate_spec("X", text)
-    assert not result.changed
+    assert result.changed
+    assert result.requirements_count == 0
+    assert "supekku:spec.requirements@v1" in result.text
+    assert "requirements: []" in result.text
 
 
 # ---------------------------------------------------------------------------

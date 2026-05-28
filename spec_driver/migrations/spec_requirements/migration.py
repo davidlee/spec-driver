@@ -291,11 +291,6 @@ def migrate_spec(
 
   _, body = split_frontmatter(text)
   parsed = _parse_requirements(body)
-  if not parsed:
-    return MigrationResult(
-      spec_id=spec_id, text=text, changed=False,
-      requirements_count=0,
-    )
 
   block = _render_block(spec_id, parsed)
   new_text = _insert_block(text, block)

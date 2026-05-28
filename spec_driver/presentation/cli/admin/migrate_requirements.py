@@ -18,7 +18,7 @@ def _find_spec_file(repo_root: Path, spec_id: str) -> Path | None:
   sd_root = repo_root / ".spec-driver"
   if not sd_root.exists():
     return None
-  for search_dir in ("product", "specs/tech"):
+  for search_dir in ("product", "tech"):
     parent = sd_root / search_dir / spec_id
     candidate = parent / f"{spec_id}.md"
     if candidate.exists():
@@ -47,9 +47,10 @@ def _report_result(
       f"{len(result.drift)} drift entries → {dl_path}",
     )
   else:
+    noun = "requirements" if result.requirements_count else "empty block"
     typer.echo(
       f"migrate-requirements: {spec_id} — "
-      f"migrated {result.requirements_count} requirements",
+      f"migrated {result.requirements_count} {noun}",
     )
 
 
@@ -121,17 +122,11 @@ def migrate_requirements(
     )
     raise typer.Exit(EXIT_FAILURE) from exc
 
-  if not result.changed:
-    typer.echo(
-      f"migrate-requirements: {spec_id} — "
-      f"no prose requirements found",
-    )
-    raise typer.Exit(EXIT_SUCCESS)
-
   if dry_run:
+    noun = "requirements" if result.requirements_count else "empty block"
     typer.echo(
       f"migrate-requirements: {spec_id} — "
-      f"dry-run: {result.requirements_count} requirements "
+      f"dry-run: {result.requirements_count} {noun} "
       f"would be migrated",
     )
     typer.echo("")

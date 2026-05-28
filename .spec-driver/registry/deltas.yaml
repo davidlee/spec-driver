@@ -13857,3 +13857,49 @@ deltas:
       attributes:
         nature: "Lifecycle-truth doctrine \u2014 revision-change intent vs observed\
           \ reconciliation"
+  DE-143:
+    kind: delta
+    status: completed
+    name: Delta - Bulk migrate spec requirements blocks and flip strict enforcement
+    slug: bulk_migrate_spec_requirements_blocks_and_flip_strict_enforcement
+    updated: '2026-05-28'
+    path: .spec-driver/deltas/DE-143-bulk_migrate_spec_requirements_blocks_and_flip_strict_enforcement/DE-143.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      requirements:
+      - PROD-004.FR-002
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes: {}
+    - type: relates_to
+      target: DE-140
+      attributes: {}
+    - type: relates_to
+      target: ADR-010
+      attributes: {}
+    plan:
+      id: IP-143
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-143
+        delta: DE-143
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-002
+          dependencies: []
+        phases:
+        - id: IP-143-P01
+      phases:
+      - id: IP-143-P01
+        phase: IP-143-P01

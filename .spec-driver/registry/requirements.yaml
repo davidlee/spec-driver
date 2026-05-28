@@ -240,7 +240,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.FR-002:
     label: FR-002
@@ -263,7 +263,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.FR-003:
     label: FR-003
@@ -286,7 +286,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.FR-004:
     label: FR-004
@@ -305,7 +305,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.FR-005:
     label: FR-005
@@ -324,7 +324,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.NF-001:
     label: NF-001
@@ -347,7 +347,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-001.NF-002:
     label: NF-002
@@ -369,7 +369,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-001:
     label: FR-001
@@ -391,7 +391,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-002:
     label: FR-002
@@ -413,7 +413,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-003:
     label: FR-003
@@ -435,7 +435,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-004:
     label: FR-004
@@ -457,7 +457,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-005:
     label: FR-005
@@ -479,7 +479,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.FR-006:
     label: FR-006
@@ -502,7 +502,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.NF-001:
     label: NF-001
@@ -524,7 +524,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-002.NF-002:
     label: NF-002
@@ -546,7 +546,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-001:
     label: FR-001
@@ -569,7 +569,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-002:
     label: FR-002
@@ -592,7 +592,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-003:
     label: FR-003
@@ -615,7 +615,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-004:
     label: FR-004
@@ -639,7 +639,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-005:
     label: FR-005
@@ -663,7 +663,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-006:
     label: FR-006
@@ -687,7 +687,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-007:
     label: FR-007
@@ -711,7 +711,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.FR-008:
     label: FR-008
@@ -735,7 +735,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.NF-001:
     label: NF-001
@@ -759,7 +759,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-003.NF-002:
     label: NF-002
@@ -783,7 +783,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-003/PROD-003.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-001:
     label: FR-001
@@ -885,7 +885,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-002:
     label: FR-002
@@ -906,6 +906,7 @@ requirements:
     - DE-140
     - DE-141
     - DE-142
+    - DE-143
     verified_by: []
     coverage_evidence:
     - VT-CC-008
@@ -958,7 +959,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-003:
     label: FR-003
@@ -995,7 +996,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-004:
     label: FR-004
@@ -1018,7 +1019,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-005:
     label: FR-005
@@ -1041,7 +1042,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-006:
     label: FR-006
@@ -1069,7 +1070,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.FR-007:
     label: FR-007
@@ -1098,7 +1099,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.NF-001:
     label: NF-001
@@ -1121,7 +1122,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.NF-002:
     label: NF-002
@@ -1139,7 +1140,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-004.NF-003:
     label: NF-003
@@ -1157,7 +1158,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-004/PROD-004.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.FR-001:
     label: FR-001
@@ -1181,7 +1182,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.FR-002:
     label: FR-002
@@ -1204,7 +1205,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.FR-003:
     label: FR-003
@@ -1227,7 +1228,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.FR-004:
     label: FR-004
@@ -1250,7 +1251,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.NF-001:
     label: NF-001
@@ -1272,7 +1273,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-005.NF-002:
     label: NF-002
@@ -1294,7 +1295,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.FR-001:
     label: FR-001
@@ -1323,7 +1324,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.FR-002:
     label: FR-002
@@ -1347,7 +1348,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.FR-003:
     label: FR-003
@@ -1372,7 +1373,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.FR-004:
     label: FR-004
@@ -1401,7 +1402,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.FR-005:
     label: FR-005
@@ -1427,7 +1428,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.NF-001:
     label: NF-001
@@ -1451,7 +1452,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-006.NF-002:
     label: NF-002
@@ -1476,7 +1477,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-007.FR-001:
     label: FR-001
@@ -1641,7 +1642,7 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-008/PROD-008.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-008.FR-002:
     label: FR-002
@@ -1667,7 +1668,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-008/PROD-008.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-008.FR-003:
     label: FR-003
@@ -1693,7 +1694,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-008/PROD-008.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-008.NF-001:
     label: NF-001
@@ -1712,7 +1713,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-008/PROD-008.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-008.NF-002:
     label: NF-002
@@ -1731,7 +1732,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-008/PROD-008.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-009.FR-001:
     label: FR-001
@@ -1756,7 +1757,7 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-009/PROD-009.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-009.FR-002:
     label: FR-002
@@ -1784,7 +1785,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-009/PROD-009.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-009.FR-003:
     label: FR-003
@@ -1809,7 +1810,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-009/PROD-009.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-009.NF-001:
     label: NF-001
@@ -1828,7 +1829,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-009/PROD-009.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-009.NF-002:
     label: NF-002
@@ -1847,7 +1848,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-009/PROD-009.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-001:
     label: FR-001
@@ -1870,7 +1871,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-002:
     label: FR-002
@@ -1893,7 +1894,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-003:
     label: FR-003
@@ -1916,7 +1917,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-004:
     label: FR-004
@@ -1939,7 +1940,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-005:
     label: FR-005
@@ -1963,7 +1964,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-006:
     label: FR-006
@@ -1986,7 +1987,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-007:
     label: FR-007
@@ -2009,7 +2010,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-008:
     label: FR-008
@@ -2031,7 +2032,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-009:
     label: FR-009
@@ -2053,7 +2054,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-010:
     label: FR-010
@@ -2076,7 +2077,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-011:
     label: FR-011
@@ -2099,7 +2100,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-012:
     label: FR-012
@@ -2122,7 +2123,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-013:
     label: FR-013
@@ -2145,7 +2146,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-014:
     label: FR-014
@@ -2168,7 +2169,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-015:
     label: FR-015
@@ -2190,7 +2191,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-016:
     label: FR-016
@@ -2216,7 +2217,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.FR-017:
     label: FR-017
@@ -2242,7 +2243,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.NF-001:
     label: NF-001
@@ -2264,7 +2265,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.NF-002:
     label: NF-002
@@ -2286,7 +2287,7 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-010.NF-003:
     label: NF-003
@@ -2309,7 +2310,7 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-001:
     label: FR-001
@@ -2332,7 +2333,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-002:
     label: FR-002
@@ -2355,7 +2356,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-003:
     label: FR-003
@@ -2377,7 +2378,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-004:
     label: FR-004
@@ -2399,7 +2400,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-005:
     label: FR-005
@@ -2421,7 +2422,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-006:
     label: FR-006
@@ -2443,7 +2444,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-007:
     label: FR-007
@@ -2465,7 +2466,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.FR-008:
     label: FR-008
@@ -2487,7 +2488,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.NF-001:
     label: NF-001
@@ -2509,7 +2510,7 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-011.NF-002:
     label: NF-002
@@ -2531,7 +2532,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-011/PROD-011.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-001:
     label: FR-001
@@ -2554,7 +2555,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-002:
     label: FR-002
@@ -2573,7 +2574,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-003:
     label: FR-003
@@ -2592,7 +2593,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-004:
     label: FR-004
@@ -2611,7 +2612,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-005:
     label: FR-005
@@ -2653,7 +2654,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-006:
     label: FR-006
@@ -2679,7 +2680,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-007:
     label: FR-007
@@ -2698,7 +2699,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-008:
     label: FR-008
@@ -2717,7 +2718,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-009:
     label: FR-009
@@ -2738,7 +2739,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-010:
     label: FR-010
@@ -2756,7 +2757,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-011:
     label: FR-011
@@ -2775,7 +2776,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-012:
     label: FR-012
@@ -2793,7 +2794,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-013:
     label: FR-013
@@ -2812,7 +2813,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-014:
     label: FR-014
@@ -2832,7 +2833,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-015:
     label: FR-015
@@ -2851,7 +2852,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-016:
     label: FR-016
@@ -2871,7 +2872,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-017:
     label: FR-017
@@ -2890,7 +2891,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.FR-018:
     label: FR-018
@@ -2909,7 +2910,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.NF-001:
     label: NF-001
@@ -2932,7 +2933,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.NF-002:
     label: NF-002
@@ -2951,7 +2952,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.NF-003:
     label: NF-003
@@ -2973,7 +2974,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.NF-004:
     label: NF-004
@@ -2991,7 +2992,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-012.NF-005:
     label: NF-005
@@ -3009,7 +3010,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-001:
     label: FR-001
@@ -3033,7 +3034,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-002:
     label: FR-002
@@ -3057,7 +3058,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-003:
     label: FR-003
@@ -3081,7 +3082,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-004:
     label: FR-004
@@ -3106,7 +3107,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-005:
     label: FR-005
@@ -3130,7 +3131,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-006:
     label: FR-006
@@ -3153,7 +3154,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.FR-007:
     label: FR-007
@@ -3176,7 +3177,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.NF-001:
     label: NF-001
@@ -3194,7 +3195,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-013.NF-002:
     label: NF-002
@@ -3212,7 +3213,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-013/PROD-013.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-001:
     label: FR-001
@@ -3236,7 +3237,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-002:
     label: FR-002
@@ -3260,7 +3261,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-003:
     label: FR-003
@@ -3284,7 +3285,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-004:
     label: FR-004
@@ -3307,7 +3308,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-005:
     label: FR-005
@@ -3331,7 +3332,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-006:
     label: FR-006
@@ -3356,7 +3357,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-007:
     label: FR-007
@@ -3379,7 +3380,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-008:
     label: FR-008
@@ -3404,7 +3405,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-009:
     label: FR-009
@@ -3427,7 +3428,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-010:
     label: FR-010
@@ -3450,7 +3451,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-011:
     label: FR-011
@@ -3474,7 +3475,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.FR-012:
     label: FR-012
@@ -3499,7 +3500,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.NF-001:
     label: NF-001
@@ -3518,7 +3519,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-014.NF-002:
     label: NF-002
@@ -3538,7 +3539,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-014/PROD-014.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.FR-001:
     label: FR-001
@@ -3562,7 +3563,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.FR-002:
     label: FR-002
@@ -3587,7 +3588,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.FR-003:
     label: FR-003
@@ -3611,7 +3612,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.FR-004:
     label: FR-004
@@ -3637,7 +3638,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.FR-005:
     label: FR-005
@@ -3663,7 +3664,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.NF-001:
     label: NF-001
@@ -3687,7 +3688,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-015.NF-002:
     label: NF-002
@@ -3711,7 +3712,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-001:
     label: FR-001
@@ -3736,7 +3737,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-002:
     label: FR-002
@@ -3761,7 +3762,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-003:
     label: FR-003
@@ -3781,7 +3782,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-004:
     label: FR-004
@@ -3805,7 +3806,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-005:
     label: FR-005
@@ -3829,7 +3830,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-006:
     label: FR-006
@@ -3854,7 +3855,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-007:
     label: FR-007
@@ -3873,7 +3874,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-008:
     label: FR-008
@@ -3898,7 +3899,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-009:
     label: FR-009
@@ -3922,7 +3923,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.FR-010:
     label: FR-010
@@ -3946,7 +3947,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.NF-001:
     label: NF-001
@@ -3966,7 +3967,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.NF-002:
     label: NF-002
@@ -3986,7 +3987,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   PROD-016.NF-003:
     label: NF-003
@@ -4009,7 +4010,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-016/PROD-016.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-001:
     label: FR-001
@@ -4037,7 +4038,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-002:
     label: FR-002
@@ -4061,7 +4062,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-003:
     label: FR-003
@@ -4084,7 +4085,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-004:
     label: FR-004
@@ -4108,7 +4109,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-005:
     label: FR-005
@@ -4145,7 +4146,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-006:
     label: FR-006
@@ -4178,7 +4179,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-007:
     label: FR-007
@@ -4202,7 +4203,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-008:
     label: FR-008
@@ -4224,7 +4225,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-009:
     label: FR-009
@@ -4252,7 +4253,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.FR-010:
     label: FR-010
@@ -4275,7 +4276,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.NF-001:
     label: NF-001
@@ -4298,7 +4299,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-110.NF-002:
     label: NF-002
@@ -4321,7 +4322,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-001:
     label: FR-001
@@ -4344,7 +4345,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-002:
     label: FR-002
@@ -4367,7 +4368,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-003:
     label: FR-003
@@ -4390,7 +4391,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-004:
     label: FR-004
@@ -4413,7 +4414,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-005:
     label: FR-005
@@ -4436,7 +4437,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-006:
     label: FR-006
@@ -4459,7 +4460,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.FR-007:
     label: FR-007
@@ -4482,7 +4483,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.NF-001:
     label: NF-001
@@ -4505,7 +4506,7 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-112.NF-002:
     label: NF-002
@@ -4528,7 +4529,7 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-001:
     label: FR-001
@@ -4546,7 +4547,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-002:
     label: FR-002
@@ -4564,7 +4565,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-003:
     label: FR-003
@@ -4582,7 +4583,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-004:
     label: FR-004
@@ -4600,7 +4601,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-005:
     label: FR-005
@@ -4618,7 +4619,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.FR-006:
     label: FR-006
@@ -4636,7 +4637,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.NF-001:
     label: NF-001
@@ -4654,7 +4655,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.NF-002:
     label: NF-002
@@ -4672,7 +4673,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-114.NF-003:
     label: NF-003
@@ -4690,7 +4691,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-116.NF-001:
     label: NF-001
@@ -4708,7 +4709,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-116.NF-002:
     label: NF-002
@@ -4726,7 +4727,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-116.NF-003:
     label: NF-003
@@ -4744,7 +4745,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-001:
     label: FR-001
@@ -4767,7 +4768,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-002:
     label: FR-002
@@ -4795,7 +4796,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-003:
     label: FR-003
@@ -4820,7 +4821,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-004:
     label: FR-004
@@ -4853,7 +4854,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-005:
     label: FR-005
@@ -4872,7 +4873,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-006:
     label: FR-006
@@ -4895,7 +4896,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-007:
     label: FR-007
@@ -4914,7 +4915,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-008:
     label: FR-008
@@ -4933,7 +4934,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.FR-009:
     label: FR-009
@@ -4956,7 +4957,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.NF-001:
     label: NF-001
@@ -4974,7 +4975,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.NF-002:
     label: NF-002
@@ -5003,7 +5004,7 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-122.NF-003:
     label: NF-003
@@ -5021,7 +5022,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-001:
     label: FR-001
@@ -5044,7 +5045,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-002:
     label: FR-002
@@ -5067,7 +5068,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-003:
     label: FR-003
@@ -5090,7 +5091,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-004:
     label: FR-004
@@ -5113,7 +5114,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-005:
     label: FR-005
@@ -5135,7 +5136,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-006:
     label: FR-006
@@ -5158,7 +5159,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-007:
     label: FR-007
@@ -5181,7 +5182,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-008:
     label: FR-008
@@ -5203,7 +5204,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.FR-009:
     label: FR-009
@@ -5225,7 +5226,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.NF-001:
     label: NF-001
@@ -5248,7 +5249,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.NF-002:
     label: NF-002
@@ -5271,7 +5272,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-124.NF-003:
     label: NF-003
@@ -5294,7 +5295,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-001:
     label: FR-001
@@ -5317,7 +5318,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-002:
     label: FR-002
@@ -5340,7 +5341,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-003:
     label: FR-003
@@ -5363,7 +5364,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-004:
     label: FR-004
@@ -5386,7 +5387,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-005:
     label: FR-005
@@ -5409,7 +5410,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.FR-006:
     label: FR-006
@@ -5432,7 +5433,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-125.NF-001:
     label: NF-001
@@ -5455,7 +5456,7 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.FR-001:
     label: FR-001
@@ -5477,7 +5478,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.FR-002:
     label: FR-002
@@ -5495,7 +5496,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.FR-003:
     label: FR-003
@@ -5513,11 +5514,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.NF-001:
     label: NF-001
-    title: '[Performance constraint with specific metrics]'
+    title:
+    - Performance constraint with specific metrics
     specs:
     - SPEC-128
     primary_spec: SPEC-128
@@ -5531,11 +5533,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.NF-002:
     label: NF-002
-    title: '[Scalability or resource requirement]'
+    title:
+    - Scalability or resource requirement
     specs:
     - SPEC-128
     primary_spec: SPEC-128
@@ -5549,11 +5552,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-128.NF-003:
     label: NF-003
-    title: '[Reliability or fault tolerance]'
+    title:
+    - Reliability or fault tolerance
     specs:
     - SPEC-128
     primary_spec: SPEC-128
@@ -5567,7 +5571,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.FR-001:
     label: FR-001
@@ -5589,7 +5593,7 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.FR-002:
     label: FR-002
@@ -5607,7 +5611,7 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.FR-003:
     label: FR-003
@@ -5625,11 +5629,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.NF-001:
     label: NF-001
-    title: '[Performance constraint with specific metrics]'
+    title:
+    - Performance constraint with specific metrics
     specs:
     - SPEC-129
     primary_spec: SPEC-129
@@ -5643,11 +5648,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.NF-002:
     label: NF-002
-    title: '[Scalability or resource requirement]'
+    title:
+    - Scalability or resource requirement
     specs:
     - SPEC-129
     primary_spec: SPEC-129
@@ -5661,11 +5667,12 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec
   SPEC-129.NF-003:
     label: NF-003
-    title: '[Reliability or fault tolerance]'
+    title:
+    - Reliability or fault tolerance
     specs:
     - SPEC-129
     primary_spec: SPEC-129
@@ -5679,5 +5686,5 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
-    source_kind: prose
+    source_kind: block
     source_type: spec

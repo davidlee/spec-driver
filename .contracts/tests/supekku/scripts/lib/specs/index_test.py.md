@@ -34,7 +34,6 @@ Test SpecIndexBuilder functionality.
 - `test_rebuild_with_language_symlinks_go(self) -> None`: Test rebuild creates by-language symlinks for Go sources.
 - `test_rebuild_with_language_symlinks_python(self) -> None`: Test rebuild creates by-language symlinks for Python sources.
 - `test_rebuild_with_mixed_language_sources(self) -> None`: Test rebuild handles specs with multiple language sources.
-- `test_rebuild_with_package_symlinks(self) -> None`: Test rebuild creates package-based symlinks.
 - `test_rebuild_with_slug_symlinks(self) -> None`: Test rebuild creates slug-based symlinks.
 - `_create_spec_with_frontmatter(self, spec_id, frontmatter) -> Path`: Create a spec directory and file with given frontmatter.
 

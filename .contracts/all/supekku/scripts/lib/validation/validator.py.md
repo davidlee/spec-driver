@@ -10,6 +10,10 @@ Validation utilities for workspace and artifact consistency.
 
 ## Functions
 
+- `check_requirements_migration_complete(workspace) -> list[str]`: Return IDs of specs/prods missing a ``spec.requirements`` block.
+
+Used as an operational guard (DEC-140-13): the strict flip must not
+proceed while any spec/prod artifact lacks a requirements block.
 - `validate_workspace(workspace, strict) -> list[ValidationIssue]`: Validate the given workspace and return a list of validation issues.
 
 ## Classes
@@ -29,6 +33,7 @@ Validates workspace consistency and artifact relationships.
 - `_block_issue(self, artifact, block_label, err) -> None`: Dispatch a block ValidationError into a ValidationIssue at its severity.
 - `_build_conformance_audit_index(self) -> dict[Tuple[str, list[tuple[Tuple[str, dict]]]]]`: Index completed conformance audits by delta_ref.
 - `_check_finding_id_collisions(self, delta_id, audits) -> None`: Warn if finding IDs collide across multi-audit union.
+- `_check_strict_content_requirements(self, artifact, data) -> None`: Reject trimmed-empty description and blank acceptance_criteria (VT-140-022).
 - `_error(self, artifact, message) -> None`
 - `_info(self, artifact, message) -> None`
 - `_validate_audit_disposition(self, audit_registry) -> None`: Validate finding dispositions in completed audits.
@@ -62,6 +67,14 @@ attempts ``model_cls(**fm)``.  Failures emit a warning using *label*
 - `_validate_phase_frontmatter(self, fm, artifact) -> None`: Validate canonical phase frontmatter fields via PhaseSheet model.
 - `_validate_phase_statuses(self) -> None`: Validate phase frontmatter statuses across all delta bundles. - -----------------------------------------------------------
 - `_validate_single_phase(self, phase_file, valid_statuses) -> None`: Validate a single phase file's frontmatter and structure.
+- `_validate_spec_blocks(self) -> None`: Validate per-spec concerns, hypotheses, and decisions block schemas.
+
+Mirrors ``_validate_delta_blocks`` for spec-kind artefacts.
+- `_validate_spec_requirements_blocks(self) -> None`: Validate per-spec requirements block schemas (DE-140 P03).
+
+Follows ``_validate_spec_blocks`` pattern: extract → schema validate →
+semantic checks. Adds spec field cross-validation and strict-mode
+trimmed-empty/blank-item rejection per DR-140 §7.
 - `_validate_spec_taxonomy(self) -> None`: Warn when tech specs are missing taxonomy or have inconsistent values.
 
 Scoped to tech specs (SPEC-*) only. PROD specs are excluded.

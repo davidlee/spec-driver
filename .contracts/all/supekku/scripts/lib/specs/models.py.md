@@ -21,9 +21,9 @@ In-memory representation of a specification artefact.
 - @property `informed_by(self) -> list[str]`: Return list of ADR IDs that inform this spec.
 - @property `kind(self) -> str`: Return the kind/type of this spec (e.g., 'spec', 'prod').
 - @property `name(self) -> str`: Return human-readable name for this spec.
-- @property `packages(self) -> list[str]`: Return list of package paths associated with this spec.
 - @property `relations(self) -> list[dict[Tuple[str, Any]]]`: Return list of relation dicts from frontmatter.
 - @property `slug(self) -> str`: Return URL-friendly slug for this spec.
+- @property `sources(self) -> list[dict[Tuple[str, Any]]]`: Return list of source dicts from frontmatter.
 - @property `status(self) -> str`: Return the status of this spec (e.g., 'draft', 'active').
 - @property `tags(self) -> list[str]`: Return list of tags for this spec.
 - `to_dict(self, root) -> dict[Tuple[str, <BinOp>]]`: Convert to dictionary for JSON serialization.

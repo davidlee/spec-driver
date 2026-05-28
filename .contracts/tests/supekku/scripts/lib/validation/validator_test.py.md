@@ -123,6 +123,20 @@ DE-129 §1.7: Zero-entry hint in _format_requirements_summary.
 - `test_zero_entries_with_hint(self) -> None`: When all counts are 0 and hint is True, show sync suggestion.
 - `test_zero_entries_without_hint(self) -> None`: When all counts are 0 and hint is False, return empty.
 
+### TestSpecBlockStrictEnforcementVTDE139FLIP001
+
+VT-DE139-FLIP-001 row 2 — strict-on-validate enforcement post-flip.
+
+Covers PROD-004.FR-002: under ``--strict``, a spec concerns block missing
+the required ``spec`` field surfaces as an error from the workspace
+validator — proving the per-spec block validator is invoked.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_missing_required_field_in_concerns_errors_under_strict(self) -> None`
+
 ### TestUnresolvedReferenceValidation
 
 VT-097-unresolved: unresolved frontmatter references detected.

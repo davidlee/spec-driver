@@ -51,3 +51,22 @@ Args:
 Returns:
   - old_error: None if valid, error message if invalid
   - new_errors: List of error strings from new validator
+
+### SpecTaxonomyStrictTest
+
+DE-139: category strict enum + c4_level tolerated unknown.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_c4_level_invalid_rejected(self)`
+- `test_c4_level_unknown_tolerated(self)`: unknown accepted (0 errors); produces warning.
+- `test_c4_level_valid_values(self)`
+- `test_category_absent_accepted(self)`: Optional field — absent is fine.
+- `test_category_assembly_accepted(self)`
+- `test_category_invalid_rejected(self)`
+- `test_category_unit_accepted(self)`
+- `test_category_unknown_rejected_no_tolerated(self)`
+- `test_category_unknown_tolerated(self)`: unknown accepted (0 errors); produces warning.
+- `_validate(self, data) -> list[str]`

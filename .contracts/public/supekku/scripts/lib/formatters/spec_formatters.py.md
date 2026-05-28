@@ -7,13 +7,8 @@ Formatters take Spec objects and return formatted strings for display.
 
 ## Functions
 
-- `format_package_list(packages) -> str`: Format list of packages as comma-separated string.
-
-Args:
-  packages: List of package paths
-
-Returns:
-  Comma-separated string of packages
+- `format_c4_glyph(c4_level) -> str`: Return single-character C4 glyph for a level, or '—' if unknown/empty.
+- `format_sources_cell(sources) -> str`: Format sources as 'count × first-lang', or '—' if none.
 - `format_spec_details(spec, root) -> str`: Format spec details as multi-line string for display.
 
 Args:
@@ -36,11 +31,10 @@ Returns:
 Args:
   spec: Specification object to format
   include_path: Include file path instead of slug (default: False)
-  include_packages: Include package list (default: False)
   root: Repository root for relative path calculation (required if include_path=True)
 
 Returns:
-  Tab-separated string: "{id}\t{slug|path}[\t{packages}]"
+  Tab-separated string: "{id}\t{slug|path}"
 - `format_spec_list_json(specs) -> str`: Format specs as JSON array.
 
 Args:
@@ -48,15 +42,15 @@ Args:
 
 Returns:
   JSON string with structure: {"items": [...]}
-- `format_spec_list_table(specs, format_type, truncate, include_packages) -> str`: Format specs as table, JSON, or TSV.
+- `format_spec_list_table(specs, format_type, truncate) -> str`: Format specs as table, JSON, or TSV.
 
 Args:
   specs: List of Spec objects to format
   format_type: Output format (table|json|tsv)
   truncate: If True, truncate long fields to fit terminal width
-  include_packages: Include package list in output
   show_external: If True, show ext_id column after ID
   show_refs: If True, show refs column (count in table, pairs in TSV)
+  show_tags: If True, show tags column (opt-in per DEC-139-09)
 
 Returns:
   Formatted string in requested format

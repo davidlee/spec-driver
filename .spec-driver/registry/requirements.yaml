@@ -240,6 +240,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.FR-002:
     label: FR-002
     title: Agent Completes All YAML Blocks Without Manual Editing
@@ -261,6 +263,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.FR-003:
     label: FR-003
     title: Clarification Questions Limited to Critical Decisions
@@ -282,6 +286,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.FR-004:
     label: FR-004
     title: Spec Type Determines Section Content Adaptation
@@ -299,6 +305,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.FR-005:
     label: FR-005
     title: Validation Integrated Before Workflow Completion
@@ -316,6 +324,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.NF-001:
     label: NF-001
     title: First-Time User Experience Requires Minimal Cognitive Load
@@ -337,6 +347,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-001.NF-002:
     label: NF-002
     title: Registry Sync Success Rate >95% on First Attempt
@@ -357,6 +369,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-001:
     label: FR-001
     title: Agent Command Provides Complete Workflow Guidance
@@ -377,6 +391,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-002:
     label: FR-002
     title: Default Behavior Creates Complete Delta Bundle
@@ -397,6 +413,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-003:
     label: FR-003
     title: Users Can Provide Known Relationships Explicitly
@@ -417,6 +435,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-004:
     label: FR-004
     title: Agent Discovers and Suggests Additional Relationships
@@ -437,6 +457,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-005:
     label: FR-005
     title: Clear Error Messages Guide Users to Corrections
@@ -457,6 +479,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.FR-006:
     label: FR-006
     title: Delta Creation Includes Design Revision Artifact
@@ -478,6 +502,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.NF-001:
     label: NF-001
     title: First-Time Users Complete Delta Creation in Under 5 Minutes
@@ -498,6 +524,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-002.NF-002:
     label: NF-002
     title: Creation Success Rate Exceeds 95% on First Attempt
@@ -518,6 +546,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-001:
     label: FR-001
     title: System MUST enable creation of policies with unique POL-XXX identifiers
@@ -539,6 +569,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-002:
     label: FR-002
     title: 'System MUST support policy lifecycle statuses: draft, required, deprecated'
@@ -560,6 +592,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-003:
     label: FR-003
     title: System MUST enable creation of standards with unique STD-XXX identifiers
@@ -581,6 +615,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-004:
     label: FR-004
     title: 'System MUST support standard statuses: draft, required, default, deprecated
@@ -603,6 +639,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-005:
     label: FR-005
     title: System MUST provide CLI commands to list policies and standards with filtering
@@ -625,6 +663,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-006:
     label: FR-006
     title: System MUST provide CLI commands to display full policy/standard details
@@ -647,6 +687,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-007:
     label: FR-007
     title: System MUST support bidirectional cross-references between policies and
@@ -669,6 +711,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.FR-008:
     label: FR-008
     title: System MUST allow ADRs, specs, deltas, and other artifacts to reference
@@ -691,6 +735,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.NF-001:
     label: NF-001
     title: Policies and standards MUST use consistent template structure (Statement,
@@ -713,6 +759,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-003.NF-002:
     label: NF-002
     title: CLI commands for policies/standards MUST follow existing spec-driver UX
@@ -735,6 +783,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-003/PROD-003.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-001:
     label: FR-001
     title: System MUST validate frontmatter for all registered kinds using metadata
@@ -835,6 +885,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-002:
     label: FR-002
     title: System MUST enforce kind-specific required fields and constraints
@@ -906,6 +958,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-003:
     label: FR-003
     title: System MUST generate JSON Schema from frontmatter metadata definitions
@@ -941,6 +995,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-004:
     label: FR-004
     title: CLI MUST support `schema show frontmatter.{kind}` commands for all kinds
@@ -962,6 +1018,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-005:
     label: FR-005
     title: System MUST maintain backward compatibility during migration
@@ -983,6 +1041,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-006:
     label: FR-006
     title: System MUST support gradual per-call-site opt-in migration
@@ -1009,6 +1069,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.FR-007:
     label: FR-007
     title: Metadata definitions MUST support canonical/derived field classification
@@ -1036,6 +1098,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.NF-001:
     label: NF-001
     title: Validation behavior MUST match imperative validator (zero regressions)
@@ -1057,6 +1121,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.NF-002:
     label: NF-002
     title: JSON Schema generation MUST complete in <100ms per kind
@@ -1073,6 +1139,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-004.NF-003:
     label: NF-003
     title: Migration MUST not break existing code at any point
@@ -1089,6 +1157,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-004/PROD-004.md
+    source_kind: prose
+    source_type: spec
   PROD-005.FR-001:
     label: FR-001
     title: Leaf Python Package Identification
@@ -1111,6 +1181,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-005.FR-002:
     label: FR-002
     title: Deterministic File Ordering Within Packages
@@ -1132,6 +1204,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-005.FR-003:
     label: FR-003
     title: Sync Operation Package Support
@@ -1153,6 +1227,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-005.FR-004:
     label: FR-004
     title: File-to-Package Resolution
@@ -1174,6 +1250,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-005.NF-001:
     label: NF-001
     title: Git Diff Stability
@@ -1194,6 +1272,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-005.NF-002:
     label: NF-002
     title: Design Extensibility
@@ -1214,6 +1294,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
+    source_kind: prose
+    source_type: spec
   PROD-006.FR-001:
     label: FR-001
     title: System MUST create phase markdown files from template with valid canonical
@@ -1241,6 +1323,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.FR-002:
     label: FR-002
     title: System MUST automatically determine next phase number by examining existing
@@ -1263,6 +1347,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.FR-003:
     label: FR-003
     title: System MUST enhance delta display to show plan ID, phase count, and phase
@@ -1286,6 +1372,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.FR-004:
     label: FR-004
     title: System MUST auto-populate phase metadata including phase ID, plan ID, and
@@ -1313,6 +1401,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.FR-005:
     label: FR-005
     title: System MUST validate phase frontmatter schema (via PhaseSheet Pydantic
@@ -1337,6 +1427,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.NF-001:
     label: NF-001
     title: Phase creation command MUST complete in <2 seconds for plans with up to
@@ -1359,6 +1451,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-006.NF-002:
     label: NF-002
     title: Delta display MUST remain readable with up to 10 phases without truncation
@@ -1382,6 +1476,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
+    source_kind: prose
+    source_type: spec
   PROD-007.FR-001:
     label: FR-001
     title: Users MUST be able to complete placeholder specs through guided agent workflow
@@ -1403,6 +1499,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-007.FR-002:
     label: FR-002
     title: System MUST preserve manually-created spec content during completion
@@ -1424,6 +1522,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-007.FR-003:
     label: FR-003
     title: Users MUST be able to complete multiple specs in batch mode
@@ -1445,6 +1545,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-007.FR-004:
     label: FR-004
     title: Users MUST be able to choose automation level for batch operations
@@ -1462,6 +1564,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-007.NF-001:
     label: NF-001
     title: Batch operations MUST show clear progress and complete in reasonable time
@@ -1483,6 +1587,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-007.NF-002:
     label: NF-002
     title: Interactive mode MUST minimize user questions
@@ -1504,6 +1610,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-007/PROD-007.md
+    source_kind: block
+    source_type: spec
   PROD-008.FR-001:
     label: FR-001
     title: "The specs frontmatter and coverage block MUST be the authoritative record\
@@ -1533,6 +1641,8 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-008/PROD-008.md
+    source_kind: prose
+    source_type: spec
   PROD-008.FR-002:
     label: FR-002
     title: Every delta that changes requirement behaviour MUST provide an implementation
@@ -1557,6 +1667,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-008/PROD-008.md
+    source_kind: prose
+    source_type: spec
   PROD-008.FR-003:
     label: FR-003
     title: "Audits MUST surface observed behaviour against the spec coverage block\
@@ -1581,6 +1693,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-008/PROD-008.md
+    source_kind: prose
+    source_type: spec
   PROD-008.NF-001:
     label: NF-001
     title: Lifecycle updates MUST propagate through the registry within one sync cycle
@@ -1598,6 +1712,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-008/PROD-008.md
+    source_kind: prose
+    source_type: spec
   PROD-008.NF-002:
     label: NF-002
     title: Validation warnings about lifecycle drift MUST be actionable, surfacing
@@ -1615,6 +1731,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-008/PROD-008.md
+    source_kind: prose
+    source_type: spec
   PROD-009.FR-001:
     label: FR-001
     title: Specs MUST allow authors to declare baseline lifecycle statuses (`planned`,
@@ -1638,6 +1756,8 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-009/PROD-009.md
+    source_kind: prose
+    source_type: spec
   PROD-009.FR-002:
     label: FR-002
     title: "The lifecycle engine MUST surface evidence from deltas and audits alongside\
@@ -1664,6 +1784,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-009/PROD-009.md
+    source_kind: prose
+    source_type: spec
   PROD-009.FR-003:
     label: FR-003
     title: Validation MUST emit corrective warnings when overlays disagree and keep
@@ -1687,6 +1809,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-009/PROD-009.md
+    source_kind: prose
+    source_type: spec
   PROD-009.NF-001:
     label: NF-001
     title: Lifecycle projections MUST expose provenance (source artefact, timestamp,
@@ -1704,6 +1828,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-009/PROD-009.md
+    source_kind: prose
+    source_type: spec
   PROD-009.NF-002:
     label: NF-002
     title: Warning messages SHOULD be actionable within one hop (point to artefacts
@@ -1721,6 +1847,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-009/PROD-009.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-001:
     label: FR-001
     title: Standardize --json across list commands
@@ -1742,6 +1870,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-002:
     label: FR-002
     title: Add --json to show commands
@@ -1763,6 +1893,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-003:
     label: FR-003
     title: Add status filter to specs
@@ -1784,6 +1916,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-004:
     label: FR-004
     title: Multi-value filter support
@@ -1805,6 +1939,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-005:
     label: FR-005
     title: Reverse relationship queries
@@ -1827,6 +1963,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-006:
     label: FR-006
     title: Enum introspection
@@ -1848,6 +1986,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-007:
     label: FR-007
     title: Help text enhancement
@@ -1869,6 +2009,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-008:
     label: FR-008
     title: --machine-readable flag
@@ -1889,6 +2031,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-009:
     label: FR-009
     title: Pagination support
@@ -1909,6 +2053,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-010:
     label: FR-010
     title: Error message improvements
@@ -1930,6 +2076,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-011:
     label: FR-011
     title: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
@@ -1951,6 +2099,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-012:
     label: FR-012
     title: CLI MUST provide help command showing core concepts, workflows, and conventions
@@ -1972,6 +2122,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-013:
     label: FR-013
     title: Help system MUST distinguish between immutable (spec-driver core) and customizable
@@ -1993,6 +2145,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-014:
     label: FR-014
     title: CLI MUST support installing customizable help docs to project for user
@@ -2014,6 +2168,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-015:
     label: FR-015
     title: CLI MUST support per-file validation of frontmatter and YAML blocks
@@ -2034,6 +2190,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-016:
     label: FR-016
     title: 'CLI MUST accept intelligent variations of artifact IDs and keywords:'
@@ -2058,6 +2216,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.FR-017:
     label: FR-017
     title: 'CLI MUST provide edit command to open artifacts in $EDITOR:'
@@ -2082,6 +2242,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.NF-001:
     label: NF-001
     title: Token efficiency final validation
@@ -2102,6 +2264,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.NF-002:
     label: NF-002
     title: Agent workflow validation
@@ -2122,6 +2286,8 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-010.NF-003:
     label: NF-003
     title: Validate against UX research findings
@@ -2143,6 +2309,8 @@ requirements:
       status: verified
       kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-001:
     label: FR-001
     title: Remove Phase-01 Auto-Creation**
@@ -2164,6 +2332,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-002:
     label: FR-002
     title: Enable Phase Creation When No Phases Exist**
@@ -2185,6 +2355,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-003:
     label: FR-003
     title: Hook Installation System**
@@ -2205,6 +2377,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-004:
     label: FR-004
     title: Default Workflow Hooks**
@@ -2225,6 +2399,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-005:
     label: FR-005
     title: IP Automation Metadata Schema**
@@ -2245,6 +2421,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-006:
     label: FR-006
     title: Constitution Integration in Commands**
@@ -2265,6 +2443,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-007:
     label: FR-007
     title: Constitution Validation Tooling**
@@ -2285,6 +2465,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.FR-008:
     label: FR-008
     title: VCS Abstraction**
@@ -2305,6 +2487,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.NF-001:
     label: NF-001
     title: High Workflow Adoption**
@@ -2325,6 +2509,8 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-011.NF-002:
     label: NF-002
     title: Improved Delta Quality**
@@ -2345,6 +2531,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-011/PROD-011.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-001:
     label: FR-001
     title: System MUST generate API contract documentation from Go, Python, and TypeScript
@@ -2366,6 +2554,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-002:
     label: FR-002
     title: System MUST preserve all comments (package-level, function-level, inline)
@@ -2383,6 +2573,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-003:
     label: FR-003
     title: System MUST extract and represent complete type information including function
@@ -2400,6 +2592,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-004:
     label: FR-004
     title: System MUST distinguish and separately document public vs private vs test
@@ -2417,6 +2611,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-005:
     label: FR-005
     title: System MUST support auto-generating stub tech specs for uncovered code,
@@ -2457,6 +2653,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-006:
     label: FR-006
     title: System MUST store the canonical generated contracts corpus under `.contracts/**`
@@ -2481,6 +2679,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-007:
     label: FR-007
     title: System MUST provide `--check` mode that reports code requiring spec coverage
@@ -2498,6 +2698,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-008:
     label: FR-008
     title: System MUST provide `--prune` flag that removes stub specs only when manual
@@ -2515,6 +2717,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-009:
     label: FR-009
     title: "System MAY create derived navigation indexes organizing contracts by-language\
@@ -2534,6 +2738,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-010:
     label: FR-010
     title: System MUST support filtering contract output by visibility level (public/private/test)
@@ -2550,6 +2756,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-011:
     label: FR-011
     title: System MUST generate useful contracts from code without JSDoc, docstrings,
@@ -2567,6 +2775,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-012:
     label: FR-012
     title: System MUST operate with zero configuration to produce meaningful contracts
@@ -2583,6 +2793,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-013:
     label: FR-013
     title: System MUST record git SHA of last sync operation in tech spec frontmatter
@@ -2600,6 +2812,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-014:
     label: FR-014
     title: System MUST support recording git SHA when spec is reviewed and verified
@@ -2618,6 +2832,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-015:
     label: FR-015
     title: System MUST map code to specs such that each piece of code belongs to exactly
@@ -2635,6 +2851,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-016:
     label: FR-016
     title: Contract navigation structures (mirror-of-source corpus and optional derived
@@ -2653,6 +2871,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-017:
     label: FR-017
     title: System MUST provide tooling to find corresponding spec from code file and
@@ -2670,6 +2890,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.FR-018:
     label: FR-018
     title: System MUST provide tooling to navigate between code directories and spec
@@ -2687,6 +2909,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.NF-001:
     label: NF-001
     title: 'Generated contracts MUST be deterministic: identical source code MUST
@@ -2708,6 +2932,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.NF-002:
     label: NF-002
     title: 'Contract generation MUST be idempotent: running `sync` multiple times
@@ -2725,6 +2951,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.NF-003:
     label: NF-003
     title: Covered by VA-001 (performance benchmarks)
@@ -2745,6 +2973,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.NF-004:
     label: NF-004
     title: Covered by VT-006 (legacy compatibility)
@@ -2761,6 +2991,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-012.NF-005:
     label: NF-005
     title: Covered by VH-001 (human readability review)
@@ -2777,6 +3009,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-012/PROD-012.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-001:
     label: FR-001
     title: All `show` subcommands MUST support `--path` flag that outputs only the
@@ -2799,6 +3033,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-002:
     label: FR-002
     title: All `show` subcommands MUST support `--raw` flag that outputs raw file
@@ -2821,6 +3057,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-003:
     label: FR-003
     title: 'System MUST provide `view` command that opens artifact in `$PAGER` (fallback:
@@ -2843,6 +3081,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-004:
     label: FR-004
     title: 'System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback:
@@ -2866,6 +3106,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-005:
     label: FR-005
     title: '`find` command MUST support all artifact types (spec, delta, adr, revision,
@@ -2888,6 +3130,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-006:
     label: FR-006
     title: All `show` subcommands MUST support `--json` flag for structured output
@@ -2909,6 +3153,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.FR-007:
     label: FR-007
     title: '`--json` output MUST include `path` field for all artifacts'
@@ -2930,6 +3176,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.NF-001:
     label: NF-001
     title: Path resolution MUST complete in <100ms for any artifact
@@ -2946,6 +3194,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-013.NF-002:
     label: NF-002
     title: CLI flag names MUST be consistent across all artifact types
@@ -2962,6 +3212,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-013/PROD-013.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-001:
     label: FR-001
     title: System MUST generate a repo-root `.contracts/` directory as a deterministic,
@@ -2984,6 +3236,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-002:
     label: FR-002
     title: System MUST mirror repo-relative source paths inside `.contracts/<view>/...`
@@ -3006,6 +3260,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-003:
     label: FR-003
     title: 'For each supported language, the index builder MUST map registered source
@@ -3028,6 +3284,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-004:
     label: FR-004
     title: 'System MUST create idiom alias paths as symlinks:'
@@ -3049,6 +3307,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-005:
     label: FR-005
     title: Rebuilding the mirror MUST remove stale entries and MUST only write within
@@ -3071,6 +3331,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-006:
     label: FR-006
     title: Mirror generation MUST be driven by existing registry + existing contract
@@ -3094,6 +3356,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-007:
     label: FR-007
     title: 'Mirror generation MUST handle missing/absent variants gracefully:'
@@ -3115,6 +3379,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-008:
     label: FR-008
     title: System MUST support generating and storing contract artefacts as real files
@@ -3138,6 +3404,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-009:
     label: FR-009
     title: System MUST support generating contracts for explicit targets without requiring
@@ -3159,6 +3427,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-010:
     label: FR-010
     title: "System SHOULD support generating contracts for \u201Call discoverable\
@@ -3180,6 +3450,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-011:
     label: FR-011
     title: System SHOULD provide an explicit backwards-compatibility strategy for
@@ -3202,6 +3474,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.FR-012:
     label: FR-012
     title: System MUST warn when contract artefacts exist but `.contracts/**` generation
@@ -3225,6 +3499,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.NF-001:
     label: NF-001
     title: 'Mirror rebuild MUST be fast enough for interactive use (target: <2s for
@@ -3242,6 +3518,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-014.NF-002:
     label: NF-002
     title: '`.contracts/` MUST be safe to `.gitignore` entirely without breaking core
@@ -3260,6 +3538,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-014/PROD-014.md
+    source_kind: prose
+    source_type: spec
   PROD-015.FR-001:
     label: FR-001
     title: 'Tech specs MUST support explicit taxonomy via frontmatter fields: `category`
@@ -3282,6 +3562,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.FR-002:
     label: FR-002
     title: 'Sync-created unit specs MUST default to `category: unit` and `c4_level:
@@ -3305,6 +3587,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.FR-003:
     label: FR-003
     title: The CLI MUST support filtering spec listings by `category` and `c4_level`.
@@ -3327,6 +3611,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.FR-004:
     label: FR-004
     title: "The system MUST provide deterministic filesystem \u201Cviews\u201D for\
@@ -3351,6 +3637,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.FR-005:
     label: FR-005
     title: 'Validation MUST warn (not error) when a tech spec is missing taxonomy
@@ -3375,6 +3663,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.NF-001:
     label: NF-001
     title: 'Taxonomy views and CLI filtering MUST remain fast enough for interactive
@@ -3397,6 +3687,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-015.NF-002:
     label: NF-002
     title: 'Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and
@@ -3419,6 +3711,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-001:
     label: FR-001
     title: The repository MUST have a single workflow configuration file (TOML) readable
@@ -3442,6 +3736,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-002:
     label: FR-002
     title: 'The configuration MUST cover the majority of workflow shaping needs with
@@ -3465,6 +3761,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-003:
     label: FR-003
     title: The system MUST provide an escape hatch for bespoke project instructions
@@ -3483,6 +3781,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-004:
     label: FR-004
     title: The system MUST provide a configurator command/skill that interviews the
@@ -3505,6 +3805,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-005:
     label: FR-005
     title: 'The configurator MUST write/update config and install skills/guidance
@@ -3527,6 +3829,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-006:
     label: FR-006
     title: The system MUST generate a short prescriptive project agent bootstrap (~30
@@ -3550,6 +3854,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-007:
     label: FR-007
     title: The system MUST provide customization hooks for projects to add local skills/guidance
@@ -3567,6 +3873,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-008:
     label: FR-008
     title: 'The system MUST generate project-local, config-tailored guidance markdown
@@ -3590,6 +3898,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-009:
     label: FR-009
     title: 'Workflow completion commands MUST be automation-safe in non-interactive
@@ -3612,6 +3922,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.FR-010:
     label: FR-010
     title: The CLI MUST provide first-class create/complete command coverage for active
@@ -3634,6 +3946,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.NF-001:
     label: NF-001
     title: The configurator and installer MUST be safe to re-run and produce minimal
@@ -3652,6 +3966,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.NF-002:
     label: NF-002
     title: Skills/guidance MUST be provider-neutral at the core, with provider-specific
@@ -3670,6 +3986,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   PROD-016.NF-003:
     label: NF-003
     title: The default bootstrap MUST be token-cheap and route an agent to the right
@@ -3691,6 +4009,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/product/PROD-016/PROD-016.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to
@@ -3717,6 +4037,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-002:
     label: FR-002
     title: List commands MUST delegate all data access to registries and all formatting
@@ -3739,6 +4061,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-003:
     label: FR-003
     title: "Backfill command MUST detect stub specs (status='stub' or \u226430 lines)\
@@ -3760,6 +4084,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-004:
     label: FR-004
     title: Sync command MUST delegate to sync adapters for multi-language code-to-spec
@@ -3782,6 +4108,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-005:
     label: FR-005
     title: 'All list commands MUST support consistent flag patterns (--format, --json,
@@ -3817,6 +4145,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-006:
     label: FR-006
     title: 'All list commands MUST support output formats: table (default), json,
@@ -3848,6 +4178,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-007:
     label: FR-007
     title: Schema commands MUST list block schemas and frontmatter schemas separately
@@ -3870,6 +4202,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-008:
     label: FR-008
     title: 'Create commands MUST support all artifact types using templates:'
@@ -3890,6 +4224,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-009:
     label: FR-009
     title: Show commands MUST display detailed artifact information for all major
@@ -3916,6 +4252,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.FR-010:
     label: FR-010
     title: Complete delta command MUST mark delta as completed AND update associated
@@ -3937,6 +4275,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.NF-001:
     label: NF-001
     title: CLI commands MUST complete typical operations (list, show, create) in <2
@@ -3958,6 +4298,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-110.NF-002:
     label: NF-002
     title: CLI modules MUST average <200 lines per file to maintain thin orchestration
@@ -3979,6 +4321,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-001:
     label: FR-001
     title: CLI MUST accept a path argument (file or directory) and validate it exists
@@ -4000,6 +4344,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-002:
     label: FR-002
     title: 'CLI MUST support `--type` argument with choices: `public` (default), `all`,
@@ -4021,6 +4367,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-003:
     label: FR-003
     title: CLI MUST exit with code 1 for invalid inputs (missing path, permission
@@ -4042,6 +4390,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-004:
     label: FR-004
     title: CLI MUST support `--check` mode that verifies documentation matches code
@@ -4063,6 +4413,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-005:
     label: FR-005
     title: "CLI MUST format results with status symbols: `+` (created), `~` (changed),\
@@ -4084,6 +4436,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-006:
     label: FR-006
     title: CLI MUST print summary statistics showing counts by status (created, changed,
@@ -4105,6 +4459,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.FR-007:
     label: FR-007
     title: CLI MUST maintain backward compatibility with original interface including
@@ -4126,6 +4482,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.NF-001:
     label: NF-001
     title: "CLI MUST complete documentation generation for typical package (\u2264\
@@ -4147,6 +4505,8 @@ requirements:
       status: planned
       kind: VA
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-112.NF-002:
     label: NF-002
     title: CLI MUST preserve all original argument names, defaults, and behaviors
@@ -4168,6 +4528,8 @@ requirements:
       status: planned
       kind: VH
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-001:
     label: FR-001
     title: Schema Definition API
@@ -4184,6 +4546,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-002:
     label: FR-002
     title: Field Constraints
@@ -4200,6 +4564,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-003:
     label: FR-003
     title: Runtime Validation
@@ -4216,6 +4582,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-004:
     label: FR-004
     title: Validation Errors
@@ -4232,6 +4600,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-005:
     label: FR-005
     title: JSON Schema Generation
@@ -4248,6 +4618,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.FR-006:
     label: FR-006
     title: Conditional Rules in JSON Schema
@@ -4264,6 +4636,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.NF-001:
     label: NF-001
     title: Immutability
@@ -4280,6 +4654,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.NF-002:
     label: NF-002
     title: Error Quality
@@ -4296,6 +4672,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-114.NF-003:
     label: NF-003
     title: Standards Compliance
@@ -4312,6 +4690,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-114/SPEC-114.md
+    source_kind: prose
+    source_type: spec
   SPEC-116.NF-001:
     label: NF-001
     title: Fast Metadata Lookup**
@@ -4328,6 +4708,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
+    source_kind: prose
+    source_type: spec
   SPEC-116.NF-002:
     label: NF-002
     title: Clear Schema Definitions**
@@ -4344,6 +4726,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
+    source_kind: prose
+    source_type: spec
   SPEC-116.NF-003:
     label: NF-003
     title: Validation Correctness**
@@ -4360,6 +4744,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-001:
     label: FR-001
     title: Define RequirementRecord dataclass with uid, label, title, specs, primary_spec,
@@ -4381,6 +4767,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-002:
     label: FR-002
     title: 'Support requirement status values: pending, in-progress, active, retired,
@@ -4407,6 +4795,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-003:
     label: FR-003
     title: Load and save requirements registry at `.spec-driver/registry/requirements.yaml`
@@ -4430,6 +4820,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-004:
     label: FR-004
     title: 'Extract requirements from spec markdown using pattern `- FR-NNN: Title`
@@ -4461,6 +4853,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-005:
     label: FR-005
     title: Parse structured spec.relationships blocks for explicit requirement lists
@@ -4478,6 +4872,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-006:
     label: FR-006
     title: Process delta frontmatter applies_to.requirements and relationship blocks
@@ -4499,6 +4895,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-007:
     label: FR-007
     title: Process revision blocks for requirement moves, introductions, and lifecycle
@@ -4516,6 +4914,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-008:
     label: FR-008
     title: Support move_requirement operation updating uid, specs, primary_spec, path,
@@ -4533,6 +4933,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.FR-009:
     label: FR-009
     title: 'Provide search API with filters: query, status, spec, implemented_by,
@@ -4554,6 +4956,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.NF-001:
     label: NF-001
     title: Registry file uses UTF-8 encoding and sorted YAML keys for diff stability
@@ -4570,6 +4974,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.NF-002:
     label: NF-002
     title: Sync operations idempotent (re-running produces identical registry)
@@ -4597,6 +5003,8 @@ requirements:
       status: verified
       kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-122.NF-003:
     label: NF-003
     title: Search results sorted by UID for stable output
@@ -4613,6 +5021,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-001:
     label: FR-001
     title: LanguageAdapter base class MUST define abstract methods for `discover_targets()`,
@@ -4634,6 +5044,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-002:
     label: FR-002
     title: LanguageAdapter MUST provide `validate_source_exists()` to check file/directory
@@ -4655,6 +5067,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-003:
     label: FR-003
     title: PythonAdapter MUST discover Python modules using package structure and
@@ -4676,6 +5090,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-004:
     label: FR-004
     title: PythonAdapter MUST generate AST-based documentation preserving docstring
@@ -4697,6 +5113,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-005:
     label: FR-005
     title: GoAdapter MUST discover Go packages using `go list` command
@@ -4717,6 +5135,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-006:
     label: FR-006
     title: GoAdapter MUST validate Go toolchain and gomarkdoc availability before
@@ -4738,6 +5158,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-007:
     label: FR-007
     title: TypeScriptAdapter MUST discover logical modules (directories with index.ts/js,
@@ -4759,6 +5181,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-008:
     label: FR-008
     title: TypeScriptAdapter MUST extract AST using ts-morph via ts-doc-extract subprocess
@@ -4779,6 +5203,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.FR-009:
     label: FR-009
     title: TypeScriptAdapter MUST detect and support npm, pnpm, and bun package managers
@@ -4799,6 +5225,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.NF-001:
     label: NF-001
     title: "All adapters MUST generate deterministic output (same input \u2192 same\
@@ -4820,6 +5248,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.NF-002:
     label: NF-002
     title: Adapters MUST fail gracefully with descriptive errors when required toolchains
@@ -4841,6 +5271,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-124.NF-003:
     label: NF-003
     title: TypeScriptAdapter MUST support multiple package managers without requiring
@@ -4862,6 +5294,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-001:
     label: FR-001
     title: Validator MUST validate all requirement lifecycle links (implemented*by,
@@ -4883,6 +5317,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-002:
     label: FR-002
     title: Validator MUST detect when change artifact relations reference non-existent
@@ -4904,6 +5340,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-003:
     label: FR-003
     title: Validator MUST validate change artifact `applies_to.requirements` fields
@@ -4925,6 +5363,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-004:
     label: FR-004
     title: Validator MUST validate all ADR `related_decisions` references point to
@@ -4946,6 +5386,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-005:
     label: FR-005
     title: Validator MUST warn (in strict mode) when active ADRs reference deprecated
@@ -4967,6 +5409,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.FR-006:
     label: FR-006
     title: Validator MUST return structured ValidationIssue objects with level, artifact,
@@ -4988,6 +5432,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-125.NF-001:
     label: NF-001
     title: Validator MUST complete full workspace validation in <5 seconds for typical
@@ -5009,6 +5455,8 @@ requirements:
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.FR-001:
     label: FR-001
     title: Component MUST [specific technical capability]
@@ -5029,6 +5477,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.FR-002:
     label: FR-002
     title: System MUST [integration or contract requirement]
@@ -5045,6 +5495,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.FR-003:
     label: FR-003
     title: Component MUST [data handling or state management]
@@ -5061,6 +5513,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.NF-001:
     label: NF-001
     title: '[Performance constraint with specific metrics]'
@@ -5077,6 +5531,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.NF-002:
     label: NF-002
     title: '[Scalability or resource requirement]'
@@ -5093,6 +5549,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-128.NF-003:
     label: NF-003
     title: '[Reliability or fault tolerance]'
@@ -5109,6 +5567,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.FR-001:
     label: FR-001
     title: Component MUST [specific technical capability]
@@ -5129,6 +5589,8 @@ requirements:
       status: planned
       kind: VT
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.FR-002:
     label: FR-002
     title: System MUST [integration or contract requirement]
@@ -5145,6 +5607,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.FR-003:
     label: FR-003
     title: Component MUST [data handling or state management]
@@ -5161,6 +5625,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.NF-001:
     label: NF-001
     title: '[Performance constraint with specific metrics]'
@@ -5177,6 +5643,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.NF-002:
     label: NF-002
     title: '[Scalability or resource requirement]'
@@ -5193,6 +5661,8 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec
   SPEC-129.NF-003:
     label: NF-003
     title: '[Reliability or fault tolerance]'
@@ -5209,3 +5679,5 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
+    source_kind: prose
+    source_type: spec

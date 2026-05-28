@@ -38,7 +38,6 @@ Args:
 Returns:
   List of Spec objects informed by the given ADR.
   Returns empty list if adr_id is None, empty, or no matches found.
-- `find_by_package(self, package) -> list[Spec]`: Find all specs that reference the given package.
 - `get(self, spec_id) -> <BinOp>`: Find a spec by ID. Deprecated — use find() instead.
 - `iter(self) -> Iterator[Spec]`: Iterate over specs, optionally filtered by status.
 

@@ -4,7 +4,7 @@ List specs command.
 
 ## Functions
 
-- @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, category, c4_level, informed_by, related_to, relation, tag, refs, regexp, case_insensitive, format_type, json_output, truncate, paths, packages, external) -> None`: List SPEC/PROD artifacts with optional filtering.
+- @app.command(specs) `list_specs(root, kind, status, substring, category, c4_level, informed_by, related_to, relation, tag, refs, regexp, case_insensitive, format_type, json_output, truncate, paths, tags_column, external) -> None`: List SPEC/PROD artifacts with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.

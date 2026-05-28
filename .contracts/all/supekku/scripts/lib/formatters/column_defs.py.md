@@ -17,15 +17,15 @@ Column order is display order.
 - `DELTA_COLUMNS` - for default (``auto``) but the column header is always present.
 - `DELTA_TAGS_COLUMN`
 - `DRIFT_COLUMNS`
-- `EXT_ID_COLUMN` - Shared optional columns (used with flags like --external, --packages)
+- `EXT_ID_COLUMN` - Shared optional columns (used with flags like --external, --refs)
 - `MEMORY_COLUMNS`
-- `PACKAGES_COLUMN` - Shared optional columns (used with flags like --external, --packages)
 - `PHASE_COLUMNS`
 - `PLAN_COLUMNS`
 - `POLICY_COLUMNS`
-- `REFS_COLUMN`
+- `REFS_COLUMN` - Shared optional columns (used with flags like --external, --refs)
 - `REQUIREMENT_COLUMNS`
 - `SPEC_COLUMNS` - --- Per-artifact-type column definitions ---
+- `SPEC_TAGS_COLUMN`
 - `STANDARD_COLUMNS`
 
 ## Functions

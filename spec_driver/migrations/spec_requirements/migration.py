@@ -137,6 +137,14 @@ def _is_requirement_like_line(line: str) -> bool:
 # ---------------------------------------------------------------------------
 
 
+def _yaml_scalar(value: str) -> str:
+  """Quote a YAML scalar if it contains characters that need quoting."""
+  if any(c in value for c in ":{}[]#&*!|>'\",@`"):
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+  return value
+
+
 def _render_block(spec_id: str, requirements: list[ParsedRequirement]) -> str:
   """Render a supekku:spec.requirements@v1 block from parsed requirements."""
   lines = [
@@ -152,11 +160,11 @@ def _render_block(spec_id: str, requirements: list[ParsedRequirement]) -> str:
   else:
     for req in requirements:
       lines.append(f"  - id: {req.id}")
-      lines.append(f"    title: {req.title}")
+      lines.append(f"    title: {_yaml_scalar(req.title)}")
       lines.append("    lifecycle: pending")
       lines.append(f"    kind: {req.kind}")
       if req.category:
-        lines.append(f"    category: {req.category}")
+        lines.append(f"    category: {_yaml_scalar(req.category)}")
       lines.append('    description: ""')
       lines.append("    acceptance_criteria: []")
       if req.tags:

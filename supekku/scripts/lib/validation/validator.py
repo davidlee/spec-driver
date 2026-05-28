@@ -830,6 +830,8 @@ def check_requirements_migration_complete(
   """
   unmigrated: list[str] = []
   for spec in workspace.specs.all_specs():
+    if spec.id.endswith(".TESTS"):
+      continue
     try:
       block = extract_spec_requirements(spec.body)
     except ValueError:

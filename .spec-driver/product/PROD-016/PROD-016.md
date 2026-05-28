@@ -19,6 +19,91 @@ assumptions:
   - An 80/20 set of knobs plus a small doctrine escape hatch covers most real projects.
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-016
+requirements:
+  - id: FR-001
+    title: "The repository MUST have a single workflow configuration file (TOML) readable by both spec-driver and agents (e.g. `.spec-driver/workflow.toml`)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "The configuration MUST cover the majority of workflow shaping needs with a minimal set of knobs (80/20), including:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: The system MUST provide an escape hatch for bespoke project instructions as a small plain-text doctrine note that is loaded at the right time (instead of exploding the config keyspace).
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: The system MUST provide a configurator command/skill that interviews the user and recommends a configuration appropriate for their repo (legacy-biased defaults).
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "The configurator MUST write/update config and install skills/guidance deterministically and idempotently:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "The system MUST generate a short prescriptive project agent bootstrap (~30 lines) that `@references` modular runsheets and is appropriate to the selected configuration."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: The system MUST provide customization hooks for projects to add local skills/guidance and policy without forking canonical content.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "The system MUST generate project-local, config-tailored guidance markdown (installed/overwritten by the installer) for skills to reference, to:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: "Workflow completion commands MUST be automation-safe in non-interactive contexts:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: "The CLI MUST provide first-class create/complete command coverage for active change primitives (`delta`, `revision`, `audit`) with lifecycle-consistent semantics."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "The configurator and installer MUST be safe to re-run and produce minimal diffs (idempotent, deterministic)."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "Skills/guidance MUST be provider-neutral at the core, with provider-specific wrappers as thin adapters."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: The default bootstrap MUST be token-cheap and route an agent to the right runsheet/skill without loading long overview docs.
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-016 – agentic sdlc configurator
 
 ```yaml supekku:spec.relationships@v1

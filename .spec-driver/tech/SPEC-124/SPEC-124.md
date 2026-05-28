@@ -30,6 +30,85 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-124
+requirements:
+  - id: FR-001
+    title: LanguageAdapter base class MUST define abstract methods for `discover_targets()`, `describe()`, `generate()`, and `supports_identifier()`
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: LanguageAdapter MUST provide `validate_source_exists()` to check file/directory existence and git tracking status
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: PythonAdapter MUST discover Python modules using package structure and `__init__.py` detection
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: PythonAdapter MUST generate AST-based documentation preserving docstring formatting (including indentation)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: GoAdapter MUST discover Go packages using `go list` command
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: GoAdapter MUST validate Go toolchain and gomarkdoc availability before generation
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: TypeScriptAdapter MUST discover logical modules (directories with index.ts/js, standalone files, src/ subdirectories)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: TypeScriptAdapter MUST extract AST using ts-morph via ts-doc-extract subprocess
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: TypeScriptAdapter MUST detect and support npm, pnpm, and bun package managers
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: All adapters MUST generate deterministic output (same input → same output)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Adapters MUST fail gracefully with descriptive errors when required toolchains are unavailable
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: TypeScriptAdapter MUST support multiple package managers without requiring explicit configuration
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-124 – supekku/scripts/lib/sync/adapters Specification
 
 ```yaml supekku:spec.relationships@v1

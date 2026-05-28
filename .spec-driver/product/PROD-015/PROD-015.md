@@ -18,6 +18,55 @@ assumptions:
   - "Auto-generated unit specs are useful, but only when they do not drown out assembly specs."
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-015
+requirements:
+  - id: FR-001
+    title: "Tech specs MUST support explicit taxonomy via frontmatter fields: `category` and `c4_level`."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "Sync-created unit specs MUST default to `category: unit` and `c4_level: code`."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "The CLI MUST support filtering spec listings by `category` and `c4_level`."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "The system MUST provide deterministic filesystem “views” for navigation by `category` and `c4_level` (e.g. `specify/tech/by-category/assembly/…`)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "Validation MUST warn (not error) when a tech spec is missing taxonomy fields or uses inconsistent combinations (e.g. `category: unit` with non-`code` `c4_level`)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "Taxonomy views and CLI filtering MUST remain fast enough for interactive use (target: <2s on typical repos)."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and registries remain valid."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-015 – spec taxonomy and navigation
 
 ```yaml supekku:spec.relationships@v1

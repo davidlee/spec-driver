@@ -19,6 +19,55 @@ assumptions:
   - Developers work on one phase at a time per implementation plan
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-006
+requirements:
+  - id: FR-001
+    title: System MUST create phase markdown files from template with valid canonical frontmatter fields (`plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: System MUST automatically determine next phase number by examining existing phases for the given plan
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: System MUST enhance delta display to show plan ID, phase count, and phase summaries with objectives
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: System MUST auto-populate phase metadata including phase ID, plan ID, and delta ID from plan context
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: System MUST validate phase frontmatter schema (via PhaseSheet Pydantic model for new-format phases, or phase.overview block for legacy phases) and report validation errors
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Phase creation command MUST complete in <2 seconds for plans with up to 20 existing phases
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Delta display MUST remain readable with up to 10 phases without truncation loss of critical information
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-006 – Phase Management
 
 ```yaml supekku:spec.relationships@v1

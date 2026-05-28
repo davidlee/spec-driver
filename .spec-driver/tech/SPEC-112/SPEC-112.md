@@ -26,6 +26,67 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-112
+requirements:
+  - id: FR-001
+    title: CLI MUST accept a path argument (file or directory) and validate it exists before processing
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "CLI MUST support `--type` argument with choices: `public` (default), `all`, `tests` to control documentation variants"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "CLI MUST exit with code 1 for invalid inputs (missing path, permission errors, invalid arguments) and print clear error messages"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "CLI MUST support `--check` mode that verifies documentation matches code without writing files, exiting 0 if unchanged or 1 if changes detected"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "CLI MUST format results with status symbols: `+` (created), `~` (changed), `=` (unchanged), `✗` (error), with `✓`/`✗` in check mode"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "CLI MUST print summary statistics showing counts by status (created, changed, unchanged, errors) after processing multiple files"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "CLI MUST maintain backward compatibility with original interface including all argument names, default values, and exit codes"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: CLI MUST complete documentation generation for typical package (≤100 files) in ≤5 seconds (wall time) on modern hardware
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "CLI MUST preserve all original argument names, defaults, and behaviors to ensure zero-modification migration for existing scripts"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-112 – supekku/scripts/cli Specification
 
 ```yaml supekku:spec.relationships@v1

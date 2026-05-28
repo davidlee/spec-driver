@@ -28,6 +28,73 @@ assumptions:
   - JSON Schema output will benefit agents and future external tooling
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-004
+requirements:
+  - id: FR-001
+    title: System MUST validate frontmatter for all registered kinds using metadata definitions
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: System MUST enforce kind-specific required fields and constraints
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: System MUST generate JSON Schema from frontmatter metadata definitions
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: CLI MUST support `schema show frontmatter.{kind}` commands for all kinds
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: System MUST maintain backward compatibility during migration
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: System MUST support gradual per-call-site opt-in migration
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: Metadata definitions MUST support canonical/derived field classification enabling compaction profiles
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Validation behavior MUST match imperative validator (zero regressions)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: JSON Schema generation MUST complete in <100ms per kind
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Migration MUST not break existing code at any point
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-004 – Frontmatter Metadata Validation
 
 ```yaml supekku:spec.relationships@v1

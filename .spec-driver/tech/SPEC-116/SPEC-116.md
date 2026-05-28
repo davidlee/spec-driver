@@ -34,6 +34,31 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-116
+requirements:
+  - id: NF-001
+    title: Fast Metadata Lookup**
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Clear Schema Definitions**
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Validation Correctness**
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-116 – supekku/scripts/lib/core/frontmatter_metadata
 
 ```yaml supekku:spec.relationships@v1

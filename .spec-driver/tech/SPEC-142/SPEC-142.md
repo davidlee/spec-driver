@@ -23,6 +23,13 @@ sources:
     path: contracts/tests.md
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-142
+requirements: []
+```
+
 # SPEC-142 – supekku/scripts/lib/core/frontmatter_metadata
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

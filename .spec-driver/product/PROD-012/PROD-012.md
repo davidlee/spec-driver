@@ -26,6 +26,169 @@ assumptions:
   - Deterministic output enables reliable change detection
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-012
+requirements:
+  - id: FR-001
+    title: "System MUST generate API contract documentation from Go, Python, and TypeScript source code using AST parsing"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "System MUST preserve all comments (package-level, function-level, inline) in generated contracts"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "System MUST extract and represent complete type information including function signatures, interfaces, type parameters, and optionality markers"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: System MUST distinguish and separately document public vs private vs test interfaces
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "System MUST support auto-generating stub tech specs for uncovered code, but spec auto-creation MUST be opt-in (persisted per-repo) rather than a first-run default."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "System MUST store the canonical generated contracts corpus under `.contracts/**` (mirror-of-source layout), with any legacy `specify/tech/SPEC-*/contracts/` paths treated as compatibility-only."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "System MUST provide `--check` mode that reports code requiring spec coverage without modifying files"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "System MUST provide `--prune` flag that removes stub specs only when manual specs exist covering same code"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: "System MAY create derived navigation indexes organizing contracts by-language and by-package. These are augmentation views over the canonical mirror-of-source contracts corpus (`.contracts/`), not a competing canonical storage structure (per ADR-007 §5–6)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: System MUST support filtering contract output by visibility level (public/private/test)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-011
+    title: "System MUST generate useful contracts from code without JSDoc, docstrings, type hints, or special annotations"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-012
+    title: System MUST operate with zero configuration to produce meaningful contracts
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-013
+    title: "System MUST record git SHA of last sync operation in tech spec frontmatter (`git_shas.last_sync`) to enable drift detection"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-014
+    title: "System MUST support recording git SHA when spec is reviewed and verified as accurate (`git_shas.last_review`), enabling calculation of what code changes need to be accounted for"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-015
+    title: "System MUST map code to specs such that each piece of code belongs to exactly one spec, with spec scope being cohesive and right-sized for the language"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-016
+    title: "Contract navigation structures (mirror-of-source corpus and optional derived indexes) MUST be intuitive, easy to navigate, and follow unsurprising conventions matching developer mental models"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-017
+    title: System MUST provide tooling to find corresponding spec from code file and vice-versa (bidirectional navigation)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-018
+    title: System MUST provide tooling to navigate between code directories and spec directories
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "Generated contracts MUST be deterministic: identical source code MUST produce byte-identical contract output"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "Contract generation MUST be idempotent: running `sync` multiple times on unchanged code MUST produce no file modifications"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: "Contract search via ripgrep MUST complete in <2 seconds for typical repositories (up to 100K LOC, 1000 files)"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-004
+    title: "System MUST support legacy codebases without requiring code changes, annotations, or special formatting"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-005
+    title: "Contract format MUST be compact and legible: maximize information density while maintaining human readability"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Covered by VA-001 (performance benchmarks)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-004
+    title: Covered by VT-006 (legacy compatibility)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-005
+    title: Covered by VH-001 (human readability review)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-012 – code-contract-documentation
 
 ```yaml supekku:spec.relationships@v1

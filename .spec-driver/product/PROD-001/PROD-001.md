@@ -12,6 +12,62 @@ guiding_principles: []
 assumptions: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-001
+requirements:
+  - id: FR-001
+    title: Claude Command Provides Complete Workflow
+    lifecycle: pending
+    kind: functional
+    category: workflow
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: Agent Completes All YAML Blocks Without Manual Editing
+    lifecycle: pending
+    kind: functional
+    category: automation
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Clarification Questions Limited to Critical Decisions
+    lifecycle: pending
+    kind: functional
+    category: ux
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Spec Type Determines Section Content Adaptation
+    lifecycle: pending
+    kind: functional
+    category: workflow
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: Validation Integrated Before Workflow Completion
+    lifecycle: pending
+    kind: functional
+    category: validation
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: First-Time User Experience Requires Minimal Cognitive Load
+    lifecycle: pending
+    kind: non-functional
+    category: ux
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Registry Sync Success Rate >95% on First Attempt
+    lifecycle: pending
+    kind: non-functional
+    category: reliability
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-001 – streamline spec creation
 
 ```yaml supekku:spec.relationships@v1

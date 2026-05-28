@@ -103,3 +103,6 @@ spec_autocreate = true
 
 [migrations]
 last_applied = "v0_10_0_003_prod_blocks"
+
+[validation.strict_requirements]
+enabled = true

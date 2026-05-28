@@ -18,6 +18,43 @@ assumptions:
   - Teams will capture priority/category metadata to drive backlogs.
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-009
+requirements:
+  - id: FR-001
+    title: Specs MUST allow authors to declare baseline lifecycle statuses (`planned`, `asserted`, `legacy_verified`, `deprecated`) directly in coverage entries.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: The lifecycle engine MUST surface evidence from deltas and audits alongside spec baseline statuses, presenting both normative and observed truth with provenance. When normative and observed truth diverge, the system MUST raise drift warnings for explicit human reconciliation rather than silently determining an effective status by timestamp or artefact-kind precedence (per ADR-008 §3–4).
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Validation MUST emit corrective warnings when overlays disagree and keep humans informed until a new delta or audit resolves the conflict.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Lifecycle projections MUST expose provenance (source artefact, timestamp, actor) for the effective status.
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Warning messages SHOULD be actionable within one hop (point to artefacts and remediation) and default to warning severity rather than errors.
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-009 – Requirement Lifecycle Semantics
 
 ```yaml supekku:spec.relationships@v1

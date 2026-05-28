@@ -23,6 +23,13 @@ sources:
     path: contracts/tests.md
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-123
+requirements: []
+```
+
 # SPEC-123 – supekku/scripts/lib/specs
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

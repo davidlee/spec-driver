@@ -38,6 +38,13 @@ sources:
     path: /home/david/dev/spec-driver/.spec-driver/skills
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-151
+requirements: []
+```
+
 # SPEC-151 – supekku/scripts/lib/skills
 
 ```yaml supekku:spec.relationships@v1

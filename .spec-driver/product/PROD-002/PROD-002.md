@@ -26,6 +26,61 @@ assumptions:
   - Default workflow creates delta + DR + plan (phase sheets created just-in-time per ADR-004)
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-002
+requirements:
+  - id: FR-001
+    title: Agent Command Provides Complete Workflow Guidance
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: Default Behavior Creates Complete Delta Bundle
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Users Can Provide Known Relationships Explicitly
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Agent Discovers and Suggests Additional Relationships
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: Clear Error Messages Guide Users to Corrections
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: Delta Creation Includes Design Revision Artifact
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: First-Time Users Complete Delta Creation in Under 5 Minutes
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Creation Success Rate Exceeds 95% on First Attempt
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-002 – Delta Creation Workflow
 
 ```yaml supekku:spec.relationships@v1

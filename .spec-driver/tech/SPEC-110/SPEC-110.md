@@ -31,6 +31,97 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-110
+requirements:
+  - id: FR-001
+    title: "CLI MUST provide single unified entry point (`spec-driver`) routing to all subcommand groups (list, show, create, sync, schema, backfill, complete, workspace)"
+    lifecycle: pending
+    kind: functional
+    category: cli
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: List commands MUST delegate all data access to registries and all formatting to formatters (zero business logic in CLI)
+    lifecycle: pending
+    kind: functional
+    category: architecture
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "Backfill command MUST detect stub specs (status='stub' or ≤30 lines) and replace body with template while preserving frontmatter"
+    lifecycle: pending
+    kind: functional
+    category: automation
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "Sync command MUST delegate to sync adapters for multi-language code-to-spec synchronization (Python, Go, TypeScript) and MUST support separate ADR registry synchronization via `--adr` flag"
+    lifecycle: pending
+    kind: functional
+    category: integration
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "All list commands MUST support consistent flag patterns (--format, --json, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:"
+    lifecycle: pending
+    kind: functional
+    category: cli
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "All list commands MUST support output formats: table (default), json, tsv; list specs command MUST additionally support --status/-s filter for filtering by spec status (draft, active, deprecated, superseded)"
+    lifecycle: pending
+    kind: functional
+    category: cli
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "Schema commands MUST list block schemas and frontmatter schemas separately (via `schema list blocks|frontmatter|all`) and MUST display schema details in json-schema or yaml-example formats"
+    lifecycle: pending
+    kind: functional
+    category: documentation
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "Create commands MUST support all artifact types using templates:"
+    lifecycle: pending
+    kind: functional
+    category: cli
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: "Show commands MUST display detailed artifact information for all major types (specs, deltas, revisions, ADRs, requirements) and MUST include `show template` for displaying spec templates"
+    lifecycle: pending
+    kind: functional
+    category: cli
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: "Complete delta command MUST mark delta as completed AND update associated requirement statuses to 'live' in revision source files"
+    lifecycle: pending
+    kind: functional
+    category: automation
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "CLI commands MUST complete typical operations (list, show, create) in <2 seconds on standard hardware"
+    lifecycle: pending
+    kind: non-functional
+    category: performance
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: CLI modules MUST average <200 lines per file to maintain thin orchestration pattern
+    lifecycle: pending
+    kind: non-functional
+    category: architecture
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-110 – supekku/cli Specification
 
 ```yaml supekku:spec.relationships@v1

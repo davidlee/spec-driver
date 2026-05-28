@@ -18,6 +18,43 @@ assumptions:
   - Audits will continue to be produced after major releases.
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-008
+requirements:
+  - id: FR-001
+    title: The specs frontmatter and coverage block MUST be the authoritative record of each requirement’s _normative_ lifecycle state and supporting evidence. Evidence overlays from deltas, audits, and contracts record _observed_ truth and may disagree with the spec — such disagreement is drift to be reconciled explicitly, not a silent override (per ADR-008). The requirements registry is a derived projection of this data, not itself an authoritative source.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: Every delta that changes requirement behaviour MUST provide an implementation plan documenting planned VT/VA/VH artefacts and promote the final state back into the owning spec coverage block before completion.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Audits MUST surface observed behaviour against the spec coverage block and raise drift through validation warnings until the spec is explicitly reconciled or follow-up work is scheduled. Audit findings do not silently override spec truth — they trigger explicit reconciliation (per ADR-008).
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Lifecycle updates MUST propagate through the registry within one sync cycle (< 5 minutes) after a spec change.
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Validation warnings about lifecycle drift MUST be actionable, surfacing responsible artefacts and suggested remediation steps.
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-008 – Requirements Lifecycle Coherence
 
 ```yaml supekku:spec.relationships@v1

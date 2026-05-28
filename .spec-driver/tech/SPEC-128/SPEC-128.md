@@ -14,6 +14,49 @@ guiding_principles: []
 assumptions: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-128
+requirements:
+  - id: FR-001
+    title: Component MUST [specific technical capability]
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: System MUST [integration or contract requirement]
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Component MUST [data handling or state management]
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: [Performance constraint with specific metrics]
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: [Scalability or resource requirement]
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: [Reliability or fault tolerance]
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-128 – No Repo
 
 ```yaml supekku:spec.relationships@v1

@@ -30,6 +30,55 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-125
+requirements:
+  - id: FR-001
+    title: Validator MUST validate all requirement lifecycle links (implemented*by, introduced_by, verified_by) point to existing artifacts
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: Validator MUST detect when change artifact relations reference non-existent requirements
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Validator MUST validate change artifact `applies_to.requirements` fields reference existing requirements
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Validator MUST validate all ADR `related_decisions` references point to existing decision IDs
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: Validator MUST warn (in strict mode) when active ADRs reference deprecated or superseded ADRs
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: Validator MUST return structured ValidationIssue objects with level, artifact, and message
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Validator MUST complete full workspace validation in <5 seconds for typical workspace size (100 specs, 500 requirements, 50 changes, 30 ADRs)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-125 – supekku/scripts/lib/validation Specification
 
 ```yaml supekku:spec.relationships@v1

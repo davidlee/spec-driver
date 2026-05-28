@@ -19,6 +19,67 @@ assumptions:
   - Consistency reduces cognitive load
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-013
+requirements:
+  - id: FR-001
+    title: "All `show` subcommands MUST support `--path` flag that outputs only the file path"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "All `show` subcommands MUST support `--raw` flag that outputs raw file content"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "System MUST provide `view` command that opens artifact in `$PAGER` (fallback: less, more)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback: $VISUAL, vi)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "`find` command MUST support all artifact types (spec, delta, adr, revision, requirement, policy, standard), not just card"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "All `show` subcommands MUST support `--json` flag for structured output"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "`--json` output MUST include `path` field for all artifacts"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Path resolution MUST complete in <100ms for any artifact
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: CLI flag names MUST be consistent across all artifact types
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-013 – CLI Artifact File Access
 
 ```yaml supekku:spec.relationships@v1

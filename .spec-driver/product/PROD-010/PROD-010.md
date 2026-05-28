@@ -26,6 +26,265 @@ assumptions:
   - Existing CLI architecture (SPEC-110) supports these enhancements
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-010
+requirements:
+  - id: FR-001
+    title: "All list commands MUST support both `--json` (shorthand) and `--format=json` flags with identical behavior"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "All show commands MUST support `--json` flag for structured output"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "All list commands MUST support `-s`/`--status` filter for consistent status-based filtering"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "All list commands MUST support multi-value filters via comma-separated values (e.g., `-s draft,in-progress`)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "List commands MUST support reverse relationship queries:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "Schema commands MUST expose enum values for all artifact fields:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: All list command help text MUST document output format differences (table/json/tsv) with examples
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-012
+    title: "CLI MUST provide help command showing core concepts, workflows, and conventions from markdown sources"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-013
+    title: Help system MUST distinguish between immutable (spec-driver core) and customizable (project-specific) documentation
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-014
+    title: CLI MUST support installing customizable help docs to project for user modification
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-015
+    title: CLI MUST support per-file validation of frontmatter and YAML blocks
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-016
+    title: "CLI MUST accept intelligent variations of artifact IDs and keywords:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-017
+    title: "CLI MUST provide edit command to open artifacts in $EDITOR:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "All commands MUST support `--machine-readable` flag that implies:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: "List commands MUST support pagination for large result sets (>100 items):"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: "Error messages MUST provide actionable guidance:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-011
+    title: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Compact JSON mode MUST reduce token usage by 30-50% compared to table format for typical workflows
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Common agent workflows (discover → filter → show) MUST complete without consulting external documentation
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Implemented improvements MUST address all Priority 1-2 findings from 2025-11-03 UX research report
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Test status filter on specs command
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Test multi-value filter parsing and application
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: Test reverse relationship query correctness
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: Test enum introspection accuracy
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: Test help text documentation completeness
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: Test machine-readable mode behavior
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: Test pagination mechanics and edge cases
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: Test error message quality and suggestions
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-001
+    title: Standardize --json across list commands
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: Add --json to show commands
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: Add status filter to specs
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Validate against UX research findings
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: Multi-value filter support
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: Reverse relationship queries
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Token efficiency validation
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: Enum introspection
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: Help text enhancement
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: Error message improvements
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Agent workflow validation
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: --machine-readable flag
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: Pagination support
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Token efficiency final validation
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-010 – CLI UX
 
 ```yaml supekku:spec.relationships@v1

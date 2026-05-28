@@ -21,6 +21,13 @@ sources:
         path: contracts/internal.md
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-156
+requirements: []
+```
+
 # SPEC-156 – backlog
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

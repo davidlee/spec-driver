@@ -24,6 +24,73 @@ assumptions:
   - Cross-artifact referencing is valuable for navigating governance relationships
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-003
+requirements:
+  - id: FR-001
+    title: System MUST enable creation of policies with unique POL-XXX identifiers
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "System MUST support policy lifecycle statuses: draft, required, deprecated"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: System MUST enable creation of standards with unique STD-XXX identifiers
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "System MUST support standard statuses: draft, required, default, deprecated (where \"default\" indicates recommended unless justified)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "System MUST provide CLI commands to list policies and standards with filtering (by status, tags, references)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: System MUST provide CLI commands to display full policy/standard details including metadata and cross-references
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: System MUST support bidirectional cross-references between policies and standards (policies can reference standards and vice versa)
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "System MUST allow ADRs, specs, deltas, and other artifacts to reference policies and standards via frontmatter fields"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "Policies and standards MUST use consistent template structure (Statement, Rationale, Scope, Verification) for predictable authoring experience"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "CLI commands for policies/standards MUST follow existing spec-driver UX patterns (argument structure, output formats, filtering semantics)"
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-003 – Policy and Standard Management
 
 ```yaml supekku:spec.relationships@v1

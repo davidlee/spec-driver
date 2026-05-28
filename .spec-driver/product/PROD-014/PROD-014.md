@@ -15,6 +15,97 @@ guiding_principles: []
 assumptions: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: PROD-014
+requirements:
+  - id: FR-001
+    title: "System MUST generate a repo-root `.contracts/` directory as a deterministic, rebuildable index of generated contracts."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "System MUST mirror repo-relative source paths inside `.contracts/<view>/...` as the canonical navigation shape for contracts."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "For each supported language, the index builder MUST map registered source units to mirror paths using language-appropriate rules:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "System MUST create idiom alias paths as symlinks:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "Rebuilding the mirror MUST remove stale entries and MUST only write within `.contracts/` (no changes elsewhere in the repo)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: "Mirror generation MUST be driven by existing registry + existing contract outputs, without requiring code parsing or toolchain execution (beyond reading contract markdown for mapping when required)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "Mirror generation MUST handle missing/absent variants gracefully:"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "System MUST support generating and storing contract artefacts as real files under `.contracts/<view>/...` using the mirror-of-source path mapping rules (FR-003)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: System MUST support generating contracts for explicit targets without requiring pre-existing specs or registry entries.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-010
+    title: System SHOULD support generating contracts for “all discoverable targets” of a language without first creating/specifying SPEC bundles.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-011
+    title: System SHOULD provide an explicit backwards-compatibility strategy for legacy access paths.
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-012
+    title: "System MUST warn when contract artefacts exist but `.contracts/**` generation yields zero entries for their owning spec/source unit(s) (convention drift / mapper mismatch)."
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: "Mirror rebuild MUST be fast enough for interactive use (target: <2s for ~10k contract artefacts on a typical dev machine; linear in number of artefacts)."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: "`.contracts/` MUST be safe to `.gitignore` entirely without breaking core spec-driver operations. Contracts are derived/deterministic: ignoring `.contracts/` means the corpus is ephemeral and must be regenerated on demand."
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # PROD-014 – Contract Mirror Tree Index
 
 ```yaml supekku:spec.relationships@v1

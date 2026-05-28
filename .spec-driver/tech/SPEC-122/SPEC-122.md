@@ -32,6 +32,85 @@ auditers: []
 relations: []
 ---
 
+```yaml supekku:spec.requirements@v1
+schema: supekku.spec.requirements
+version: 1
+spec: SPEC-122
+requirements:
+  - id: FR-001
+    title: "Define RequirementRecord dataclass with uid, label, title, specs, primary_spec, kind, status, introduced, implemented_by, verified_by, path fields"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-002
+    title: "Support requirement status values: pending, in-progress, active, retired, deprecated, superseded, deprecated, superseded"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-003
+    title: "Load and save requirements registry at `.spec-driver/registry/requirements.yaml`"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-004
+    title: "Extract requirements from spec markdown using pattern `- FR-NNN: Title` (case-insensitive, bold/italic tolerant)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-005
+    title: "Parse structured spec.relationships blocks for explicit requirement lists (primary, collaborators)"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-006
+    title: Process delta frontmatter applies_to.requirements and relationship blocks to link deltas to requirements
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-007
+    title: "Process revision blocks for requirement moves, introductions, and lifecycle updates"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-008
+    title: "Support move_requirement operation updating uid, specs, primary_spec, path, and introduced fields"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: FR-009
+    title: "Provide search API with filters: query, status, spec, implemented_by, introduced_by, verified_by"
+    lifecycle: pending
+    kind: functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-001
+    title: Registry file uses UTF-8 encoding and sorted YAML keys for diff stability
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-002
+    title: Sync operations idempotent (re-running produces identical registry)
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+  - id: NF-003
+    title: Search results sorted by UID for stable output
+    lifecycle: pending
+    kind: non-functional
+    description: ""
+    acceptance_criteria: []
+```
+
 # SPEC-122 – supekku/scripts/lib/requirements
 
 ```yaml supekku:spec.relationships@v1

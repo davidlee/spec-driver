@@ -1029,18 +1029,18 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-136
     verified_by: []
     coverage_evidence:
-    - VT-005
+    - VA-DE136-CLOSE-001
     coverage_entries:
-    - artefact: VT-005
-      status: planned
-      kind: VT
+    - artefact: VA-DE136-CLOSE-001
+      status: verified
+      kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
     source_kind: block
     source_type: spec
@@ -1081,7 +1081,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: in-progress
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1089,15 +1089,15 @@ requirements:
     - DE-138
     verified_by: []
     coverage_evidence:
-    - VT-007
+    - VA-DE136-CLOSE-001
     - VT-DE138-MIG-001
     coverage_entries:
-    - artefact: VT-007
-      status: planned
-      kind: VT
     - artefact: VT-DE138-MIG-001
       status: verified
       kind: VT
+    - artefact: VA-DE136-CLOSE-001
+      status: verified
+      kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
     source_kind: block
     source_type: spec
@@ -1109,18 +1109,18 @@ requirements:
     primary_spec: PROD-004
     kind: non-functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-136
     verified_by: []
     coverage_evidence:
-    - VT-006
+    - VA-DE136-CLOSE-001
     coverage_entries:
-    - artefact: VT-006
-      status: planned
-      kind: VT
+    - artefact: VA-DE136-CLOSE-001
+      status: verified
+      kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
     source_kind: block
     source_type: spec

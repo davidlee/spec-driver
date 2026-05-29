@@ -225,21 +225,6 @@ entries:
     requirement: PROD-004.FR-004
     status: verified
     notes: CLI integration tests for schema show frontmatter.* commands - 23 schema tests passing (8 new), implemented in DE-003
-  - artefact: VT-005
-    kind: VT
-    requirement: PROD-004.FR-005
-    status: planned
-    notes: Backward compatibility tests comparing old and new validator outputs
-  - artefact: VT-006
-    kind: VT
-    requirement: PROD-004.NF-001
-    status: planned
-    notes: Dual-validation pattern tests ensuring zero behavioral regressions
-  - artefact: VT-007
-    kind: VT
-    requirement: PROD-004.FR-007
-    status: planned
-    notes: Compaction profile tests - canonical/derived classification, round-trip fidelity, default omission
   - artefact: VT-DE138-LIST-001
     kind: VT
     requirement: PROD-004.FR-001
@@ -430,6 +415,21 @@ entries:
     requirement: PROD-004.FR-006
     status: verified
     notes: Parametric schema enums smoke across every Category A controlled-vocab field (kind × field matrix, ~85 cases); DE-137 IP-137-P03
+  - artefact: VA-DE136-CLOSE-001
+    kind: VA
+    requirement: PROD-004.FR-005
+    status: verified
+    notes: Umbrella conformance audit AUD-028 — gradual-migration semantics honoured (tolerant-by-default read, per-kind opt-in strict via [validation.strict]); revision/delta/audit kinds 0 errors post-flip; DE-136 Phase 4 close 2026-05-30
+  - artefact: VA-DE136-CLOSE-001
+    kind: VA
+    requirement: PROD-004.FR-007
+    status: verified
+    notes: Umbrella conformance audit AUD-028 — canonical/derived compaction infra (DE-036) exercised across delta/spec/audit/revision migrations; per-kind schema_version state operational; DE-136 Phase 4 close 2026-05-30
+  - artefact: VA-DE136-CLOSE-001
+    kind: VA
+    requirement: PROD-004.NF-001
+    status: verified
+    notes: Umbrella conformance audit AUD-028 — single MetadataValidator layer, zero behavioural regressions across kinds (child-delta VT/VA roll-up); DE-136 Phase 4 close 2026-05-30
 ```
 
 ## 1. Intent & Summary

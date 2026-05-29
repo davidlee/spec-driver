@@ -5,9 +5,11 @@ Covers VA-140-001 through VA-140-005.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
+import yaml
 
 from spec_driver.migrations.spec_requirements.migration import (
   DRIFT_ACCEPTANCE_PLACEHOLDER,
@@ -356,6 +358,35 @@ class TestDriftLedger:
     assert DRIFT_DESCRIPTION_PLACEHOLDER in content
     assert DRIFT_ACCEPTANCE_PLACEHOLDER in content
 
+  def test_entry_blocks_are_valid_yaml(self, tmp_path: Path):
+    """Detail strings with ': ' must serialize as valid YAML scalars.
+
+    Regression: the hand-built emitter wrote ``detail: <raw>`` unquoted, so
+    any detail containing ': ' (every unparseable-line and placeholder
+    entry) produced malformed YAML that broke ``list drift`` parsing.
+    """
+    drift_dir = tmp_path / "drift"
+    entries = [
+      DriftEntry(
+        "PROD-099", DRIFT_REQUIREMENT_UNPARSEABLE,
+        "unparseable requirement-like line: - PROD-099.FR-001",
+      ),
+      DriftEntry(
+        "PROD-099", DRIFT_DESCRIPTION_PLACEHOLDER,
+        "FR-001: description is empty placeholder",
+      ),
+    ]
+    path = write_drift_ledger(drift_dir, "PROD-099", entries)
+    assert path is not None
+
+    content = path.read_text(encoding="utf-8")
+    blocks = re.findall(r"```yaml\n(.*?)```", content, re.DOTALL)
+    assert len(blocks) == 2
+    for block in blocks:
+      parsed = yaml.safe_load(block)
+      assert parsed["target"] == "PROD-099"
+      assert parsed["detail"].endswith(("FR-001", "placeholder"))
+
   def test_no_entries_returns_none(self, tmp_path: Path):
     drift_dir = tmp_path / "drift"
     result = write_drift_ledger(drift_dir, "PROD-099", [])
@@ -407,4 +438,3 @@ class TestDetectDrift:
       if d.kind == DRIFT_REQUIREMENT_UNPARSEABLE
     ]
     assert len(unparseable) == 1
-

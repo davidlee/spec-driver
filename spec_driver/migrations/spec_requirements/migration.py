@@ -380,16 +380,23 @@ def write_drift_ledger(
   ]
 
   for i, entry in enumerate(entries, 1):
+    body = yaml.safe_dump(
+      {
+        "target": entry.spec_id,
+        "drift_kind": entry.kind,
+        "detail": entry.detail,
+        "disposition": "open",
+        "owner": "unassigned",
+        "status": "open",
+      },
+      sort_keys=False,
+      allow_unicode=True,
+    ).rstrip("\n")
     lines.extend([
       f"### DL-{next_id:03d}.{i:03d}: {entry.kind} — {entry.spec_id}",
       "",
       "```yaml",
-      f"target: {entry.spec_id}",
-      f"drift_kind: {entry.kind}",
-      f"detail: {entry.detail}",
-      "disposition: open",
-      "owner: unassigned",
-      "status: open",
+      body,
       "```",
       "",
     ])

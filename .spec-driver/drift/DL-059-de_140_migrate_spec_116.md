@@ -2,8 +2,8 @@
 id: DL-059
 name: DE-140 requirements migration SPEC-116
 created: '2026-05-28'
-updated: '2026-05-28'
-status: open
+updated: '2026-05-30'
+status: closed
 kind: drift_ledger
 delta_ref: DE-140
 ---
@@ -12,6 +12,8 @@ delta_ref: DE-140
 
 Drift entries from requirements migration of SPEC-116.
 
+> **Disposition (DE-136 Phase 4 close, VA-DE136-CLOSE-001):** closed as tolerated drift per IP-136 §4. `requirement_unparseable` entries are false positives (coverage/relationship reference lines, not requirement definitions) → **dismissed**. `*_placeholder` entries are real but minor backfill debt → **deferred**. Durable residue tracked in **ISSUE-064**. Entry `detail` fields re-quoted to valid YAML (emitter bug fixed in DE-136 P4).
+
 ## Entries
 
 ### DL-059.001: requirement_unparseable — SPEC-116
@@ -19,10 +21,10 @@ Drift entries from requirements migration of SPEC-116.
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-001
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-001"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.002: requirement_unparseable — SPEC-116
@@ -30,10 +32,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-002
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-002"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.003: requirement_unparseable — SPEC-116
@@ -41,10 +43,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-003
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-003"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.004: requirement_unparseable — SPEC-116
@@ -52,10 +54,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-004
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-004"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.005: requirement_unparseable — SPEC-116
@@ -63,10 +65,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-005
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-005"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.006: requirement_unparseable — SPEC-116
@@ -74,10 +76,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-006
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-006"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.007: requirement_unparseable — SPEC-116
@@ -85,10 +87,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-001
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-001"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.008: requirement_unparseable — SPEC-116
@@ -96,10 +98,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-002
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-002"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.009: requirement_unparseable — SPEC-116
@@ -107,10 +109,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-003
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-003"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.010: requirement_unparseable — SPEC-116
@@ -118,10 +120,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-001
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-001"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.011: requirement_unparseable — SPEC-116
@@ -129,10 +131,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-001
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-001"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.012: requirement_unparseable — SPEC-116
@@ -140,10 +142,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-002
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-002"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.013: requirement_unparseable — SPEC-116
@@ -151,10 +153,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-003
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-003"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.014: requirement_unparseable — SPEC-116
@@ -162,10 +164,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-002
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-002"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.015: requirement_unparseable — SPEC-116
@@ -173,10 +175,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-004
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-004"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.016: requirement_unparseable — SPEC-116
@@ -184,10 +186,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-003
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-003"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.017: requirement_unparseable — SPEC-116
@@ -195,10 +197,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-005
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-005"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.018: requirement_unparseable — SPEC-116
@@ -206,10 +208,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-001
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-001"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.019: requirement_unparseable — SPEC-116
@@ -217,10 +219,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.FR-006
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.FR-006"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.020: requirement_unparseable — SPEC-116
@@ -228,10 +230,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: requirement_unparseable
-detail: unparseable requirement-like line: - SPEC-116.NF-003
-disposition: open
+detail: "unparseable requirement-like line: - SPEC-116.NF-003"
+disposition: dismissed
 owner: unassigned
-status: open
+status: dismissed
 ```
 
 ### DL-059.021: description_placeholder — SPEC-116
@@ -239,10 +241,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: description_placeholder
-detail: NF-001: description is empty placeholder
-disposition: open
+detail: "NF-001: description is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```
 
 ### DL-059.022: acceptance_placeholder — SPEC-116
@@ -250,10 +252,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: acceptance_placeholder
-detail: NF-001: acceptance_criteria is empty placeholder
-disposition: open
+detail: "NF-001: acceptance_criteria is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```
 
 ### DL-059.023: description_placeholder — SPEC-116
@@ -261,10 +263,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: description_placeholder
-detail: NF-002: description is empty placeholder
-disposition: open
+detail: "NF-002: description is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```
 
 ### DL-059.024: acceptance_placeholder — SPEC-116
@@ -272,10 +274,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: acceptance_placeholder
-detail: NF-002: acceptance_criteria is empty placeholder
-disposition: open
+detail: "NF-002: acceptance_criteria is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```
 
 ### DL-059.025: description_placeholder — SPEC-116
@@ -283,10 +285,10 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: description_placeholder
-detail: NF-003: description is empty placeholder
-disposition: open
+detail: "NF-003: description is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```
 
 ### DL-059.026: acceptance_placeholder — SPEC-116
@@ -294,8 +296,8 @@ status: open
 ```yaml
 target: SPEC-116
 drift_kind: acceptance_placeholder
-detail: NF-003: acceptance_criteria is empty placeholder
-disposition: open
+detail: "NF-003: acceptance_criteria is empty placeholder"
+disposition: deferred
 owner: unassigned
-status: open
+status: deferred
 ```

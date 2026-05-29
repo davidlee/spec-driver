@@ -4,7 +4,7 @@ slug: "142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_
 name: IP-142 Phase 04 — patterns + migration + sweep + flip
 created: "2026-05-29"
 updated: "2026-05-29"
-status: in-progress  # one of: completed | deferred | draft | in-progress | pending
+status: completed  # one of: completed | deferred | draft | in-progress | pending
 kind: phase  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
 plan: IP-142
 delta: DE-142
@@ -120,16 +120,16 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | ------ | --- | ----------- | --------- | ----- |
-| [ ] | 4.1 | RED: VT-142-PATTERN-001 — broadened constants accept PROD/ISSUE/NF + dotted suffix, reject garbage | [ ] | new/colocated test |
-| [ ] | 4.2 | GREEN: shared `REQUIREMENT_ID_PATTERN` + `SPEC_ID_PATTERN` (STD-003 home); reuse in revision_metadata (7×) + verification_metadata | [ ] | collapses dup; fixes NF gap |
-| [ ] | 4.3 | Regression: block-validator + verification suites green; fix any test that encoded the SPEC-only bug | [P] | relaxation only |
-| [ ] | 4.4 | RED: `v005/migration_test.py` — VT-142-MIGRATE-001/002/003/004 | [ ] | fixtures from RE-042 (block) + RE-015/RE-040 (FM-only) shapes |
-| [ ] | 4.5 | GREEN: `v005/{migration.py,__init__.py}` — cut keys + synthesise modify block (no move/lifecycle/drift); idempotent; block-wins | [ ] | mirror v004; isolation strict |
-| [ ] | 4.6 | Confirm folder auto-discovery (`admin migrate revision --dry-run` lists the step); no registry edit | [ ] | folder-based `_discover_steps` |
-| [ ] | 4.7 | Template: confirm fresh `create revision` validates `--strict`; minimal touch if needed | [P] | template already narrow |
-| [ ] | 4.8 | Sweep: tolerant baseline → `migrate --dry-run` → `migrate` → `--strict` (VA-142-CORPUS-001) → `--no-tolerated-aliases`; disposition residual | [ ] | capture evidence |
-| [ ] | 4.9 | MANUAL flip `[validation.strict].revision = true` in `workflow.toml` (DEC-142-11) | [ ] | after VA disposition |
-| [ ] | 4.10 | Verify: full `pytest supekku` + `just` clean; update DR/IP coverage; IP §9 P04 | [ ] | no new pylint message types |
+| [x] | 4.1 | RED: VT-142-PATTERN-001 — broadened constants accept PROD/ISSUE/NF + dotted suffix, reject garbage | [ ] | `blocks/id_patterns_test.py` (17 cases) |
+| [x] | 4.2 | GREEN: shared `REQUIREMENT_ID_PATTERN` + `SPEC_ID_PATTERN` in `blocks/id_patterns.py` (STD-003: blocks/ level, NOT metadata/); reuse in revision_metadata (9×) + verification_metadata | [ ] | collapsed dup; fixed NF gap |
+| [x] | 4.3 | Regression: block-validator + verification suites green; no test encoded the SPEC-only bug | [P] | 568 blocks + 91 targeted pass |
+| [x] | 4.4 | RED: `v005/migration_test.py` — VT-142-MIGRATE-001/002/003/004 (+ edges) | [ ] | 24 cases |
+| [x] | 4.5 | GREEN: `v005/{migration.py,__init__.py}` — cut keys + synthesise modify block (no move/lifecycle/drift); idempotent; block-wins | [ ] | mirror v004; isolation strict |
+| [x] | 4.6 | Folder auto-discovery confirmed (`migrate --list`); fixed 2 orchestrator bugs (DEC-142-13: `_kind_files` comment-strip, dry-run count) | [ ] | no registry edit |
+| [x] | 4.7 | Template: `create_revision` rewritten to narrow FM + canonical block (DEC-142-14); fresh `create revision` validates `--strict` clean; completion suppress-flag (DEC-142-15, ISSUE-062); template kind-enum comment fixed | [P] | NOT verify-only |
+| [x] | 4.8 | Sweep: baseline → dry-run (42) → migrate (42 files) → `--strict --no-tolerated-aliases` clean (VA-142-CORPUS-001, exit 0, zero residual) | [ ] | evidence in §5/§9 |
+| [x] | 4.9 | MANUAL flip `[validation.strict].revision = true` in `workflow.toml` (DEC-142-11) | [ ] | done |
+| [x] | 4.10 | Verify: full pytest (supekku+spec_driver) — zero new failures (5 pre-existing); ruff/ty/pylint clean; DR/IP coverage + IP §9 P04 updated | [ ] | template test FIXED |
 
 ### Task Details
 
@@ -176,6 +176,19 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - `2026-05-29` — **DEC-142-08 (broaden patterns)**, **DEC-142-09 (modify + omit lifecycle, no
   `unknown`)**, **DEC-142-10 (no auto-drift; ISSUE-061)**, **DEC-142-11 (manual flip)** — ratified
   at P04 consult; see DR-142 §8/§12 + notes.md session 6 for evidence and rationale.
+- `2026-05-29/30` — **execution consults (notes.md session 7)**:
+  - **DEC-142-12**: synthesise `specs[]` from `destination_specs` only (not `source ∪ dest`).
+    `source_specs` is origin data with no block home under modify-only; ADR-* sources excluded.
+    Updates DR §8 step 4.
+  - **DEC-142-13**: fix two pre-existing `migrate.py` orchestrator defects (`_kind_files` trailing
+    `# comment` strip → RE-041/RE-042 now swept; dry-run count sums previews not empty results).
+  - **DEC-142-14**: `create_revision` rewritten to emit narrow FM + canonical block (it was
+    emitting legacy FM → freshly-created revisions failed strict). Dead `--source` removed.
+  - **DEC-142-15**: completion path passes `render_change_block=False` to avoid a duplicate block;
+    single-renderer consolidation deferred to **ISSUE-062**.
+- **VA-142-CORPUS-001** (2026-05-30): `admin migrate revision` applied to 42 records; `validate
+  workspace --kind revision --strict --no-tolerated-aliases` → exit 0, clean, **zero residual**.
+  No STOP condition triggered. `[validation.strict].revision = true` set in `workflow.toml`.
 
 ## 10. Findings / Research Notes
 
@@ -195,9 +208,9 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored (§5 / §9) — VA-142-CORPUS-001 output captured
-- [ ] DR-142/IP-142 coverage updated; IP §9 P04 checked
-- [ ] `[validation.strict].revision = true` confirmed in `workflow.toml`
-- [ ] Hand-off: DE-142 ready to close (audit deferred to DE-136 umbrella, VA-DE136-CLOSE-001);
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (§5 / §9) — VA-142-CORPUS-001 captured
+- [x] DR-142/IP-142 coverage updated; IP §9 P04 checked
+- [x] `[validation.strict].revision = true` confirmed in `workflow.toml`
+- [x] Hand-off: DE-142 ready to close (audit deferred to DE-136 umbrella, VA-DE136-CLOSE-001);
       then DE-136 P03 tasks 3.9–3.11 (flip confirm, baseline) → DE-136 P04 umbrella close

@@ -2,7 +2,7 @@
 id: "{{ revision_id }}"
 name: "Revision - {{ name }}"
 slug: "{{ slug }}"
-kind: revision  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+kind: revision  # one of: revision
 status: draft  # one of: completed | deferred | draft | in-progress | pending
 created: "{{ today }}"
 updated: "{{ today }}"

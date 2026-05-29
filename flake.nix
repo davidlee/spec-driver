@@ -78,6 +78,8 @@
           #gomarkdoc
 
           d2
+
+          codex
         ];
 
         # sibling repos to bind-mount (for editable deps / source inspection)

@@ -104,6 +104,8 @@ class ChangeArtifact:
   ext_id: str = ""
   ext_url: str = ""
   audit_gate: str | None = None
+  mode: str | None = None
+  delta_ref: str | None = None
 
   def to_dict(self, repo_root: Path) -> dict[str, Any]:
     """Convert artifact to dictionary for registry serialization.
@@ -133,6 +135,10 @@ class ChangeArtifact:
       data["ext_id"] = self.ext_id
     if self.ext_url:
       data["ext_url"] = self.ext_url
+    if self.mode:
+      data["mode"] = self.mode
+    if self.delta_ref:
+      data["delta_ref"] = self.delta_ref
     return data
 
 
@@ -266,6 +272,10 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     ext_url=str(frontmatter.get("ext_url", "")),
     audit_gate=(
       str(frontmatter["audit_gate"]).strip() if frontmatter.get("audit_gate") else None
+    ),
+    mode=str(frontmatter["mode"]).strip() if frontmatter.get("mode") else None,
+    delta_ref=(
+      str(frontmatter["delta_ref"]).strip() if frontmatter.get("delta_ref") else None
     ),
   )
 

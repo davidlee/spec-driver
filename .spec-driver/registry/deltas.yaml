@@ -13773,11 +13773,11 @@ deltas:
         status: completed
   DE-141:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Audit artefact metadata propagation: findings block, strict outcome
       enum, list enrichment (DE-136 child)'
     slug: audit_artefact_metadata_propagation_findings_block_strict_outcome_enum_list_enrichment_de_136_child
-    updated: '2026-05-09'
+    updated: '2026-05-29'
     path: .spec-driver/deltas/DE-141-audit_artefact_metadata_propagation_findings_block_strict_outcome_enum_list_enrichment_de_136_child/DE-141.md
     applies_to:
       specs:
@@ -13810,6 +13810,48 @@ deltas:
       attributes:
         nature: Lifecycle-truth doctrine governs how audit findings reconcile with
           status
+    plan:
+      id: IP-141
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-141
+        delta: DE-141
+        revision_links:
+          aligns_with:
+          - DR-141
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          dependencies: []
+        phases:
+        - id: IP-141-P01
+        - id: IP-141-P02
+        - id: IP-141-P03
+        - id: IP-141-P04
+      phases:
+      - plan: IP-141
+        delta: DE-141
+        phase: IP-141-P01
+        status: completed
+      - plan: IP-141
+        delta: DE-141
+        phase: IP-141-P02
+        status: completed
+      - plan: IP-141
+        delta: DE-141
+        phase: IP-141-P03
+        status: completed
+      - plan: IP-141
+        delta: DE-141
+        phase: IP-141-P04
+        status: completed
   DE-142:
     kind: delta
     status: draft

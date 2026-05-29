@@ -4,7 +4,7 @@ slug: "141-audit_artefact_metadata_propagation-phase-03"
 name: "IP-141 Phase 03 — Strict enforcement"
 created: "2026-05-29"
 updated: "2026-05-29"
-status: draft
+status: completed
 kind: phase
 plan: IP-141
 delta: DE-141

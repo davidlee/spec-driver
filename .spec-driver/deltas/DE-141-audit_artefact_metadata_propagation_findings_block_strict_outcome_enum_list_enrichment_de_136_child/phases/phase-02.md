@@ -4,7 +4,7 @@ slug: "141-audit_artefact_metadata_propagation-phase-02"
 name: "IP-141 Phase 02 — List enrichment"
 created: "2026-05-29"
 updated: "2026-05-29"
-status: draft
+status: completed
 kind: phase
 plan: IP-141
 delta: DE-141

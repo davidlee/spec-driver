@@ -23,6 +23,7 @@ from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.frontmatter_metadata.delta import AUDIT_GATE_AUTO
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
+  AUDIT_COLUMNS,
   CHANGE_COLUMNS,
   DELTA_COLUMNS,
   DELTA_TAGS_COLUMN,
@@ -46,9 +47,10 @@ from supekku.scripts.lib.formatters.theme import get_change_status_style
 from supekku.scripts.lib.relations.query import collect_references
 
 if TYPE_CHECKING:
-  from collections.abc import Sequence
+  from collections.abc import Mapping, Sequence
 
   from supekku.scripts.lib.changes.artifacts import ChangeArtifact
+  from supekku.scripts.lib.changes.audit_check import AuditFindingsSummary
 
 
 def format_change_list_item(artifact: ChangeArtifact) -> str:
@@ -903,6 +905,127 @@ def format_audit_details(
 
   lines = [line for section in sections for line in section]
   return "\n".join(lines)
+
+
+_MODE_GLYPHS = {"conformance": "C", "discovery": "D"}
+
+
+def _format_mode_glyph(artifact: ChangeArtifact) -> str:
+  return _MODE_GLYPHS.get(artifact.mode or "", artifact.mode or _EMPTY_CELL)
+
+
+def _format_delta_ref(artifact: ChangeArtifact) -> str:
+  return artifact.delta_ref or _EMPTY_CELL
+
+
+def format_audit_list_row(
+  artifact: ChangeArtifact,
+  summary: AuditFindingsSummary,
+) -> dict[str, str]:
+  """Render one audit as a column-keyed cell dict (DR-141 §5.4)."""
+  display_name = artifact.name
+  if display_name.startswith("Audit - "):
+    display_name = display_name[8:]
+  return {
+    "id": artifact.id,
+    "name": display_name,
+    "status": artifact.status,
+    "mode": _format_mode_glyph(artifact),
+    "delta_ref": _format_delta_ref(artifact),
+    "findings": summary.findings_cell(),
+    "disposed": summary.disposed_cell(),
+  }
+
+
+def format_audit_list_json(
+  audits: Sequence[ChangeArtifact],
+  summaries: Mapping[str, AuditFindingsSummary],
+) -> str:
+  """JSON output for audit list — includes enriched fields."""
+  items: list[dict[str, Any]] = []
+  for a in audits:
+    s = summaries.get(a.id)
+    item: dict[str, Any] = {
+      "id": a.id,
+      "kind": a.kind,
+      "status": a.status,
+      "name": a.name,
+      "slug": a.slug,
+      "path": a.path.as_posix(),
+      "mode": a.mode,
+      "delta_ref": a.delta_ref,
+    }
+    if s:
+      item["findings_total"] = s.total
+      item["findings_aligned"] = s.aligned
+      item["findings_drift"] = s.drift
+      item["findings_risk"] = s.risk
+      item["findings_disposed"] = s.disposed
+    if a.applies_to:
+      item["applies_to"] = a.applies_to
+    if a.tags:
+      item["tags"] = a.tags
+    items.append(item)
+  return format_as_json(items)
+
+
+def format_audit_list_table(
+  audits: Sequence[ChangeArtifact],
+  summaries: Mapping[str, AuditFindingsSummary],
+  *,
+  format_type: str = "table",
+  truncate: bool = False,
+  show_external: bool = False,
+) -> str:
+  """Render enriched audit list per DR-141 §5.5."""
+  col_defs = list(AUDIT_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
+  fields = [c.field for c in col_defs]
+
+  def _get_summary(a: ChangeArtifact) -> AuditFindingsSummary:
+    s = summaries.get(a.id)
+    if s:
+      return s
+    from supekku.scripts.lib.changes.audit_check import (  # noqa: PLC0415
+      AuditFindingsSummary as _Summary,
+    )
+    return _Summary(0, 0, 0, 0, 0)
+
+  def _table_row(a: ChangeArtifact) -> list[str]:
+    row = format_audit_list_row(a, _get_summary(a))
+    if show_external:
+      row["ext_id"] = a.ext_id
+    cells: list[str] = []
+    for field_name in fields:
+      cell = row.get(field_name, "")
+      if field_name == "id":
+        cell = f"[change.id]{cell}[/change.id]"
+      elif field_name == "status":
+        style = get_change_status_style(a.status)
+        cell = f"[{style}]{cell}[/{style}]"
+      cells.append(cell)
+    return cells
+
+  def _tsv_row(a: ChangeArtifact) -> list[str]:
+    row = format_audit_list_row(a, _get_summary(a))
+    if show_external:
+      row["ext_id"] = a.ext_id
+    return [row.get(field_name, "") for field_name in fields]
+
+  def _to_json(items: Sequence[ChangeArtifact]) -> str:
+    return format_audit_list_json(items, summaries)
+
+  return format_list_table(
+    audits,
+    columns=column_labels(col_defs),
+    title="Audits",
+    prepare_row=_table_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=_to_json,
+    format_type=format_type,
+    truncate=truncate,
+  )
 
 
 def format_plan_details(

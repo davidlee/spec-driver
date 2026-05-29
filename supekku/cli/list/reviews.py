@@ -20,9 +20,11 @@ from supekku.cli.common import (
   matches_regexp,
 )
 from supekku.cli.list import app
+from supekku.scripts.lib.changes.audit_check import audit_findings_summary
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.formatters.change_formatters import (
+  format_audit_list_table,
   format_change_list_table,
 )
 from supekku.scripts.lib.relations.query import partition_by_reverse_references
@@ -303,10 +305,12 @@ def list_audits(
 
     # Sort and format
     audits.sort(key=lambda a: a.id)
-    output = format_change_list_table(
+    summaries = {a.id: audit_findings_summary(a) for a in audits}
+    output = format_audit_list_table(
       audits,
-      format_type,
-      not truncate,
+      summaries,
+      format_type=format_type,
+      truncate=not truncate,
       show_external=external,
     )
     typer.echo(output)

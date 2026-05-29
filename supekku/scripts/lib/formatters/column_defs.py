@@ -70,6 +70,16 @@ DELTA_COLUMNS = [
 ]
 DELTA_TAGS_COLUMN = ColumnDef(label="Tags", field="tags")
 
+AUDIT_COLUMNS = [
+  ColumnDef(label="ID", field="id", style_key="change.id"),
+  ColumnDef(label="Name", field="name"),
+  ColumnDef(label="Status", field="status"),
+  ColumnDef(label="Mode", field="mode"),
+  ColumnDef(label="Delta", field="delta_ref"),
+  ColumnDef(label="Findings", field="findings"),
+  ColumnDef(label="Disposed", field="disposed"),
+]
+
 PLAN_COLUMNS = [
   ColumnDef(label="ID", field="id", style_key="change.id"),
   ColumnDef(label="Status", field="status"),

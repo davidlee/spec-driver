@@ -9,10 +9,12 @@ Design authority: DR-079 (DEC-079-003, -005, -006, -008, -011).
 
 from __future__ import annotations
 
+import contextlib
 import sys
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.blocks.audit_findings import load_audit_findings
 from supekku.scripts.lib.core.frontmatter_metadata.audit import (
   AUDIT_MODE_CONFORMANCE,
   DISPOSITION_KIND_FOLLOW_UP_BACKLOG,
@@ -29,8 +31,10 @@ from supekku.scripts.lib.core.frontmatter_metadata.delta import (
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
+  from collections.abc import Mapping
   from pathlib import Path
 
+  from supekku.scripts.lib.changes.artifacts import ChangeArtifact
   from supekku.scripts.lib.workspace import Workspace
 
 
@@ -77,6 +81,70 @@ class AuditCheckResult:
   blocking_findings: list[GatingFinding] = field(default_factory=list)
   warning_findings: list[GatingFinding] = field(default_factory=list)
   collisions: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class AuditFindingsSummary:
+  """Aggregated findings breakdown for an audit (DEC-141-01)."""
+
+  total: int
+  aligned: int
+  drift: int
+  risk: int
+  disposed: int
+
+  def findings_cell(self) -> str:
+    """DR-136 §9.4: '7 (3a/2d/2r)' or em-dash."""
+    if not self.total:
+      return "–"
+    return f"{self.total} ({self.aligned}a/{self.drift}d/{self.risk}r)"
+
+  def disposed_cell(self) -> str:
+    """DR-136 §9.4: '5/7' or em-dash."""
+    if not self.total:
+      return "–"
+    return f"{self.disposed}/{self.total}"
+
+
+def audit_findings_summary(artifact: ChangeArtifact) -> AuditFindingsSummary:
+  """Compute findings breakdown from block (preferred) or FM fallback."""
+  body = ""
+  fm: dict[str, Any] | None = None
+  with contextlib.suppress(FileNotFoundError, ValueError, OSError):
+    fm, body = load_markdown_file(artifact.path)
+  findings = load_audit_findings(body, fm=fm)
+  aligned = drift = risk = disposed = 0
+  for f in findings:
+    outcome = f.get("outcome", "")
+    if outcome == "aligned":
+      aligned += 1
+    elif outcome == "drift":
+      drift += 1
+    elif outcome == "risk":
+      risk += 1
+    if f.get("disposition"):
+      disposed += 1
+  return AuditFindingsSummary(
+    total=len(findings),
+    aligned=aligned,
+    drift=drift,
+    risk=risk,
+    disposed=disposed,
+  )
+
+
+def collect_audited_delta_ids(
+  audits: Mapping[str, ChangeArtifact],
+) -> set[str]:
+  """Set of delta IDs covered by completed audits (DEC-141-02).
+
+  Uses ChangeArtifact.delta_ref (populated from FM at load time).
+  """
+  return {
+    a.delta_ref
+    for a in audits.values()
+    if a.status == "completed" and a.delta_ref
+  }
 
 
 # -- Pure functions --
@@ -441,8 +509,11 @@ def display_audit_warnings(
 
 __all__ = [
   "AuditCheckResult",
+  "AuditFindingsSummary",
   "GatingFinding",
+  "audit_findings_summary",
   "check_audit_completeness",
+  "collect_audited_delta_ids",
   "collect_gating_findings",
   "derive_closure_effect",
   "display_audit_error",

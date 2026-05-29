@@ -4,7 +4,7 @@ slug: "142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_
 name: IP-142 Phase 01 — Engine + block conditional rules
 created: "2026-05-29"
 updated: "2026-05-29"
-status: draft  # one of: completed | deferred | draft | in-progress | pending
+status: completed  # one of: completed | deferred | draft | in-progress | pending
 kind: phase  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
 plan: IP-142
 delta: DE-142
@@ -38,16 +38,16 @@ Foundation phase — P02–P04 build on the validated block.
 
 - [x] DR-142 approved, validated, reconciled with DE-142
 - [x] DR-136 §10.2 erratum committed
-- [ ] Owning delta DE-142 moved to `in-progress` (at execute time)
+- [x] Owning delta DE-142 moved to `in-progress` (at execute time)
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `FieldMetadata.conditional_rules: list[ConditionalRule]` exists (additive, default empty)
-- [ ] Object-level conditional rules applied in `_validate_object` via shared helper; top-level call preserved with no error-path regression (no leading dot)
-- [ ] `REVISION_CHANGE_METADATA` `requirements[]` item declares: `move`→{origin,destination}, `introduce`→{destination}, `modify`→{destination}
-- [ ] VT-142-ENGINE-001/002/003 + VT-142-BLOCK-001/002/003 pass
-- [ ] Existing block-validator + `test_engine` suites green (no-change guard)
-- [ ] `just lint` zero warnings; `just pylint-files` on touched files no new warnings
+- [x] `FieldMetadata.conditional_rules: list[ConditionalRule]` exists (additive, default empty)
+- [x] Object-level conditional rules applied in `_validate_object` via shared helper; top-level call preserved with no error-path regression (no leading dot)
+- [x] `REVISION_CHANGE_METADATA` `requirements[]` item declares: `move`→{origin,destination}, `introduce`→{destination}, `modify`→{destination}
+- [x] VT-142-ENGINE-001/002/003 + VT-142-BLOCK-001/002/003 pass
+- [x] Existing block-validator + `test_engine` suites green (no-change guard)
+- [x] `just lint` zero warnings; `just pylint-files` on touched files no new warnings
 
 ## 5. Verification
 
@@ -76,12 +76,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | ------ | --- | ----------- | --------- | ----- |
-| [ ] | 1.1 | Add `conditional_rules: list[ConditionalRule] = field(default_factory=list)` to `FieldMetadata` | [ ] | schema.py; additive |
-| [ ] | 1.2 | Extract `_apply_conditional_rules(obj, rules, path_prefix)` from `_validate_conditional_rules`; call from `validate()` (prefix="") and `_validate_object` (prefix=field_path) | [ ] | preserve error path (no leading dot) — R-142-03 |
-| [ ] | 1.3 | Declare `conditional_rules` on `requirements[]` item in `REVISION_CHANGE_METADATA` | [ ] | move→{origin,destination}, introduce/modify→{destination} |
-| [ ] | 1.4 | Tests VT-142-ENGINE-001/002/003 | [P] | validator_test / test_engine |
-| [ ] | 1.5 | Tests VT-142-BLOCK-001/002/003 (RE-042 regression fixture) | [P] | revision_metadata_test |
-| [ ] | 1.6 | Lint + full suite green (no-change guard) | [ ] | `just lint`, `just test` |
+| [x] | 1.1 | Add `conditional_rules: list[ConditionalRule] = field(default_factory=list)` to `FieldMetadata` | [ ] | schema.py; additive |
+| [x] | 1.2 | Extract `_apply_conditional_rules(obj, rules, path_prefix)` from `_validate_conditional_rules`; call from `validate()` (prefix="") and `_validate_object` (prefix=field_path) | [ ] | preserve error path (no leading dot) — R-142-03 |
+| [x] | 1.3 | Declare `conditional_rules` on `requirements[]` item in `REVISION_CHANGE_METADATA` | [ ] | move→{origin,destination}, introduce/modify→{destination} |
+| [x] | 1.4 | Tests VT-142-ENGINE-001/002/003 | [P] | test_engine.py `ObjectScopedConditionalRuleTest` |
+| [x] | 1.5 | Tests VT-142-BLOCK-001/002/003 (RE-042 regression fixture) | [P] | new `revision_metadata_conditional_test.py` |
+| [x] | 1.6 | Lint + full suite green (no-change guard) | [ ] | ruff/pylint/ty clean; suite green except 3 pre-existing env failures |
 
 ### Task Details
 
@@ -110,15 +110,29 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 ## 9. Decisions & Outcomes
 
 - `2026-05-29` — Conditional rules are object-scoped on `FieldMetadata`, applied in `_validate_object`, so they cover both top-level blocks and array items without touching `_validate_array` (DEC-142-02).
+- `2026-05-29` — Extracted `_validate_additional_keys` from `_validate_object` to keep McCabe under threshold after adding the conditional-rule call; behaviour-identical (covered by existing object/strict tests).
 
 ## 10. Findings / Research Notes
 
 - `_validate_conditional_rules` (validator.py:529) uses dot-path traversal on the passed dict; generalising the object it receives is sufficient for per-item rules — no array-indexing logic needed.
 - Only `test_engine.py` exercises top-level `conditional_rules` today — low refactor blast radius.
 
+### Implementation evidence (2026-05-29)
+
+- **Engine**: `FieldMetadata.conditional_rules` added (schema.py). `_validate_conditional_rules` → `_apply_conditional_rules(obj, rules, path_prefix)` (validator.py); top-level `validate()` calls with `prefix=""`, `_validate_object` with `prefix=field_path`. Path join: `f"{prefix}.{field}" if prefix else field` (no leading dot at top level).
+- **Complexity**: adding the `_validate_object` rule-call pushed McCabe 10→11 (`too-complex`). Extracted the additional/strict-key pass into `_validate_additional_keys`; `_validate_object` back under threshold, validator pylint matches HEAD baseline (only pre-existing `too-few-public-methods` + `too-many-return-statements`).
+- **Block**: `requirements[]` item declares 3 `ConditionalRule`s (move→origin+destination, introduce→destination, modify→destination); `retire` unconstrained (DEC-142-03), `specs[]` unconstrained.
+- **Tests**: `ObjectScopedConditionalRuleTest` (VT-142-ENGINE-001/002/003) in `test_engine.py`; `RequirementActionConditionalRuleTest` (VT-142-BLOCK-001/002/003) in new `revision_metadata_conditional_test.py` (split out to keep `revision_metadata_test.py` under the 1000-line ceiling — moving them inline introduced a new `too-many-lines`).
+- **Suite**: `metadata/test_engine.py` + both revision test files → 121 passed. Full `pytest supekku` → **5229 passed, 4 skipped**; **3 pre-existing failures** in `cli/list_test.py::ListDeltasMalformedFrontmatterTest` (×2) and `cli/show_test.py::ShowPathFlagTest::test_path_and_json_mutually_exclusive` — reproduce on clean HEAD with this work stashed; caused by stray untracked `.spec-driver/deltas/.spec-driver/run` telemetry polluting CLI discovery. Not introduced by P01.
+- **Lint**: `ruff check`/`ruff format`/`ty check` clean on all touched files; `pylint_report` no new message types (schema's `too-many-instance-attributes` 16→17 is the same pre-existing warning on an additive dataclass field).
+
+### Residual for later phases
+
+- **JSON-schema gap**: `metadata_to_json_schema` only emits `allOf` from `BlockMetadata.conditional_rules`; per-item `FieldMetadata.conditional_rules` are **not** projected into generated JSON Schema. Runtime validation is correct (VT-142-ENGINE-003 guards no-change); doc/schema generation parity is deferred. Flag for P02+ if JSON-schema consumers need the if/then.
+
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored (§10)
-- [ ] DR-142/IP-142 updated if approach shifted
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (§10)
+- [x] DR-142/IP-142 updated if approach shifted (no design shift; engine extracted `_validate_additional_keys` per §10 — within DR §4 intent)
 - [ ] Hand-off note to P02 (FM completion + applies_to derivation)

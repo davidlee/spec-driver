@@ -29,7 +29,7 @@ from typing import Any, Literal
 
 from spec_driver.core.string_utils import closest_match
 
-from .schema import BlockMetadata, FieldMetadata
+from .schema import BlockMetadata, ConditionalRule, FieldMetadata
 
 SEVERITY_ERROR: Literal["error"] = "error"
 SEVERITY_WARNING: Literal["warning"] = "warning"
@@ -134,7 +134,9 @@ class MetadataValidator:
           )
 
     if self.metadata.conditional_rules:
-      errors.extend(self._validate_conditional_rules(data))
+      errors.extend(
+        self._apply_conditional_rules(data, self.metadata.conditional_rules, "")
+      )
 
     return errors
 
@@ -503,20 +505,42 @@ class MetadataValidator:
         self._current_field_aliases = saved
       declared = set(field_meta.properties)
 
-    # Keys present under declared properties (or under their alias keys)
-    # are already covered above; skip them in the additional/strict pass.
+    errors.extend(
+      self._validate_additional_keys(value, field_meta, field_path, declared)
+    )
+
+    if field_meta.conditional_rules:
+      errors.extend(
+        self._apply_conditional_rules(value, field_meta.conditional_rules, field_path)
+      )
+    return errors
+
+  def _validate_additional_keys(
+    self,
+    value: dict[str, Any],
+    field_meta: FieldMetadata,
+    field_path: str,
+    declared: set[str],
+  ) -> list[ValidationError]:
+    """Validate keys not covered by declared properties (additional/strict pass).
+
+    Keys present under declared properties (or under their alias keys) are
+    already validated by ``_validate_fields``; this pass handles the rest via
+    ``additional_properties`` or the strict unknown-key rejection.
+    """
     declared_or_aliased = set(declared)
     for alias_key, canonical_key in (field_meta.field_aliases or {}).items():
       if canonical_key in declared:
         declared_or_aliased.add(alias_key)
 
-    for key in value:
+    errors: list[ValidationError] = []
+    for key, item in value.items():
       if key in declared_or_aliased:
         continue
       sub_path = f"{field_path}.{key}" if field_path else key
       if field_meta.additional_properties is not None:
         errors.extend(
-          self._validate_field(value[key], field_meta.additional_properties, sub_path)
+          self._validate_field(item, field_meta.additional_properties, sub_path)
         )
       elif self._strict:
         errors.append(
@@ -526,23 +550,34 @@ class MetadataValidator:
 
   # -- conditional rules ---------------------------------------------------
 
-  def _validate_conditional_rules(self, data: dict[str, Any]) -> list[ValidationError]:
-    """Validate conditional rules (if/then logic)."""
+  def _apply_conditional_rules(
+    self,
+    obj: dict[str, Any],
+    rules: list[ConditionalRule],
+    path_prefix: str,
+  ) -> list[ValidationError]:
+    """Apply if/then rules to *obj*, prefixing error paths with *path_prefix*.
+
+    Object-scoped: the top-level call passes ``path_prefix=""`` (so an error
+    on ``origin`` reads ``origin``, no leading dot) while ``_validate_object``
+    passes the array-item/nested path (so it reads ``requirements[2].origin``).
+    """
     errors: list[ValidationError] = []
-    for rule in self.metadata.conditional_rules:
-      condition_value = self._get_nested_value(data, rule.condition_field)
+    for rule in rules:
+      condition_value = self._get_nested_value(obj, rule.condition_field)
       if condition_value != rule.condition_value:
         continue
       for required_field in rule.requires:
-        if self._has_nested_value(data, required_field):
+        if self._has_nested_value(obj, required_field):
           continue
         expected_msg = (
           f"field present (due to: {rule.description})" if rule.description else None
         )
         condition_desc = f"{rule.condition_field}={rule.condition_value}"
+        path = f"{path_prefix}.{required_field}" if path_prefix else required_field
         errors.append(
           ValidationError(
-            path=required_field,
+            path=path,
             message=f"is required when {condition_desc}",
             expected=expected_msg,
             severity=SEVERITY_ERROR,

@@ -533,6 +533,107 @@ class ConditionalRuleValidationTest(unittest.TestCase):
     assert errors[0].path == "changes"
 
 
+class ObjectScopedConditionalRuleTest(unittest.TestCase):
+  """Object-scoped conditional rules on FieldMetadata (DE-142 P01).
+
+  Rules declared on an object/array-item FieldMetadata fire per object, with
+  error paths prefixed by the object's path (VT-142-ENGINE-001/002/003).
+  """
+
+  def _item_with_move_rule(self) -> FieldMetadata:
+    """An array-item object that requires origin when action=move."""
+    return FieldMetadata(
+      type="object",
+      properties={
+        "action": FieldMetadata(type="string", required=True),
+        "origin": FieldMetadata(type="string", required=False),
+      },
+      conditional_rules=[
+        ConditionalRule(
+          condition_field="action",
+          condition_value="move",
+          requires=["origin"],
+          description="move requires origin",
+        )
+      ],
+    )
+
+  def test_per_item_rule_fires_with_indexed_path(self):
+    """VT-142-ENGINE-001: array item action=move without origin errors.
+
+    Error path is prefixed with the array index (no leading dot).
+    """
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "requirements": FieldMetadata(
+          type="array", required=True, items=self._item_with_move_rule()
+        )
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate(
+      {"requirements": [{"action": "introduce"}, {"action": "move"}]}
+    )
+    assert len(errors) == 1
+    assert errors[0].path == "requirements[1].origin"
+    assert "is required when action=move" in errors[0].message
+
+  def test_nested_object_rule_fires(self):
+    """VT-142-ENGINE-002: rule on a non-array nested object also fires."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "change": FieldMetadata(
+          type="object",
+          required=True,
+          properties={
+            "action": FieldMetadata(type="string", required=True),
+            "origin": FieldMetadata(type="string", required=False),
+          },
+          conditional_rules=[
+            ConditionalRule(
+              condition_field="action",
+              condition_value="move",
+              requires=["origin"],
+              description="move requires origin",
+            )
+          ],
+        )
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"change": {"action": "move"}})
+    assert len(errors) == 1
+    assert errors[0].path == "change.origin"
+
+  def test_no_conditional_rules_is_no_change(self):
+    """VT-142-ENGINE-003: object without conditional_rules validates clean.
+
+    Regression guard: the shared helper must not fabricate errors when an
+    object declares no rules (default empty list).
+    """
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "requirements": FieldMetadata(
+          type="array",
+          required=True,
+          items=FieldMetadata(
+            type="object",
+            properties={"action": FieldMetadata(type="string", required=True)},
+          ),
+        )
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"requirements": [{"action": "move"}]})
+    assert not errors
+
+
 class RequiredFieldValidationTest(unittest.TestCase):
   """Test required field enforcement."""
 

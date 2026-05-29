@@ -10,6 +10,7 @@ from typing import Any
 
 from supekku.scripts.lib.blocks.metadata import (
   BlockMetadata,
+  ConditionalRule,
   FieldMetadata,
   MetadataValidator,
 )
@@ -178,6 +179,26 @@ REVISION_CHANGE_METADATA = BlockMetadata(
       items=FieldMetadata(
         type="object",
         description="A single requirement change entry",
+        conditional_rules=[
+          ConditionalRule(
+            condition_field="action",
+            condition_value="move",
+            requires=["origin", "destination"],
+            description="move requires both origin and destination",
+          ),
+          ConditionalRule(
+            condition_field="action",
+            condition_value="introduce",
+            requires=["destination"],
+            description="introduce requires destination",
+          ),
+          ConditionalRule(
+            condition_field="action",
+            condition_value="modify",
+            requires=["destination"],
+            description="modify requires destination",
+          ),
+        ],
         properties={
           "requirement_id": FieldMetadata(
             type="string",

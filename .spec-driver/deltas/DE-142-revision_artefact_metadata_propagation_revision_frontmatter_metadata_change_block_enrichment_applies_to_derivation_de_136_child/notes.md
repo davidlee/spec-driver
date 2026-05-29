@@ -47,6 +47,47 @@
 ### Memory to capture once P01 lands (not yet — design only)
 - "Object-level `FieldMetadata.conditional_rules` enable per-array-item
   validation" — capture as a metadata-engine capability memory after it's real.
+  → **landed**; memory `mem.pattern.spec-driver.field-conditional-rules` written.
+
+---
+
+## Session 2026-05-29 — P01 executed (engine + block conditional rules)
+
+### Done
+- `FieldMetadata.conditional_rules` (additive, default `[]`) — `schema.py`.
+- `_validate_conditional_rules` → `_apply_conditional_rules(obj, rules, path_prefix)`
+  (`validator.py`). Top-level `validate()` passes `prefix=""` (no leading dot);
+  `_validate_object` passes `field_path` → array-item errors read
+  `requirements[2].origin`.
+- Extracted `_validate_additional_keys` from `_validate_object` (the rule-call
+  pushed McCabe 10→11; extraction restores it). Behaviour-identical.
+- `requirements[]` item declares 3 `ConditionalRule`s: move→{origin,destination},
+  introduce→{destination}, modify→{destination}; retire/`specs[]` unconstrained.
+- Tests: `ObjectScopedConditionalRuleTest` (test_engine.py, ENGINE-001/002/003);
+  `RequirementActionConditionalRuleTest` (new file
+  `revision_metadata_conditional_test.py`, BLOCK-001/002/003). 121 targeted pass.
+
+### Verification evidence
+- Full `pytest supekku`: **5229 passed, 4 skipped**. **3 pre-existing failures**
+  (`cli/list_test.py::ListDeltasMalformedFrontmatterTest` ×2,
+  `cli/show_test.py::ShowPathFlagTest::test_path_and_json_mutually_exclusive`) —
+  reproduce on clean HEAD with this work stashed; caused by stray untracked
+  `.spec-driver/deltas/.spec-driver/run` telemetry polluting CLI discovery. Not P01.
+- ruff/ruff-format/ty clean; pylint no new message types (validator matches HEAD
+  baseline after the extraction).
+
+### Residual → P02+
+- **JSON-schema gap**: `metadata_to_json_schema` emits `allOf` only from
+  `BlockMetadata.conditional_rules`; per-item `FieldMetadata.conditional_rules`
+  are NOT projected to JSON Schema. Runtime validation correct; doc/schema parity
+  deferred. Flag if JSON-schema consumers need the if/then.
+
+### Handoff → P02 (FM completion + applies_to derivation)
+- R-142-04 still open: confirm FM-beside-block strict check generalises to
+  `kind:revision` (may be delta-keyed).
+- `applies_to.specs` dedup/order to finalise (DR-142 §13.2 / §7.1 split).
+- F-F additive-only; DEC-138-10 derive-don't-store; DR-136 §11.1 engine/migration
+  boundary still hold.
 
 ---
 

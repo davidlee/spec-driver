@@ -67,6 +67,11 @@ class FieldMetadata:
       ``BlockMetadata.field_aliases``. Carried on object-typed FieldMetadata
       so nested schemas (e.g. the relations item) can declare key renames at
       their own layer rather than only at the top-level block.
+    conditional_rules: Object-scoped if/then rules mirroring
+      ``BlockMetadata.conditional_rules``. Applied per object (top-level block,
+      nested object, or array item) so per-item conditionality (e.g.
+      ``action=move`` requires ``origin``) is declarative rather than
+      hand-rolled. Additive; default empty.
   """
 
   type: str
@@ -85,6 +90,7 @@ class FieldMetadata:
   aliases: Mapping[str, str] | None = None
   tolerated_aliases: Mapping[str, ToleratedAlias] | None = None
   field_aliases: Mapping[str, str] | None = None
+  conditional_rules: list[ConditionalRule] = field(default_factory=list)
 
   _VALID_PERSISTENCE = frozenset(
     {

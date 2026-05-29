@@ -144,6 +144,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 - `2026-05-22` — Phase 3 is orchestration-only: umbrella does not execute sibling internals. Each sibling owns own DR/IP/VT/VA/audit/close per its own delta bundle. Umbrella records entry + closure receipts + strict-mode flip evidence + workspace baseline.
 - `2026-05-22` — Sequential per DEC-004; no parallel sibling execution. DE-139 enters first; DE-140 enters when DE-139 closes; etc.
+- `2026-05-29` — **DR-136 §10.2 erratum (during task 3.8 DE-142 authoring).** §10.2's illustrative *flat* `changes:` block sketch contradicted both DE-118's shipped rich `metadata`/`specs`/`requirements` schema and the governing F-F scope-note ("additive enrichment, not redefinition"). Corrected §10.2 + §10.5 in place to the shipped DE-118 shape + field-mapping; residual DE-142 block scope reduced to *additive* `conditional_rules` (action enum already exists). No umbrella RE — binding intent (F-F) unchanged; DR-136 still draft. Routed via /consult; user-approved erratum path.
 
 ## 10. Findings / Research Notes
 

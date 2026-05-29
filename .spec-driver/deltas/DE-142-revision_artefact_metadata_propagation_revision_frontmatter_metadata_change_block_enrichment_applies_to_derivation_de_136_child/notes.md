@@ -1,5 +1,74 @@
 # Notes for DE-142
 
+## Session 2026-05-29 (6) — P04 consult (migration design locked)
+
+P04 is the consult gate, not a mechanical phase. Ran a 4-agent read-only evidence
+workflow (`de-142-p04-consult-evidence`) to ground the open decisions, then consulted.
+**The evidence corrected the handover's central claim** and reshaped DR §8.
+
+### Evidence (verified against current code/corpus, supersedes some recon claims)
+- **Block ID patterns are NOT uniformly "SPEC-only".** Each field carries a
+  kind-appropriate regex. The killer is `requirements[].requirement_id`
+  (`revision_metadata.py:206`): `^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$`
+  (+ 6 sibling copies at :99/:109/:119/:129/:275 and `destination.requirement_id`).
+- **97 legitimate refs across ~24 records violate it** on two axes: (1) container
+  prefix `PROD-*`/`ISSUE-*` (first-class spec-likes), not `SPEC-`; (2) requirement
+  token `NF-` (and dotted suffix `FR-016.001`), not `(FR|NFR)`. **99 `NF-`
+  requirements exist repo-wide** vs 437 `FR-` — `NF` is canonical, never matched.
+- **Handover's `r".+"` delta-block claim was WRONG.** `DELTA_RELATIONSHIPS_METADATA`
+  declares **NO** ID patterns (type=string only). The `r".+"` lives in
+  `delta.context_inputs`/`risk_register` (different blocks). So the closest sibling
+  runs pattern-free.
+- **A partial canonical constant already exists, unused here:**
+  `verification_metadata.py:22` `REQUIREMENT_ID_PATTERN = ^(SPEC|PROD)-\d{3,}...(FR|NFR)...`.
+  Revision hardcodes SPEC-only ×7 (POL-001 dup). Even this constant misses `NF`/`ISSUE`.
+- **`lifecycle` + `lifecycle.status` are both `required=False`** (`:297`,`:302`).
+- **Zero corpus blocks use `action: move`** — 27 blocks are all `modify` (the
+  `updated` counts are the separate `specs[].action` enum). FM-only records carry
+  `source_specs == destination_specs` (in-place) or dest-only. So DR §8's
+  synthesise-as-`move` is unimplementable (move requires `origin`, which nothing has).
+- **DEC-05 confirmed**: `write_drift_ledger`/`_next_drift_id` are bespoke to
+  `migrations/spec_requirements/migration.py:346`, called only by `migrate_requirements.py`.
+  Generic `admin migrate` orchestrator captures `StepResult.drift_entries` but **never
+  writes DL files** (only a per-run log). Mechanism architecturally incomplete.
+
+### User decisions (consult, 2026-05-29) — all 4 ratified
+- **DEC-CONSULT-04 → BROADEN to shared patterns.** Hoist/extend two shared constants
+  and reuse across revision + verification blocks (POL-001, kills the dup + the latent
+  NF bug):
+  - `REQUIREMENT_ID_PATTERN = ^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NF|NFR)-[A-Z0-9.-]+$`
+  - `SPEC_ID_PATTERN = ^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*$` (for `specs[].spec_id`,
+    `destination.spec`, `destination.additional_specs[]`).
+  - `RE-`/`DE-`/`AUD-` patterns (`metadata.revision`, `lifecycle.introduced_by/
+    implemented_by/verified_by`) stay — they're correct.
+  - F-F-safe: pure relaxation (no previously-valid block becomes invalid; not a `@v2`).
+  - Rationale beats narrow/strict default: narrow here = MASSIVE real lossage (97 legit
+    records) → the standing rule itself points to loosening.
+- **DEC-CONSULT-03 → DISSOLVED. Synthesise `action: modify`, OMIT `lifecycle`.** No
+  `unknown` value, no touching shared `REQUIREMENT_STATUSES` (3-5 consumers), R-142-02
+  leak gone. **Supersedes approved DEC-142-04's `unknown` tolerated_alias** (ratified).
+- **DEC-CONSULT-05 → NO auto-drift in this migration. Backlog the gap = ISSUE-061.**
+  Broadened patterns + faithful modify-synthesis is a lossless reformat, not
+  spec-vs-reality divergence → no drift entries warranted. Residual strict errors
+  (expected ~0) dispositioned manually. Don't build the orchestrator drift helper
+  speculatively in DE-142 (write-less / YAGNI).
+- **DEC-CONSULT-07 → manual `[validation.strict].revision = true` AFTER
+  VA-142-CORPUS-001 disposition**, decoupled from the migrate run (DR-136 §11.2 order).
+
+### DR §8 corrections (ratified — see DR-142 §8/§12/§13 updates this session)
+1. Synthesis action `move` → **`modify`**; `origin` from source_specs → **dropped**;
+   `lifecycle.status: unknown` → **lifecycle omitted**.
+2. Per-record drift emission → **removed** (no synthesis drift; manual residual).
+3. Add pattern-broadening as work item (was implicit/absent).
+
+### What's next
+- **`/plan-phases`** → author `phases/phase-04.md`. Migration folder
+  `v0_10_0_005_revision_metadata`. P04 tasks: (a) broaden+hoist the two ID-pattern
+  constants, reuse in revision+verification blocks; (b) migration step (cut §4 +
+  hand-rolled FM keys; synthesise modify-blocks for FM-only; idempotent; block-wins);
+  (c) template cut (`supekku/templates/revision.md`); (d) sweep + VA-142-CORPUS-001;
+  (e) manual strict flip. No drift-helper work (→ ISSUE-061).
+
 ## Session 2026-05-29 (5) — P03 executed (list revisions enrichment)
 
 ### Done (TDD)

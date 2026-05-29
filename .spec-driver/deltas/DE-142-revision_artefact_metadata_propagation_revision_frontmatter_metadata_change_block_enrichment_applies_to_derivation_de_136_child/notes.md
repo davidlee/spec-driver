@@ -61,13 +61,21 @@ workflow (`de-142-p04-consult-evidence`) to ground the open decisions, then cons
 2. Per-record drift emission → **removed** (no synthesis drift; manual residual).
 3. Add pattern-broadening as work item (was implicit/absent).
 
+### Done (planning) — phase-04 authored + committed
+- Consult outcomes recorded (DR-142 §8/§12/§13, IP-142 §4/§8, this notes session) — commit `d576d446`.
+- ISSUE-061 filed (orchestrator drift-write gap, DEC-142-10) — commit `d576d446`.
+- `phases/phase-04.md` authored (10 tasks, 4 groups, TDD) + validated clean — commit `abe80b42`.
+- Two more verified facts captured for execution: (1) `supekku/templates/revision.md` is
+  ALREADY narrow (base FM + `{{ revision_change_block }}`) → template work is verify-only;
+  (2) migration steps auto-discover by folder (`_discover_steps` iterates `migrations/`) →
+  creating `v0_10_0_005_revision_metadata/` registers it, no `_registry` edit.
+
 ### What's next
-- **`/plan-phases`** → author `phases/phase-04.md`. Migration folder
-  `v0_10_0_005_revision_metadata`. P04 tasks: (a) broaden+hoist the two ID-pattern
-  constants, reuse in revision+verification blocks; (b) migration step (cut §4 +
-  hand-rolled FM keys; synthesise modify-blocks for FM-only; idempotent; block-wins);
-  (c) template cut (`supekku/templates/revision.md`); (d) sweep + VA-142-CORPUS-001;
-  (e) manual strict flip. No drift-helper work (→ ISSUE-061).
+- **`/execute-phase` for IP-142-P04** (TDD per phase-04 §7). Groups A→D in order:
+  A broaden+hoist ID patterns (shared `blocks/metadata/patterns.py`, reuse in
+  revision+verification); B `v0_10_0_005` migration step (mirror v004, isolation strict,
+  no drift); C template verify; D sweep + manual strict flip. **STOP + /consult** if the
+  post-migrate `--strict` shows residual NOT explained by the broadened patterns (§6).
 
 ## Session 2026-05-29 (5) — P03 executed (list revisions enrichment)
 
@@ -305,89 +313,112 @@ workflow (`de-142-p04-consult-evidence`) to ground the open decisions, then cons
 ### Task card
 - **This delta**: `.spec-driver/deltas/DE-142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child/`
 - **Parent (umbrella)**: `.spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/` (DE-142 is the last per-artefact child; tracked in DE-136 phase-03 task 3.8)
-- **Status**: DE-142 `in-progress`. **P01/P02/P03 COMPLETE** (commits `44c54f58`, `084e8616`, + P03). P04 NOT started — it is the consequential gate.
+- **Status**: DE-142 `in-progress`. **P01/P02/P03 COMPLETE** (`44c54f58`, `084e8616`, `34b470de`).
+  **P04 CONSULTED + PLANNED, NOT YET EXECUTED** (`d576d446` decisions, `abe80b42` phase sheet).
 
-### Next activity — **P04 (migration + sweep + flip): CONSULT FIRST, then plan**
-P04 is NOT a mechanical mirror like P02/P03 — recon proved the DR §8 plan is partly
-unimplementable against the real corpus. **Do not start coding P04. Bring a focused
-consult round** (the user wants UX/schema/arch decisions unpacked with example YAML;
-lean narrow/strict unless the corpus shows real lossage — see memory
-`user-decision-density-preference`). Open decisions (DR-142 §13 + recon register):
-- **DEC-CONSULT-04 (SCHEMA, the big one)**: block ID patterns are SPEC-only
-  (`^SPEC-\d{3}`) but the corpus pervasively uses `PROD-*` (a first-class spec),
-  `ADR-*`, `ISSUE-*`, `NF-` (not `NFR-`). The sibling DELTA block uses `pattern=r".+"`.
-  Strict flip would drift-track ~38/42 legit records; dest-only synthesised `move`
-  (RE-030) trips P01's origin+dest rule. Decide: broaden patterns (likely right —
-  arguably additive, not a redefinition) vs SPEC-only + drift-track. Bring before/after YAML.
-- **DEC-CONSULT-03 (SCHEMA)**: `unknown` lifecycle status — DR DEC-142-04/§13.3 approved
-  the WIDE shared-`REQUIREMENT_STATUSES`-enum path; recon recommends narrowing. Overriding
-  the approved DEC needs ratification.
-- **DEC-CONSULT-05 (ARCH)**: DL drift-write has no mechanism in the generic `admin migrate`
-  orchestrator (only the bespoke migrate-requirements writes DLs). Recommend promoting
-  `write_drift_ledger` to a shared migration helper.
-- **DEC-CONSULT-07**: strict-flip timing — recommend manual `workflow.toml` flip AFTER
-  VA-142-CORPUS-001 disposition (decoupled from the migrate run).
-Then `/plan-phases` → author `phases/phase-04.md`; `/execute-phase`. Migration folder =
-`v0_10_0_005_revision_metadata` (DEC-142-07). Next DL = DL-075.
+### Next activity — **`/execute-phase` for IP-142-P04** (NOT consult — that's done)
+The consult gate is closed: DEC-142-08..11 ratified (DR-142 §8/§12, session 6 above).
+`phases/phase-04.md` is authored, validated, committed. **Route `/using-spec-driver` →
+`/execute-phase`** and implement P04 §7 tasks TDD, groups A→D in order:
+- **A — broaden ID patterns** (application code, ships first): new shared
+  `blocks/metadata/patterns.py` (confirm vs STD-003) with
+  `REQUIREMENT_ID_PATTERN = r"^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NF|NFR)-[A-Z0-9.-]+$"`
+  + `SPEC_ID_PATTERN = r"^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*$"`; reuse across
+  revision_metadata.py (7 hardcoded copies) + verification_metadata.py (drop its local dup,
+  fix the `NF` gap). VT-142-PATTERN-001.
+- **B — migration step** `v0_10_0_005_revision_metadata/` (mirror v004; isolation DEC-138-12:
+  stdlib + `_helpers` + `_protocol` + pyyaml only, frozen-local block constants). Cut keys
+  `{lifecycle, aliases, auditers, source, source_specs, destination_specs, requirements}`;
+  FM-only → synthesise `modify` block (kind from FR/NF token, destination.spec = requirement
+  container, **omit lifecycle/origin**); block-wins; idempotent; **`drift_entries=[]` always**.
+  VT-142-MIGRATE-001..004.
+- **C — template** verify-only (`supekku/templates/revision.md` already narrow + block-canonical).
+- **D — sweep** (DR §8.1 order) → VA-142-CORPUS-001 (expect strict clean) → **manual**
+  `[validation.strict].revision = true` in `workflow.toml` (DEC-142-11).
+- **STOP + /consult** if post-migrate `--strict` shows residual NOT explained by the broadened
+  patterns (e.g. a genuine `modify` missing `destination`) — see phase-04 §6.
 
-### Corpus facts (verified — load-bearing for P04)
-- 42 revisions: 27 carry a `supekku:revision.change` block, 15 are FM-only (need synth).
-- ALL 42 carry hand-rolled `aliases` + (most) `source_specs`/`destination_specs`/
-  `requirements` FM keys → cut by migration. ZERO carry `lifecycle/auditers/source/owners/summary`.
-- ZERO have a populated `origin[]` (all completion-revisions, action=modify, dest only).
-- Pattern-violating blocks (PROD/ADR/ISSUE/NF refs) ≈ 25/27 existing + ~13/15 synth targets.
+### Corpus facts (verified session 6 — supersede earlier recon claims)
+- 42 revisions: 27 carry a `supekku:revision.change` block, 15 FM-only (need synth).
+- ALL carry hand-rolled `aliases` + most carry `source_specs`/`destination_specs`/`requirements`
+  → cut by migration. ZERO carry `lifecycle/auditers/source/owners/summary`.
+- **ZERO `move` blocks** — all 27 are `action: modify` (`updated` counts = the separate
+  `specs[].action` enum). FM-only records are in-place (`source==destination`, e.g. RE-015
+  PROD-014) or dest-only (RE-040 → SPEC-122). So synthesise `modify`, never `move`.
+- **97 requirement_id violators across ~24 records** vs the OLD SPEC-only regex: `PROD-*` (17
+  families), `ISSUE-016`, `SPEC-110/122`; `NF-` token (99 NF reqs repo-wide vs 437 FR). These
+  are LEGITIMATE, not drift — fixed by broadening (group A), not drift-tracking.
+- `lifecycle` + `lifecycle.status` are both `required=False` → synthesis omits lifecycle.
+- (Earlier recon's "`ADR-*`", "~38/42", "RE-030 dest-only move", "DL-075/drift per record" are
+  SUPERSEDED — no `ADR-*` requirement refs; no `move`; no synthesis drift; ISSUE-061 owns the gap.)
 
 ### After P04 closes
 - `[validation.strict].revision = true` in `workflow.toml`; then DE-136 P03 tasks 3.9–3.11
   (flip confirm, baseline) → DE-136 P04 umbrella close. Audit deferred to DE-136 umbrella
   (VA-DE136-CLOSE-001). DE-142 has no standalone audit.
 
-### Historical (P01) — reference only
-The P01-specific reading list below is retained for context; P01/P02/P03 are done.
+### Required reading (in order) — for P04 execution
+1. `phases/phase-04.md` (the runsheet — tasks, VT specs, STOP conditions, findings)
+2. `DR-142.md` §8 + §8.0/§8.1 (migration logic + pattern broadening + flip sequence), §12 (DEC-142-08..11)
+3. `IP-142.md` §4 (P04 row), §6 (test plan), §8 (resolved decisions)
+4. DR-136 §11.1 (engine/migration boundary — load-bearing for isolation) + §11.2 (sweep order)
+5. notes.md session 6 (this file, above — evidence + decisions) + memory `user-decision-density-preference`
+   (only if a NEW decision arises — the planned ones are settled)
 
-### Required reading (in order)
-1. `DR-142.md` §4 (engine extension + declared rules), §13 (adversarial residuals — esp. §13.1 behaviour-preservation, §13.2 applies_to composition, §13.3 alias blast radius)
-2. `phases/phase-01.md` (task breakdown + VT specs + STOP conditions)
-3. `IP-142.md` §4 (phase overview), §6 (test plan)
-4. DR-136 §10 (reconciled placement table) + §11.1/§11.2 (engine/migration boundary, sweep procedure)
-5. DE-136 `notes.md:78` (F-F scope-note — the binding additive directive)
-
-### Key files (code, verified this session)
-- `supekku/scripts/lib/blocks/metadata/schema.py` — `FieldMetadata`, `ConditionalRule`, `BlockMetadata`
-- `supekku/scripts/lib/blocks/metadata/validator.py` — `_validate_conditional_rules` (:529), `_validate_object` (:476), `_validate_array` (:432)
-- `supekku/scripts/lib/blocks/metadata/test_engine.py` — ONLY current top-level `conditional_rules` user; must stay green
-- `supekku/scripts/lib/blocks/revision_metadata.py` — `REVISION_CHANGE_METADATA` (declare requirements[] rules here)
-- `supekku/scripts/lib/core/frontmatter_metadata/revision.py` — DE-137 stub to complete (P02)
-- `supekku/scripts/lib/changes/artifacts.py` — `_derive_applies_to` (:29) precedent (P02)
-- `supekku/cli/list/reviews.py` — `list revisions` (:33) (P03)
-- Real fixtures: `RE-042` (well-formed `modify`+`destination`, no `origin`) — regression guard
+### Key files (code, verified — for P04)
+- `spec_driver/migrations/v0_10_0_004_audit_findings/{migration,migration_test}.py` — the step to MIRROR
+- `spec_driver/migrations/_protocol.py` (`BaseMigrationStep`/`StepPreview`/`StepResult`),
+  `_helpers.py` (`atomic_write`, `split_frontmatter`) — the only allowed imports (+ stdlib/yaml)
+- `spec_driver/presentation/cli/admin/migrate.py` — `_discover_steps` (folder-based; no registry edit)
+- `supekku/scripts/lib/blocks/revision_metadata.py` — 7 hardcoded SPEC-only regexes (:74/:99/:109/:119/:129/:206/:269/:275/:289) to replace
+- `supekku/scripts/lib/blocks/verification_metadata.py:22` — `REQUIREMENT_ID_PATTERN` (the dup to fix+share)
+- `supekku/scripts/lib/core/git.py:12` — `SHA_HEX_PATTERN` (domain-local placement precedent, STD-003)
+- `supekku/templates/revision.md` — already narrow (verify only)
+- Real fixtures: `RE-042` (block + modify + destination), `RE-015` (FM-only, source==dest=PROD-014),
+  `RE-040` (FM-only, dest-only SPEC-122 + requirements)
 
 ### Relevant memories
-- `mem.pattern.validation.per-kind-block-wiring`
-- `mem.pattern.spec-driver.block-class-data-taxonomy`
-- `mem.pattern.spec-driver.metadata-validator-strictness`
+- `mem.pattern.validation.per-kind-block-wiring`, `mem.pattern.spec-driver.block-class-data-taxonomy`,
+  `mem.pattern.spec-driver.metadata-validator-strictness` (block/validator patterns)
+- `user-decision-density-preference` (Claude Code auto-memory — consult style; only if new decisions)
+- Candidate NEW memory after P04 lands: "revision.change ID patterns broadened to shared
+  `(SPEC|PROD|ISSUE)`+`(FR|NF|NFR)` constants" (capture once real, per the once-it-lands rule)
 - (run `/retrieving-memory` at execute start)
 
 ### Relevant doctrines
-- **F-F (load-bearing)**: additive over DE-118; no block redefinition, no `@v2`.
-- **DEC-138-10**: `applies_to` derived, never stored (no competing truths).
-- **DR-136 §11.1**: metadata engine = application code (current-schema); migration = legacy-aware, stdlib+helpers only.
-- POL-003 (no business logic in formatters); STD-002 (lint/pylint); ADR-008 (intent vs observed).
+- **F-F (load-bearing)**: additive over DE-118; no block redefinition, no `@v2`. Pattern broadening
+  is a pure RELAXATION (no previously-valid block becomes invalid) → F-F-safe, not a redefinition.
+- **DEC-138-12 (load-bearing for P04 group B)**: migration steps import ONLY stdlib + `_helpers` +
+  `_protocol` + pyyaml — NO `supekku.*`, NO validation/registries/cli. Frozen-local block constants.
+- **DR-136 §11.1**: metadata engine = application code (current-schema); migration = legacy-aware.
+  The broadened patterns are APPLICATION code (group A); the step does NOT import them.
+- **DEC-138-10**: `applies_to` derived, never stored.
+- POL-001 (max reuse — the shared pattern constants); STD-003 (utility/pattern placement);
+  POL-003 (formatters); STD-002 (lint/pylint); ADR-008 (intent vs observed — referential integrity
+  is an audit/registry concern, NOT a block-schema regex; rationale for broadening over strictness).
 
-### User decisions this session
-- Block-shape conflict → **pause + /consult** (not silent adoption).
-- Reconciliation → **in-place erratum** on DR-136 §10.2 (not formal RE; not full re-derivation).
-- Conditional-rule enforcement → **extend FieldMetadata** (declarative engine change), not hand-rolled per-item checks, not deferral.
-- Scope locked: all 7 work items + OQ defaults accepted.
-- Then → **/plan-phases** (done).
+### User decisions (P04 consult, 2026-05-29) — all ratified, see DR-142 §12
+- **DEC-142-08**: broaden ID patterns to shared constants (chose "broaden", not "remove" or "drift-track").
+- **DEC-142-09**: synthesise `action: modify` + omit `lifecycle` (no `unknown`; supersedes DEC-142-04).
+- **DEC-142-10**: no automated migration drift; orchestrator gap → ISSUE-061 (out of scope).
+- **DEC-142-11**: manual `workflow.toml` strict flip after VA-142-CORPUS-001 disposition.
+- Standing style (memory `user-decision-density-preference`): one focused decision at a time, example
+  YAML, lean narrow/strict UNLESS the corpus shows real lossage (here it did → broaden).
 
-### Loose ends / unresolved (assess before coding)
-- IP-level details (DR-142 §13): error-path prefix on generalised helper (no leading dot); `applies_to.specs` dedup/order; `unknown` alias sunset wording.
-- R-142-04: confirm the FM-beside-block strict check generalises to `kind:revision` (may be delta-keyed) — P02 concern.
-- R-142-01: legacy `action: move` blocks missing `origin` will error at strict flip — P04 sweep must drift-track first.
+### Loose ends / unresolved (assess during P04)
+- R-142-01/02/04 are RESOLVED/DISSOLVED (DR-142 §13): no `move` blocks; lifecycle omitted; FM-beside-block
+  check generalised in P02. The one live risk: post-migrate residual strict errors NOT explained by
+  broadening (e.g. a genuinely malformed existing block) → STOP + /consult (phase-04 §6), do not mass-drift.
+- Shared-pattern home: phase proposes `blocks/metadata/patterns.py` — CONFIRM against STD-003 at execute start.
+- JSON-schema gap (P01 residual): per-item `FieldMetadata.conditional_rules` not projected to JSON Schema.
+  Runtime correct; flag only if a JSON-schema consumer needs the if/then. Not P04 scope.
 
 ### Commit-state guidance
-- Worktree clean re: this work. All DE-142/DE-136 artefacts committed (`45b756a1`, `760d4984`, `b5363f73`, `717c5872`).
-- Pre-existing unrelated changes (NOT mine, do not commit): `.gitignore`, `flake.lock`, `flake.nix` (modified), `.vscode/` (untracked).
-- **Stray junk**: `.spec-driver/deltas/.spec-driver/run/events.jsonl` — misdirected CLI telemetry (bad CWD); not staged; safe to ignore/remove.
-- Repo doctrine: prefer frequent small `.spec-driver/**` commits; code + `.spec-driver` may commit together or separately. During P01, commit engine+block code with its tests (red/green/refactor).
+- Worktree CLEAN re: this work. P04-consult artefacts committed: `d576d446` (DR/IP/notes + ISSUE-061),
+  `abe80b42` (phase-04). Earlier: `45b756a1`/`760d4984`/`b5363f73` + P01–P03 feat commits.
+- Pre-existing unrelated changes (NOT mine, DO NOT commit): `.gitignore`, `flake.lock`, `flake.nix`
+  (modified), `.vscode/` (untracked).
+- This continuation's notes update is uncommitted — commit it before/with the first P04 work.
+- Repo doctrine: prefer frequent small `.spec-driver/**` commits; code + `.spec-driver` may commit
+  together or separately. For P04: commit group A (patterns+tests), then B (migration step+tests),
+  then the swept corpus + flip, as logical units.

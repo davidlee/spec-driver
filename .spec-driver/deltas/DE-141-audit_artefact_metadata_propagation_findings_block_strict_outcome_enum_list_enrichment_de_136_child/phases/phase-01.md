@@ -4,7 +4,7 @@ slug: "141-audit_artefact_metadata_propagation_findings_block_strict_outcome_enu
 name: "IP-141 Phase 01 — Block schema, canonical loader, ChangeArtifact model"
 created: "2026-05-28"
 updated: "2026-05-28"
-status: draft
+status: completed
 kind: phase
 plan: IP-141
 delta: DE-141
@@ -28,18 +28,18 @@ Deploy `supekku:audit.findings@v1` block infrastructure: render, extract, canoni
 
 - [x] DR-141 authored and adversarially reviewed
 - [x] IP-141 created with phase overview
-- [ ] DE-141 status set to `in-progress`
+- [x] DE-141 status set to `in-progress`
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `render_audit_findings_block()` produces valid code-fenced block
-- [ ] `extract_audit_findings()` parses block from body; raises on duplicates/malformed/mismatch
-- [ ] `load_audit_findings()` canonical loader: block-first, FM-fallback
-- [ ] Block schema registered in block registry
-- [ ] `ChangeArtifact` has optional `mode`, `delta_ref` fields; populated from FM at load
-- [ ] VT-141-BLOCK-001 through -004 and VT-141-TRANSITION-001/-002 passing
-- [ ] All existing tests still pass
-- [ ] Lint clean
+- [x] `render_audit_findings_block()` produces valid code-fenced block
+- [x] `extract_audit_findings()` parses block from body; raises on duplicates/malformed/mismatch
+- [x] `load_audit_findings()` canonical loader: block-first, FM-fallback
+- [x] Block schema registered in block registry
+- [x] `ChangeArtifact` has optional `mode`, `delta_ref` fields; populated from FM at load
+- [x] VT-141-BLOCK-001 through -004 and VT-141-TRANSITION-001/-002 passing (20 tests)
+- [x] All existing tests still pass (5209 passed)
+- [x] Lint clean
 
 ## 5. Verification
 
@@ -62,11 +62,11 @@ Deploy `supekku:audit.findings@v1` block infrastructure: render, extract, canoni
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Create `blocks/audit_findings.py`: render + extract + register | [ ] | DR-141 §3.1–§3.2 |
-| [ ] | 1.2 | Add `load_audit_findings()` canonical dual-path loader | [ ] | DR-141 §3.2, DEC-141-06 |
-| [ ] | 1.3 | Extend `ChangeArtifact` with `mode`, `delta_ref` fields | [P] | DR-141 §5.0, DEC-141-07 |
-| [ ] | 1.4 | Write tests: VT-141-BLOCK-001..004, VT-141-TRANSITION-001..002 | [ ] | After 1.1 + 1.2 |
-| [ ] | 1.5 | Full test suite + lint pass | [ ] | Gate |
+| [x] | 1.1 | Create `blocks/audit_findings.py`: render + extract + register | [ ] | DR-141 §3.1–§3.2 |
+| [x] | 1.2 | Add `load_audit_findings()` canonical dual-path loader | [ ] | DR-141 §3.2, DEC-141-06 |
+| [x] | 1.3 | Extend `ChangeArtifact` with `mode`, `delta_ref` fields | [P] | DR-141 §5.0, DEC-141-07 |
+| [x] | 1.4 | Write tests: VT-141-BLOCK-001..004, VT-141-TRANSITION-001..002 | [ ] | After 1.1 + 1.2 |
+| [x] | 1.5 | Full test suite + lint pass | [ ] | Gate: 5209 passed, ruff clean |
 
 ### Task Details
 
@@ -96,19 +96,25 @@ Deploy `supekku:audit.findings@v1` block infrastructure: render, extract, canoni
 
 | Risk | Mitigation | Status |
 |------|------------|--------|
-| Block registry pattern differs from assumed | Check spec_requirements.py registration first | open |
-| ChangeArtifact serialization changes break registry | to_dict only adds fields when non-None | design |
+| Block registry pattern differs from assumed | Check spec_requirements.py registration first | resolved — pattern confirmed |
+| ChangeArtifact serialization changes break registry | to_dict only adds fields when non-None | resolved — tests pass |
 
 ## 9. Decisions & Outcomes
 
-_(populated during execution)_
+- Followed spec_requirements.py pattern (single-block-per-module, frozen dataclass)
+- `validate_audit_field()` as standalone function (not embedded in extract) per block-class-data-taxonomy memory
+- `_yaml_str()` helper handles special YAML characters in rendered output
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- Block registry registration pattern: import at module bottom with `# noqa: E402`, same as spec_requirements.py
+- `yaml.dump()` appends `\n...\n` to some strings — stripped in `_yaml_str()`
+- Disposition refs rendered as proper YAML list (not inline flow-style) to avoid parse errors
+- No audit_findings_metadata.py needed for P01 — metadata=None in schema registration; P03 (strict enforcement) will add if needed
+- Commit: `05cc140e`
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (§4) satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes for P02/P03 (parallel entry)
+- [x] Exit criteria (§4) satisfied
+- [x] Verification evidence stored (20 tests, 5209 suite, ruff clean)
+- [x] Hand-off notes for P02/P03: P01 block module ready, `load_audit_findings()` available for caller migration. P02 (list enrichment) and P03 (strict enforcement) can proceed in parallel.

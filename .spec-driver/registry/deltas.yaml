@@ -13854,11 +13854,11 @@ deltas:
         status: completed
   DE-142:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Revision artefact metadata propagation: REVISION_FRONTMATTER_METADATA
       + change-block enrichment + applies_to derivation (DE-136 child)'
     slug: revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child
-    updated: '2026-05-09'
+    updated: '2026-05-30'
     path: .spec-driver/deltas/DE-142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child/DE-142.md
     applies_to:
       specs:
@@ -13899,6 +13899,48 @@ deltas:
       attributes:
         nature: "Lifecycle-truth doctrine \u2014 revision-change intent vs observed\
           \ reconciliation"
+    plan:
+      id: IP-142
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-142
+        delta: DE-142
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          - SPEC-116
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          dependencies: []
+        phases:
+        - id: IP-142-P01
+        - id: IP-142-P02
+        - id: IP-142-P03
+        - id: IP-142-P04
+      phases:
+      - plan: IP-142
+        delta: DE-142
+        phase: IP-142-P01
+        status: completed
+      - plan: IP-142
+        delta: DE-142
+        phase: IP-142-P02
+        status: completed
+      - plan: IP-142
+        delta: DE-142
+        phase: IP-142-P03
+        status: completed
+      - plan: IP-142
+        delta: DE-142
+        phase: IP-142-P04
+        status: completed
   DE-143:
     kind: delta
     status: completed

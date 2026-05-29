@@ -53,20 +53,20 @@ groups, in order:
 
 ## 4. Exit Criteria / Done When
 
-- [ ] **A**: `REQUIREMENT_ID_PATTERN` + `SPEC_ID_PATTERN` live in one shared module (STD-003);
+- [x] **A**: `REQUIREMENT_ID_PATTERN` + `SPEC_ID_PATTERN` live in one shared module (STD-003);
       revision_metadata.py's 7 hardcoded copies + verification_metadata.py's local copy both
       reuse them. VT-142-PATTERN-001 passes. Existing block-validator + verification suites green.
-- [ ] **B**: `v0_10_0_005_revision_metadata/{__init__.py,migration.py,migration_test.py}` exist;
+- [x] **B**: `v0_10_0_005_revision_metadata/{__init__.py,migration.py,migration_test.py}` exist;
       auto-discovered by `admin migrate revision`. VT-142-MIGRATE-001/002/003/004 pass.
       Isolation honoured (stdlib + `_helpers` + `_protocol` + pyyaml only).
-- [ ] **C**: a freshly `create revision`'d artefact validates `--strict` clean; template confirmed
+- [x] **C**: a freshly `create revision`'d artefact validates `--strict` clean; template confirmed
       narrow + block-canonical (no FM cut needed, or minimal touch documented).
-- [ ] **D**: `admin migrate revision` applied to the repo corpus; `validate --kind revision
+- [x] **D**: `admin migrate revision` applied to the repo corpus; `validate --kind revision
       --strict` clean (VA-142-CORPUS-001), `--no-tolerated-aliases` clean; `[validation.strict].revision
       = true` set manually in `workflow.toml`. Any residual dispositioned + documented.
-- [ ] Full `pytest supekku` green (modulo the 2 known width-wrap pre-existing failures);
+- [x] Full `pytest supekku` green (modulo the 2 known width-wrap pre-existing failures);
       `just` (ruff/ty/pylint) clean — no new message types.
-- [ ] DR-142/IP-142 coverage updated (VT-142-PATTERN/MIGRATE → verified, VA-142-CORPUS-001
+- [x] DR-142/IP-142 coverage updated (VT-142-PATTERN/MIGRATE → verified, VA-142-CORPUS-001
       dispositioned); IP §9 P04 checked.
 
 ## 5. Verification

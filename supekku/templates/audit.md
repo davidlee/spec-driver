@@ -10,6 +10,13 @@ updated: "{{ today }}"
 
 {{ audit_verification_block }}
 
+```yaml supekku:audit.findings@v1
+schema: supekku.audit.findings
+version: 1
+audit: {{ audit_id }}
+findings: []
+```
+
 ## Observations
 
 - …

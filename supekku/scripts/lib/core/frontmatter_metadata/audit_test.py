@@ -1,7 +1,8 @@
 """Dual-validation tests for audit frontmatter metadata.
 
 Tests that the metadata-driven validator handles audit-specific fields
-correctly, including the per-finding disposition contract (DEC-079-001).
+correctly. Finding/disposition validation moved to block-level tests
+(audit_findings_test.py) after DE-141 P04.
 """
 
 from __future__ import annotations
@@ -74,139 +75,21 @@ class AuditFrontmatterValidationTest(unittest.TestCase):
       }
     )
 
-  def test_valid_findings_without_disposition(self) -> None:
-    """Findings without disposition are valid (backward compat)."""
-    self._assert_both_valid(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test finding",
-            "outcome": "drift",
-          }
-        ],
-      }
-    )
-
-  def test_valid_finding_with_full_disposition(self) -> None:
+  def test_valid_audit_with_spec_refs(self) -> None:
     self._assert_both_valid(
       {
         **_BASE,
         "mode": "conformance",
         "delta_ref": "DE-021",
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Content reconciler deviates",
-            "outcome": "drift",
-            "disposition": {
-              "status": "reconciled",
-              "kind": "spec_patch",
-              "refs": [{"kind": "spec", "ref": "SPEC-101"}],
-              "drift_refs": [
-                {"kind": "drift_entry", "ref": "DL-047.003"},
-              ],
-              "rationale": "Patched SPEC-101",
-            },
-          }
-        ],
+        "spec_refs": ["PROD-004", "SPEC-114"],
       }
     )
 
-  def test_valid_finding_aligned(self) -> None:
+  def test_valid_audit_with_code_scope(self) -> None:
     self._assert_both_valid(
       {
         **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Already aligned",
-            "outcome": "aligned",
-            "disposition": {
-              "status": "reconciled",
-              "kind": "aligned",
-            },
-          }
-        ],
-      }
-    )
-
-  def test_valid_disposition_follow_up_delta_accepted(self) -> None:
-    self._assert_both_valid(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Needs follow-up",
-            "outcome": "drift",
-            "disposition": {
-              "status": "accepted",
-              "kind": "follow_up_delta",
-              "refs": [{"kind": "delta", "ref": "DE-082"}],
-              "rationale": "Created DE-082 to handle this",
-            },
-          }
-        ],
-      }
-    )
-
-  def test_valid_disposition_tolerated_drift(self) -> None:
-    self._assert_both_valid(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Known drift, accepted",
-            "outcome": "risk",
-            "disposition": {
-              "status": "accepted",
-              "kind": "tolerated_drift",
-              "rationale": "Accepted per governance decision",
-            },
-          }
-        ],
-      }
-    )
-
-  def test_valid_disposition_with_closure_override(self) -> None:
-    self._assert_both_valid(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Drift with override",
-            "outcome": "drift",
-            "disposition": {
-              "status": "accepted",
-              "kind": "tolerated_drift",
-              "rationale": "Known limitation",
-              "closure_override": {
-                "effect": "warn",
-                "rationale": "Low impact, tracked in backlog",
-              },
-            },
-          }
-        ],
-      }
-    )
-
-  def test_valid_finding_with_linked_fields(self) -> None:
-    self._assert_both_valid(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "linked_issue": "ISSUE-018",
-            "linked_delta": "DE-021",
-          }
-        ],
+        "code_scope": ["supekku/scripts/lib/blocks/"],
       }
     )
 
@@ -238,182 +121,18 @@ class AuditFrontmatterValidationTest(unittest.TestCase):
     )
     self.assertNotEqual(errors, [])
 
-  def test_finding_missing_required_fields(self) -> None:
+  def test_findings_in_fm_rejected_strict(self) -> None:
+    """After DE-141, findings in FM is an unknown key under strict."""
     errors = _new_errors(
       {
         **_BASE,
-        "findings": [{"id": "FIND-001"}],
+        "findings": [{"id": "FIND-001", "description": "T", "outcome": "drift"}],
       }
     )
-    self.assertNotEqual(errors, [])
-
-  def test_finding_invalid_outcome(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "invalid",
-          }
-        ],
-      }
+    self.assertTrue(
+      any("findings" in e.lower() for e in errors),
+      f"Expected rejection of FM findings key: {errors}",
     )
-    self.assertNotEqual(errors, [])
-
-  def test_disposition_missing_status(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {"kind": "spec_patch"},
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_disposition_missing_kind(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {"status": "reconciled"},
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_disposition_invalid_status(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "invalid",
-              "kind": "spec_patch",
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_disposition_invalid_kind(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "reconciled",
-              "kind": "invalid",
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_closure_override_missing_rationale(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "accepted",
-              "kind": "tolerated_drift",
-              "closure_override": {"effect": "warn"},
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_closure_override_invalid_effect(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "accepted",
-              "kind": "tolerated_drift",
-              "closure_override": {
-                "effect": "block",
-                "rationale": "This should not be valid",
-              },
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_ref_missing_kind(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "reconciled",
-              "kind": "spec_patch",
-              "refs": [{"ref": "SPEC-101"}],
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
-
-  def test_ref_missing_ref(self) -> None:
-    errors = _new_errors(
-      {
-        **_BASE,
-        "findings": [
-          {
-            "id": "FIND-001",
-            "description": "Test",
-            "outcome": "drift",
-            "disposition": {
-              "status": "reconciled",
-              "kind": "spec_patch",
-              "refs": [{"kind": "spec"}],
-            },
-          }
-        ],
-      }
-    )
-    self.assertNotEqual(errors, [])
 
 
 if __name__ == "__main__":

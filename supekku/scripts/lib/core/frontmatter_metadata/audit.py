@@ -261,48 +261,8 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
         ),
       },
     ),
-    "findings": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="Individual audit finding",
-        properties={
-          "id": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Finding ID",
-          ),
-          "description": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Description of the finding",
-          ),
-          "outcome": FieldMetadata(
-            type="enum",
-            required=True,
-            enum_values=sorted(FINDING_OUTCOMES),
-            description="Finding outcome",
-          ),
-          "linked_issue": FieldMetadata(
-            type="string",
-            required=False,
-            pattern=r".+",
-            description="Related issue ID",
-          ),
-          "linked_delta": FieldMetadata(
-            type="string",
-            required=False,
-            pattern=r".+",
-            description="Related delta ID",
-          ),
-          "disposition": _DISPOSITION_SCHEMA,
-        },
-      ),
-      description="Audit findings with optional per-finding disposition",
-    ),
+    # findings: cut from FM — now lives in supekku:audit.findings@v1 block
+    # (DR-141 §3.3; DE-141 P04 migration)
   },
   examples=[
     # Minimal audit

@@ -17,6 +17,7 @@ spec_driver_installed_version = "0.9.7"
 [validation.strict]
 delta = true
 spec = true
+audit = true
 
 [schema_version]
 delta = "0.10.0+001"
@@ -102,7 +103,7 @@ exec = "uv run spec-driver"
 spec_autocreate = true
 
 [migrations]
-last_applied = "v0_10_0_003_prod_blocks"
+last_applied = "v0_10_0_004_audit_findings"
 
 [validation.strict_requirements]
 enabled = true

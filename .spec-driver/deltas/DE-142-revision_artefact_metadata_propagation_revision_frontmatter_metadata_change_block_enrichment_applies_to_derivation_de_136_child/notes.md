@@ -1,5 +1,52 @@
 # Notes for DE-142
 
+## Session 2026-05-29 (3) — recon workflow + P02 planning + consult
+
+### Done
+- **Recon workflow** (`de-142-recon`, 6 agents, read-only): mapped P02-P04 code
+  reality vs DR-142 and surfaced an 8-item decision register. Key outcomes:
+  - **R-142-04 resolved MINOR** (was flagged ARCH): the FM-beside-block strict
+    check needs NO bespoke/kind-specific code. `validator.py:128-134` is a generic
+    declared-fields unknown-key check; revision is already registered
+    (`__init__.py:52`); `get_strict_map` reads `[validation.strict].revision`
+    generically. P02 verifies via VT-142-DERIVE-002, adds no check code.
+  - **Corpus FM survey (42 revisions)**: only
+    `id,name,slug,kind,status,created,updated,relations,aliases,destination_specs,
+    requirements,source_specs` present. **None** carry
+    `lifecycle/auditers/source/owners/summary` → narrow FM shape is **lossless**.
+  - **P04 corpus issue (deferred)**: the `revision.change@v1` block patterns are
+    SPEC-only (`^SPEC-\d{3}`) while the sibling **delta** block uses `pattern=r".+"`.
+    Corpus pervasively references `PROD-*` (first-class spec), `ADR-*`, `ISSUE-*`,
+    `NF-`. Strict would drift-track ~38/42 legit records, and a dest-only synthesised
+    `move` trips P01's origin+destination rule (RE-030). DR §8's synthesis is partly
+    unimplementable as written → needs a pattern decision at P04 (DEC-CONSULT-03/04).
+  - Baseline: targeted suite 1298 passed/0 failed @ default width. The "3 failures"
+    split: `show_test` mutually-exclusive is the stray-telemetry dir; the two
+    `ListDeltasMalformedFrontmatterTest` are terminal-width wrap artifacts. Suite is
+    width-brittle BOTH ways.
+
+### User decisions this session (consult)
+- **DEC-CONSULT-01 → NARROW FM shape** (zero corpus lossage). Declared set = DR §5
+  table exactly: Base 7 + relations + tags + ext_id + ext_url; omit
+  lifecycle/auditers/source/owners/summary.
+- **DEC-CONSULT-02 → NARROW applies_to.specs** (DR §6): `specs` from
+  `block.specs[].spec_id` only; source/dest split recomputed in P03, not folded in.
+- **P04 decisions (03/04 patterns+`unknown`, 05 drift-write, 06 list UX, 07 flip
+  timing, 08 stray-dir delete) DEFERRED** — bring researched proposals at P03/P04.
+- User interaction preference captured to memory `user-decision-density-preference`:
+  unpack consequential decisions with example YAML; lean narrow/strict unless real
+  data shows lossage; no dense multi-question batches.
+
+### Done (planning)
+- `phases/phase-02.md` authored (6 tasks, ~4 files, TDD). P01 wrap-up handoff closed.
+
+### What's next
+- **`/execute-phase` for IP-142-P02** (TDD per phase-02 §7). Inline (small, sequential
+  TDD) — reserve workflow orchestration for P03 (parallel: domain/columns/formatter/CLI/tests)
+  and P04. Then plan P03, then consult+plan P04.
+
+---
+
 ## Session 2026-05-29 — reconciliation + DR + planning
 
 ### Done

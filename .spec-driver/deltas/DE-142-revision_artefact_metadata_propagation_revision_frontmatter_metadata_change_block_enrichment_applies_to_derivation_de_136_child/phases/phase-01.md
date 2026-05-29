@@ -135,4 +135,4 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (§10)
 - [x] DR-142/IP-142 updated if approach shifted (no design shift; engine extracted `_validate_additional_keys` per §10 — within DR §4 intent)
-- [ ] Hand-off note to P02 (FM completion + applies_to derivation)
+- [x] Hand-off note to P02 (FM completion + applies_to derivation) — see `phases/phase-02.md`; narrow FM shape + narrow `applies_to` locked (user-approved 2026-05-29, zero corpus lossage); R-142-04 resolved MINOR (no kind-specific check code)

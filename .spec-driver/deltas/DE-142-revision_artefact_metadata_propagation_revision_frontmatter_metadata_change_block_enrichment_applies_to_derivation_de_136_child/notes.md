@@ -64,6 +64,27 @@ User approved fixing both (recommended) over hand-fixing 2 records. Tests: `Test
 ruff/format clean; pylint 0 new (import-outside-toplevel are pre-existing deferred imports); ty 5
 pre-existing tomlkit `Item` false-positives (lines 180/538-540, untouched).
 
+### Group C — NOT verify-only; `create revision` was emitting legacy FM (DEC-142-14/15)
+The phase assumed the template+creation were already narrow+block-canonical. WRONG: the
+`revision.md` template IS narrow, but `create_revision` (`changes/revision_creation.py`) ignored
+the `{{ revision_change_block }}` placeholder AND injected hand-rolled FM keys (aliases/
+source_specs/destination_specs/requirements) → a freshly-created revision FAILED strict.
+- **DEC-142-14 (consult)**: fix `create_revision` to emit narrow FM + render the canonical block
+  via the existing `blocks/revision.render_revision_change_block` (specs from destination,
+  requirements as `modify`, DEC-142-09/12). Live `create revision` now validates `--strict` clean.
+  Also dropped the dead `--source`/`source_specs` (no block home under modify-only; separable from
+  consolidation — approved block design carries no source). Fixed stale test-fixture template
+  (`creation_test._make_repo` revision.md lacked the placeholder).
+- **DEC-142-15 (consult)**: `create_completion_revision` (complete-delta path) appends its OWN
+  richer lifecycle-bearing block → would DOUBLE with create_revision's new block. User: consolidate
+  to a single block author is right BUT defer to after handover. NOW: add `render_change_block: bool
+  = True` to create_revision; completion passes `False` (keeps its rich block as sole author, zero
+  output change). Consolidation (create_revision = single canonical renderer, drop completion's
+  `_render_revision_change_block`) filed as **ISSUE-062**.
+- **Cleanup**: removed stray `RE-044-test_revision` (this-session machine junk per events.jsonl
+  `eb74cb09`; `create revision "Test Revision"` with legacy shape, never tracked — would have
+  corrupted the group-D sweep). Not recreated by any test (only `--help` is invoked in-tree).
+
 ## Session 2026-05-29 (6) — P04 consult (migration design locked)
 
 P04 is the consult gate, not a mechanical phase. Ran a 4-agent read-only evidence

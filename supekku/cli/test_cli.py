@@ -135,8 +135,8 @@ class TestCreateCommands:
     result = runner.invoke(app, ["create", "revision", "--help"])
     assert result.exit_code == 0
     assert "Create a Spec Revision bundle" in result.stdout
-    assert "--source" in result.stdout
     assert "--destination" in result.stdout
+    assert "--requirement" in result.stdout
 
   def test_create_adr_help(self):
     """Test create adr command help."""

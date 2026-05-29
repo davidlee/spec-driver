@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from jinja2 import Template
 
+from supekku.scripts.lib.blocks.revision import render_revision_change_block
 from supekku.scripts.lib.changes._creation_utils import (
   ChangeArtifactCreated,
   _ensure_directory,
@@ -27,23 +28,64 @@ if TYPE_CHECKING:
   from collections.abc import Iterable
 
 
+def _requirement_kind(requirement_id: str) -> str:
+  """Derive requirement kind from its ID token (FR -> functional, NF/NFR -> not)."""
+  _, _, tail = requirement_id.partition(".")
+  token = tail.split("-", 1)[0]
+  return "non-functional" if token in ("NF", "NFR") else "functional"
+
+
+def _requirement_container(requirement_id: str) -> str:
+  """The spec/container prefix of a requirement_id (text before the first dot)."""
+  container, _, _ = requirement_id.partition(".")
+  return container
+
+
+def _render_scope_block(
+  revision_id: str,
+  destination_specs: Iterable[str] | None,
+  requirements: Iterable[str] | None,
+) -> str:
+  """Render the canonical revision.change block from supplied scope.
+
+  specs[] from destination_specs, requirements[] as modify (DEC-142-09/12).
+  """
+  return render_revision_change_block(
+    revision_id,
+    specs=[
+      {"spec_id": s, "action": "updated"} for s in sorted(set(destination_specs or []))
+    ],
+    requirements=[
+      {
+        "requirement_id": r,
+        "kind": _requirement_kind(r),
+        "action": "modify",
+        "destination": {"spec": _requirement_container(r)},
+      }
+      for r in sorted(set(requirements or []))
+    ],
+    prepared_by="create-revision",
+  )
+
+
 def create_revision(
   name: str,
   *,
-  _summary: str | None = None,
-  source_specs: Iterable[str] | None = None,
   destination_specs: Iterable[str] | None = None,
   requirements: Iterable[str] | None = None,
+  render_change_block: bool = True,
   repo_root: Path | None = None,
 ) -> ChangeArtifactCreated:
   """Create a new spec revision artifact.
 
   Args:
     name: Revision name/title.
-    summary: Optional summary text.
-    source_specs: Spec IDs being revised from.
     destination_specs: Spec IDs being revised to.
     requirements: Requirement IDs affected.
+    render_change_block: Emit the canonical revision.change block from the
+      supplied scope. ``complete delta`` sets this False because it appends
+      its own richer (lifecycle-bearing) block (see ISSUE-062 for the
+      planned consolidation).
     repo_root: Optional repository root. Auto-detected if not provided.
 
   Returns:
@@ -59,6 +101,7 @@ def create_revision(
   revision_dir = base_dir / f"{revision_id}-{slug}"
   _ensure_directory(revision_dir)
 
+  # Narrow frontmatter (ADR-010 / DE-142): scope lives in the block, not FM.
   frontmatter = {
     "id": revision_id,
     "slug": slug,
@@ -67,25 +110,24 @@ def create_revision(
     "updated": today,
     "status": "draft",
     "kind": "revision",
-    "aliases": [],
     "relations": [],
   }
-  if source_specs:
-    frontmatter["source_specs"] = sorted(set(source_specs))
-  if destination_specs:
-    frontmatter["destination_specs"] = sorted(set(destination_specs))
-  if requirements:
-    frontmatter["requirements"] = sorted(set(requirements))
+
+  change_block = (
+    _render_scope_block(revision_id, destination_specs, requirements)
+    if render_change_block
+    else ""
+  )
 
   # Load template and render with Jinja2
-  template_path = _get_template_path("revision.md", repo)
-  template_body = extract_template_body(template_path)
-  template = Template(template_body)
-  body = template.render(
+  body = Template(
+    extract_template_body(_get_template_path("revision.md", repo))
+  ).render(
     revision_id=revision_id,
     name=name,
     created=today,
     updated=today,
+    revision_change_block=change_block,
   )
 
   revision_path = revision_dir / f"{revision_id}.md"

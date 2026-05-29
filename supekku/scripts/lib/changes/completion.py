@@ -177,11 +177,13 @@ def create_completion_revision(
     req_data.append((req_id, spec_id, req.title))
 
   # Create base revision
+  # completion appends its own richer lifecycle-bearing block below, so suppress
+  # create_revision's canonical block to avoid a duplicate (DEC-142-15, ISSUE-062).
   result = create_revision(
     name=revision_name,
-    source_specs=None,
     destination_specs=sorted(specs_set),
     requirements=requirements,
+    render_change_block=False,
     repo_root=workspace.root,
   )
 

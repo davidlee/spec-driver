@@ -10,6 +10,8 @@ from textwrap import dedent
 
 import frontmatter
 
+from supekku.scripts.lib.blocks.revision import load_revision_blocks
+from supekku.scripts.lib.blocks.revision_metadata import validate_revision_change
 from supekku.scripts.lib.changes.creation import (
   ChangeArtifactCreated,
   PhaseCreationError,
@@ -62,8 +64,9 @@ class CreateChangeTest(unittest.TestCase):
     )
 
     # Revision template (Jinja2, no frontmatter)
+    # DE-142: scope lives in the rendered revision.change block.
     (templates_dir / "revision.md").write_text(
-      "## 1. Context\n- **Why**: Change reason\n",
+      "{{ revision_change_block }}\n\n## 1. Context\n- **Why**: Change reason\n",
       encoding="utf-8",
     )
 
@@ -101,20 +104,45 @@ class CreateChangeTest(unittest.TestCase):
     return root
 
   def test_create_revision(self) -> None:
-    """Test creating a revision change artifact with source and destination specs."""
+    """Revision creation emits narrow FM + a canonical revision.change block.
+
+    DE-142 DEC-142-14: legacy hand-rolled FM scope keys (source_specs/
+    destination_specs/requirements/aliases) are gone; scope lives in the
+    block (specs from destination, requirements as modify).
+    """
     root = self._make_repo()
     result = create_revision(
       "Move FR",
-      source_specs=["SPEC-100"],
       destination_specs=["SPEC-101"],
-      requirements=["SPEC-100.FR-100"],
+      requirements=["SPEC-101.FR-100"],
       repo_root=root,
     )
     assert isinstance(result, ChangeArtifactCreated)
     assert result.primary_path.exists()
-    frontmatter, _ = load_markdown_file(result.primary_path)
-    assert frontmatter["kind"] == "revision"
-    assert "SPEC-100" in frontmatter.get("source_specs", [])
+    fm, body = load_markdown_file(result.primary_path)
+    assert fm["kind"] == "revision"
+    # Narrow FM: no legacy scope keys.
+    for legacy in ("source_specs", "destination_specs", "requirements", "aliases"):
+      assert legacy not in fm
+    # Scope is carried by the block.
+    assert "supekku:revision.change@v1" in body
+    assert "SPEC-101" in body
+    assert "SPEC-101.FR-100" in body
+    assert "action: modify" in body
+
+  def test_create_revision_validates_strict(self) -> None:
+    """A freshly-created revision passes strict block + FM validation."""
+    root = self._make_repo()
+    result = create_revision(
+      "Strict check",
+      destination_specs=["PROD-014"],
+      requirements=["PROD-014.NF-001"],
+      repo_root=root,
+    )
+    blocks = load_revision_blocks(result.primary_path)
+    assert len(blocks) == 1
+    errors = validate_revision_change(blocks[0].parse())
+    assert errors == [], errors
 
   def test_create_delta(self) -> None:
     """VT-016-001: Test delta creation produces 4 files without phase-01."""

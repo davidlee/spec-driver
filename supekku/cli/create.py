@@ -335,13 +335,6 @@ def create_requirement(
 @app.command("revision")
 def create_revision_cmd(
   name: Annotated[str, typer.Argument(help="Revision title (summary)")],
-  source_specs: Annotated[
-    list[str] | None,
-    typer.Option(
-      "--source",
-      help="Source spec ID (repeatable)",
-    ),
-  ] = None,
   destination_specs: Annotated[
     list[str] | None,
     typer.Option(
@@ -363,7 +356,6 @@ def create_revision_cmd(
   try:
     result = create_revision(
       name,
-      source_specs=source_specs,
       destination_specs=destination_specs,
       requirements=requirements,
     )

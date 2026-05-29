@@ -47,3 +47,62 @@
 ### Memory to capture once P01 lands (not yet — design only)
 - "Object-level `FieldMetadata.conditional_rules` enable per-array-item
   validation" — capture as a metadata-engine capability memory after it's real.
+
+---
+
+## New Agent Instructions
+
+### Task card
+- **This delta**: `.spec-driver/deltas/DE-142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child/`
+- **Parent (umbrella)**: `.spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/` (DE-142 is the last per-artefact child; tracked in DE-136 phase-03 task 3.8)
+- **Status**: DE-142 `draft`; DR-142/IP-142 authored & validated; phase-01 sheet ready. Move DE-142 → `in-progress` when execution starts.
+
+### Next activity
+**`/execute-phase` for IP-142-P01** (engine + block conditional rules). TDD per `phases/phase-01.md` §7 tasks 1.1–1.6. Foundation phase; P02–P04 build on it.
+
+### Required reading (in order)
+1. `DR-142.md` §4 (engine extension + declared rules), §13 (adversarial residuals — esp. §13.1 behaviour-preservation, §13.2 applies_to composition, §13.3 alias blast radius)
+2. `phases/phase-01.md` (task breakdown + VT specs + STOP conditions)
+3. `IP-142.md` §4 (phase overview), §6 (test plan)
+4. DR-136 §10 (reconciled placement table) + §11.1/§11.2 (engine/migration boundary, sweep procedure)
+5. DE-136 `notes.md:78` (F-F scope-note — the binding additive directive)
+
+### Key files (code, verified this session)
+- `supekku/scripts/lib/blocks/metadata/schema.py` — `FieldMetadata`, `ConditionalRule`, `BlockMetadata`
+- `supekku/scripts/lib/blocks/metadata/validator.py` — `_validate_conditional_rules` (:529), `_validate_object` (:476), `_validate_array` (:432)
+- `supekku/scripts/lib/blocks/metadata/test_engine.py` — ONLY current top-level `conditional_rules` user; must stay green
+- `supekku/scripts/lib/blocks/revision_metadata.py` — `REVISION_CHANGE_METADATA` (declare requirements[] rules here)
+- `supekku/scripts/lib/core/frontmatter_metadata/revision.py` — DE-137 stub to complete (P02)
+- `supekku/scripts/lib/changes/artifacts.py` — `_derive_applies_to` (:29) precedent (P02)
+- `supekku/cli/list/reviews.py` — `list revisions` (:33) (P03)
+- Real fixtures: `RE-042` (well-formed `modify`+`destination`, no `origin`) — regression guard
+
+### Relevant memories
+- `mem.pattern.validation.per-kind-block-wiring`
+- `mem.pattern.spec-driver.block-class-data-taxonomy`
+- `mem.pattern.spec-driver.metadata-validator-strictness`
+- (run `/retrieving-memory` at execute start)
+
+### Relevant doctrines
+- **F-F (load-bearing)**: additive over DE-118; no block redefinition, no `@v2`.
+- **DEC-138-10**: `applies_to` derived, never stored (no competing truths).
+- **DR-136 §11.1**: metadata engine = application code (current-schema); migration = legacy-aware, stdlib+helpers only.
+- POL-003 (no business logic in formatters); STD-002 (lint/pylint); ADR-008 (intent vs observed).
+
+### User decisions this session
+- Block-shape conflict → **pause + /consult** (not silent adoption).
+- Reconciliation → **in-place erratum** on DR-136 §10.2 (not formal RE; not full re-derivation).
+- Conditional-rule enforcement → **extend FieldMetadata** (declarative engine change), not hand-rolled per-item checks, not deferral.
+- Scope locked: all 7 work items + OQ defaults accepted.
+- Then → **/plan-phases** (done).
+
+### Loose ends / unresolved (assess before coding)
+- IP-level details (DR-142 §13): error-path prefix on generalised helper (no leading dot); `applies_to.specs` dedup/order; `unknown` alias sunset wording.
+- R-142-04: confirm the FM-beside-block strict check generalises to `kind:revision` (may be delta-keyed) — P02 concern.
+- R-142-01: legacy `action: move` blocks missing `origin` will error at strict flip — P04 sweep must drift-track first.
+
+### Commit-state guidance
+- Worktree clean re: this work. All DE-142/DE-136 artefacts committed (`45b756a1`, `760d4984`, `b5363f73`, `717c5872`).
+- Pre-existing unrelated changes (NOT mine, do not commit): `.gitignore`, `flake.lock`, `flake.nix` (modified), `.vscode/` (untracked).
+- **Stray junk**: `.spec-driver/deltas/.spec-driver/run/events.jsonl` — misdirected CLI telemetry (bad CWD); not staged; safe to ignore/remove.
+- Repo doctrine: prefer frequent small `.spec-driver/**` commits; code + `.spec-driver` may commit together or separately. During P01, commit engine+block code with its tests (red/green/refactor).

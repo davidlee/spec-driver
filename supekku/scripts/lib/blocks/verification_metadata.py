@@ -6,6 +6,7 @@ enabling metadata-driven validation and JSON Schema generation.
 
 from __future__ import annotations
 
+from supekku.scripts.lib.blocks.id_patterns import REQUIREMENT_ID_PATTERN
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 # Reuse constants from verification.py
@@ -16,10 +17,11 @@ from .verification import (
   VERIFICATION_STATUSES,
 )
 
-# Regex patterns for validation
+# Regex patterns for validation. The requirement-ID universe is shared
+# (id_patterns.REQUIREMENT_ID_PATTERN — DEC-142-08); subject/phase IDs
+# carry their own (IP/AUD subjects, phase suffixes) and stay local.
 VERIFICATION_ID_PATTERN = r"^V[TAH]-\d{3,}$"
 SUBJECT_ID_PATTERN = r"^(SPEC|PROD|IP|AUD)-\d{3,}(?:-[A-Z0-9]+)*$"
-REQUIREMENT_ID_PATTERN = r"^(SPEC|PROD)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$"
 PHASE_ID_PATTERN = r"^IP-\d{3,}(?:-[A-Z0-9]+)*\.PHASE-\d{2}$"
 
 # Metadata definition for verification coverage blocks

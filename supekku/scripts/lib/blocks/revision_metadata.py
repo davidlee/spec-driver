@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from supekku.scripts.lib.blocks.id_patterns import (
+  REQUIREMENT_ID_PATTERN,
+  SPEC_ID_PATTERN,
+)
 from supekku.scripts.lib.blocks.metadata import (
   BlockMetadata,
   ConditionalRule,
@@ -71,7 +75,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
           "spec_id": FieldMetadata(
             type="string",
             required=True,
-            pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
+            pattern=SPEC_ID_PATTERN,
             description="Specification ID (e.g., SPEC-100)",
           ),
           "action": FieldMetadata(
@@ -96,7 +100,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                 description="Requirements added to this spec",
                 items=FieldMetadata(
                   type="string",
-                  pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+                  pattern=REQUIREMENT_ID_PATTERN,
                   description="Requirement ID",
                 ),
               ),
@@ -106,7 +110,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                 description="Requirements removed from this spec",
                 items=FieldMetadata(
                   type="string",
-                  pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+                  pattern=REQUIREMENT_ID_PATTERN,
                   description="Requirement ID",
                 ),
               ),
@@ -116,7 +120,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                 description="Requirements moved into this spec",
                 items=FieldMetadata(
                   type="string",
-                  pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+                  pattern=REQUIREMENT_ID_PATTERN,
                   description="Requirement ID",
                 ),
               ),
@@ -126,7 +130,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                 description="Requirements moved out of this spec",
                 items=FieldMetadata(
                   type="string",
-                  pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+                  pattern=REQUIREMENT_ID_PATTERN,
                   description="Requirement ID",
                 ),
               ),
@@ -203,7 +207,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
           "requirement_id": FieldMetadata(
             type="string",
             required=True,
-            pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+            pattern=REQUIREMENT_ID_PATTERN,
             description="Requirement ID (e.g., SPEC-100.FR-001)",
           ),
           "kind": FieldMetadata(
@@ -266,13 +270,13 @@ REVISION_CHANGE_METADATA = BlockMetadata(
               "spec": FieldMetadata(
                 type="string",
                 required=True,
-                pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
+                pattern=SPEC_ID_PATTERN,
                 description="Target specification ID",
               ),
               "requirement_id": FieldMetadata(
                 type="string",
                 required=False,
-                pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+                pattern=REQUIREMENT_ID_PATTERN,
                 description="Target requirement ID",
               ),
               "path": FieldMetadata(
@@ -286,7 +290,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                 description="Additional specifications affected",
                 items=FieldMetadata(
                   type="string",
-                  pattern=r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
+                  pattern=SPEC_ID_PATTERN,
                   description="Specification ID",
                 ),
               ),

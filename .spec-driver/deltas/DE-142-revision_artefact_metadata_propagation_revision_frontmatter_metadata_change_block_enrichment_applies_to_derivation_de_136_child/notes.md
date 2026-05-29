@@ -1,5 +1,33 @@
 # Notes for DE-142
 
+## Session 2026-05-29 (7) — P04 execution: group A (patterns) done; group B obstacle
+
+### Done — group A (broaden + share ID patterns), TDD
+- **NEW `blocks/id_patterns.py`** (NOT `blocks/metadata/patterns.py`). STD-003 resolution:
+  callers (`revision_metadata.py`, `verification_metadata.py`) live at `blocks/` level;
+  `blocks/metadata/` is the generic validation engine (domain-agnostic). ID regexes are
+  domain-specific → `blocks/` level, alongside the `yaml_utils.py` precedent. Phase §6 STOP
+  condition anticipated this ("follow STD-003").
+  - `REQUIREMENT_ID_PATTERN = r"^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NF|NFR)-[A-Z0-9.-]+$"`
+  - `SPEC_ID_PATTERN = r"^(SPEC|PROD|ISSUE)-\d{3,}(?:-[A-Z0-9]+)*$"`
+- **revision_metadata.py**: replaced 6 REQUIREMENT copies (was `^SPEC-\d{3}...(FR|NFR)...`) +
+  3 SPEC copies (`^SPEC-\d{3}...`) with the shared constants. RE-/DE-/AUD- patterns untouched.
+- **verification_metadata.py**: dropped its local `REQUIREMENT_ID_PATTERN` (`(SPEC|PROD)...(FR|NFR)`
+  — missed NF/ISSUE) → imports the share. SUBJECT/VERIFICATION/PHASE patterns stay local.
+- **VT-142-PATTERN-001** (`blocks/id_patterns_test.py`, 17 cases): accepts SPEC/PROD/ISSUE +
+  FR/NF/NFR + dotted suffix + segmented container; rejects ADR, too-few-digits, bare-spec-as-req,
+  requirement-form-as-spec, empty. No pre-existing test encoded the SPEC-only bug (grep clean).
+- Evidence: `blocks/` suite 568 pass; targeted 91 pass; ruff/ty clean; pylint 10.00/10, 0 msgs.
+
+### Group B OBSTACLE (must /consult before synthesis) — ADR in source_specs
+DR §8 step 4 says synthesise `specs[]` from `source_specs ∪ destination_specs`. But the corpus
+FM-only records carry **`source_specs: [ADR-007]`/`[ADR-008]`** (RE-035/034/033/031/032/029).
+`SPEC_ID_PATTERN` deliberately excludes ADR (ADRs are decisions, not specs) → emitting
+`spec_id: ADR-007` yields an INVALID synthesised block → the post-migrate `--strict` we're
+chasing would fail. The P04 consult evidence ("no ADR refs") was about *requirements*, missed
+`source_specs`. Also RE-028 is source≠dest both-real (PROD-011→PROD-002, looks like a move but
+DEC-142-09 mandates `modify`). Need a focused decision on what `specs[]` is synthesised from.
+
 ## Session 2026-05-29 (6) — P04 consult (migration design locked)
 
 P04 is the consult gate, not a mechanical phase. Ran a 4-agent read-only evidence

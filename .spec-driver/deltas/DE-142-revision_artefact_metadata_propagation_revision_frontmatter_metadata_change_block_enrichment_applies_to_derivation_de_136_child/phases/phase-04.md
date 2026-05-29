@@ -4,7 +4,7 @@ slug: "142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_
 name: IP-142 Phase 04 — patterns + migration + sweep + flip
 created: "2026-05-29"
 updated: "2026-05-29"
-status: draft  # one of: completed | deferred | draft | in-progress | pending
+status: in-progress  # one of: completed | deferred | draft | in-progress | pending
 kind: phase  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
 plan: IP-142
 delta: DE-142

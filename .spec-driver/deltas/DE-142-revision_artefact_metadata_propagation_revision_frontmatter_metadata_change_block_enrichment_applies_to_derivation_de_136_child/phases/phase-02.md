@@ -4,7 +4,7 @@ slug: "142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_
 name: IP-142 Phase 02 — FM completion + applies_to derivation
 created: "2026-05-29"
 updated: "2026-05-29"
-status: draft  # one of: completed | deferred | draft | in-progress | pending
+status: completed  # one of: completed | deferred | draft | in-progress | pending
 kind: phase  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
 plan: IP-142
 delta: DE-142
@@ -49,20 +49,23 @@ of which rejects legacy corpus keys in tolerant (default) mode.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `REVISION_FRONTMATTER_METADATA` declares **narrow** field set: Base 7
+- [x] `REVISION_FRONTMATTER_METADATA` declares **narrow** field set: Base 7
       (status = revision enum + aliases) + `relations` (plain) + `tags` +
-      `ext_id` + `ext_url`; no `revision_links` projection (DEC-142-06)
-- [ ] `_derive_revision_applies_to` derives `specs` ← `sorted(set(block.specs[].spec_id))`,
+      `ext_id` + `ext_url`; no `revision_links` projection (DEC-142-06). `kind`
+      pinned to `["revision"]` (BASE enum omits it — §9)
+- [x] `_derive_revision_applies_to` derives `specs` ← `sorted(set(block.specs[].spec_id))`,
       `requirements` ← `sorted(set(block.requirements[].requirement_id))`; multi-block union;
       block-first with FM-fallback only when no block
-- [ ] `load_change_artifact` hooks the deriver for `kind == "revision"`; FM scope
+- [x] `load_change_artifact` hooks the deriver for `kind == "revision"`; FM scope
       keys no longer read; `applies_to` runtime-only (never persisted)
-- [ ] VT-142-FM-001/002 + VT-142-DERIVE-001/002 pass
-- [ ] R-142-04 verified resolved with **zero** kind-specific check code (the generic
+- [x] VT-142-FM-001/002 + VT-142-DERIVE-001/002 pass (37 targeted, 9 subtests)
+- [x] R-142-04 verified resolved with **zero** kind-specific check code (the generic
       `validator.py:128` strict check is armed for revision by the declared field set)
-- [ ] Existing suites green (regression: `audit_test`, `artifacts_test`, `validator`);
-      RE-042 still loads under tolerant mode
-- [ ] `just lint` zero warnings; `just pylint-files` on touched files no new warnings
+- [x] Existing suites green (regression: `audit_test`, `artifacts_test`, `validator`);
+      RE-042 still loads under tolerant mode (full suite: 5244 passed, only 3 known
+      pre-existing env/width failures)
+- [x] `just lint` zero warnings; pylint net-improved (use-implicit-booleaness 4→0;
+      no new message types)
 
 ## 5. Verification
 
@@ -111,12 +114,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | ------ | --- | ----------- | --------- | ----- |
-| [ ] | 2.1 | Write `revision_test.py` FIRST (RED): VT-142-FM-001 valid cases + VT-142-FM-002 cut-key (narrow set) + VT-142-DERIVE-002 strict/tolerant legs | [ ] | mirror `audit_test.py:20-34`; cut-key set as one module constant |
-| [ ] | 2.2 | Complete `REVISION_FRONTMATTER_METADATA` (narrow, explicit key picks from BASE; status enum replace; drop stub docstring; add examples — declared-valid fields ONLY) | [ ] | GREEN FM-001/002/DERIVE-002; additive, no block touch |
-| [ ] | 2.3 | Add `_derive_revision_applies_to(blocks, frontmatter)` (narrow; sorted(set); multi-block union; block-first/FM-fallback) | [ ] | RED first via DERIVE-001 matrix; do NOT generalise `_derive_applies_to` |
-| [ ] | 2.4 | Hook `elif kind == "revision":` in `load_change_artifact` (try/except ValueError like delta) | [ ] | applies_to runtime-only; no `_derive_revision_link_relations` (delta-only) |
-| [ ] | 2.5 | DERIVE-001 integration leg: RE-042-shaped `tmp_path` fixture through `load_change_artifact` | [P] | block shadows FM scope keys |
-| [ ] | 2.6 | Verify `__init__.py` needs no change; lint + targeted suites green; RE-042 tolerant-load check; pin terminal width on any wrapped/truncated assertion | [ ] | width-brittle suite (see §10) |
+| [x] | 2.1 | Write `revision_test.py` FIRST (RED): VT-142-FM-001 valid cases + VT-142-FM-002 cut-key (narrow set) + VT-142-DERIVE-002 strict/tolerant legs | [ ] | mirror `audit_test.py:20-34`; cut-key set as one module constant. New-validator-only (no legacy `validate_frontmatter` dual-check) |
+| [x] | 2.2 | Complete `REVISION_FRONTMATTER_METADATA` (narrow, explicit key picks from BASE; status enum replace; drop stub docstring; add examples — declared-valid fields ONLY) | [ ] | GREEN FM-001/002/DERIVE-002; additive, no block touch. Also pinned `kind` enum to `["revision"]` (BASE enum omits it — see §9) |
+| [x] | 2.3 | Add `_derive_revision_applies_to(blocks, frontmatter)` (narrow; sorted(set); multi-block union; block-first/FM-fallback) | [ ] | RED first via DERIVE-001 matrix; kept local (not generalised — POL-001) |
+| [x] | 2.4 | Hook `elif kind == "revision":` in `load_change_artifact` | [ ] | applies_to runtime-only; no `_derive_revision_link_relations` (delta-only). `extract_revision_blocks` does not raise; deriver tolerates bad blocks per-block |
+| [x] | 2.5 | DERIVE-001 integration leg: RE-050 `tmp_path` fixture through `load_change_artifact` | [P] | block shadows FM scope keys (verified) |
+| [x] | 2.6 | `__init__.py` unchanged (verified); ruff/ty clean; pylint net-improved (booleaness 4→0); full suite green bar 3 known pre-existing | [ ] | width-brittle suite (see §10) |
 
 ### Task Details
 
@@ -187,6 +190,17 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
   generic declared-fields unknown-key check, revision is already registered
   (`__init__.py:52`), and `get_strict_map` reads `[validation.strict].revision`
   generically. VT-142-DERIVE-002 verifies this rather than any new code path.
+- `2026-05-29` — **`kind` enum pinned to `["revision"]`** in the revision FM class.
+  Surfaced at RED: the shared `BASE` `kind` enum omits `revision` (it lists
+  `design_revision` for DR-* artefacts, not RE-* revisions), so a real revision fails
+  strict on `kind`. Latent pre-existing bug — never surfaced because revision strict
+  validation isn't on yet. Pinned locally via `replace(_BASE["kind"], enum_values=
+  ["revision"])` rather than widening the shared BASE enum (narrow / no sprawl;
+  POL-001). The shared-enum omission is left as a separate observation, not fixed here.
+- `2026-05-29` — **Test surface = `MetadataValidator` only** (not the legacy
+  `validate_frontmatter` dual-check audit_test uses). The new validator is the single
+  canonical surface (per `mem.pattern.spec-driver.metadata-validator-strictness`);
+  coupling new tests to a phased-out validator adds brittleness for no VT value.
 
 ## 10. Findings / Research Notes
 
@@ -209,9 +223,35 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
   legitimately-structured records. This is a **genuine P04 decision** (DEC-CONSULT-03/04),
   deferred — bring a concrete pattern proposal + before/after YAML when planning P04.
 
+### Implementation evidence (2026-05-29)
+
+- **FM class** (`revision.py`): narrow field set via explicit BASE picks (not a
+  `**BASE` splat); `status` enum-replaced; `kind` pinned to `["revision"]`; docstring
+  de-stubbed; two declared-valid examples. `__init__.py` unchanged.
+- **Deriver + hook** (`artifacts.py`): `_derive_revision_applies_to(blocks, frontmatter)`
+  unions `specs[].spec_id` / `requirements[].requirement_id` across all blocks,
+  `sorted(set())`, block-first/FM-fallback, per-block `parse()` with tolerant skip.
+  `elif kind == "revision":` branch in `load_change_artifact`.
+- **Tests**: `revision_test.py` (VT-142-FM-001/002 + VT-142-DERIVE-002), 8 new
+  `_derive_revision_applies_to` cases + RE-050 integration leg in `artifacts_test.py`
+  (VT-142-DERIVE-001). **37 targeted passed, 9 subtests.**
+- **Full suite**: `pytest supekku` → **5244 passed, 4 skipped**; only the **3 known
+  pre-existing failures** (2 width-wrap `ListDeltasMalformedFrontmatterTest`, 1
+  stray-telemetry `show_test::test_path_and_json_mutually_exclusive`). Zero new.
+- **Lint**: ruff check/format clean on touched files (whole-repo `ruff check` passes);
+  ty clean; pylint **net-improved** — `use-implicit-booleaness-not-comparison` 4→0
+  (fixed my 2 + 4 pre-existing); zero new message types. `load_change_artifact`'s
+  pre-existing `too-complex`/`too-many-*` (present at HEAD) nudged by the 1-line
+  `elif` but unchanged in count — left as a pre-existing observation (not introduced).
+
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored (§10)
-- [ ] DR-142/IP-142 updated if approach shifted
-- [ ] Hand-off note to P03 (list enrichment — needs the derived summary + RE-042 fixture)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (§10)
+- [x] DR-142/IP-142 updated (IP §6 coverage VT-142-FM-001/DERIVE-001 → verified; §9 progress P02)
+- [x] Hand-off note to P03 — P03 (list enrichment) consumes the derived block scope.
+      Reuse: `_rev_block(data)` fixture helper (artifacts_test.py) + RE-042/RE-040 as
+      real corpus fixtures; the source/destination SPLIT (origin vs destination.spec)
+      is recomputed in `revision_check.py` (NOT read from `applies_to`, which is the
+      deduped union). `RevisionChangeBlock.parse()` is on-demand. UX consult (DEC-CONSULT-06
+      list columns) is still open — bring the rendered mockup before wiring the formatter.

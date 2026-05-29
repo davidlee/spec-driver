@@ -4,9 +4,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import yaml
+
 from supekku.scripts.lib.blocks.delta import DeltaRelationshipsBlock
+from supekku.scripts.lib.blocks.revision import (
+  REVISION_BLOCK_MARKER,
+  RevisionChangeBlock,
+  render_revision_change_block,
+)
 from supekku.scripts.lib.changes.artifacts import (
   _derive_applies_to,
+  _derive_revision_applies_to,
   _derive_revision_link_relations,
   load_change_artifact,
 )
@@ -454,7 +462,7 @@ def test_derive_applies_to_falls_back_to_fm_when_block_absent() -> None:
 
 def test_derive_applies_to_returns_empty_when_both_absent() -> None:
   """Both block and FM absent → empty dict."""
-  assert _derive_applies_to(None, {}) == {}
+  assert not _derive_applies_to(None, {})
 
 
 def test_derive_applies_to_empty_block_falls_through_to_fm() -> None:
@@ -467,7 +475,7 @@ def test_derive_applies_to_empty_block_falls_through_to_fm() -> None:
 
 def test_derive_applies_to_fm_non_dict_returns_empty() -> None:
   """FM applies_to that is not a dict → empty (guards against bad payloads)."""
-  assert _derive_applies_to(None, {"applies_to": "not-a-dict"}) == {}
+  assert not _derive_applies_to(None, {"applies_to": "not-a-dict"})
 
 
 # -- VT-DE138-COLLAB-001 — union primary + collaborators (DR-138 §6.1, DEC-138-11) --
@@ -536,12 +544,12 @@ def test_derive_revision_link_relations_projects_supersedes() -> None:
 
 
 def test_derive_revision_link_relations_empty_when_block_absent() -> None:
-  assert _derive_revision_link_relations(None) == []
+  assert not _derive_revision_link_relations(None)
 
 
 def test_derive_revision_link_relations_empty_when_no_revision_links() -> None:
   block = _block({})
-  assert _derive_revision_link_relations(block) == []
+  assert not _derive_revision_link_relations(block)
 
 
 def test_derive_revision_link_relations_preserves_both_kinds() -> None:
@@ -558,4 +566,132 @@ def test_derive_revision_link_relations_preserves_both_kinds() -> None:
   assert {(r["type"], r["target"]) for r in rels} == {
     ("introduces", "RE-100"),
     ("supersedes", "RE-090"),
+  }
+
+
+# -- VT-142-DERIVE-001 — _derive_revision_applies_to (DR-142 §6, DEC-142-05) --
+# Narrow (DEC-CONSULT-02, user-approved): specs ← block.specs[].spec_id,
+# requirements ← block.requirements[].requirement_id; sorted+deduped union over
+# all blocks. Block-first (FM shadowed); FM-fallback only when no block. The
+# source/destination split the list columns need (P03) is recomputed there, not
+# folded into derived scope. RevisionChangeBlock is parse-on-demand.
+
+
+def _rev_block(data: dict) -> RevisionChangeBlock:
+  return RevisionChangeBlock(
+    marker=REVISION_BLOCK_MARKER,
+    language="yaml",
+    info=REVISION_BLOCK_MARKER,
+    yaml_content=yaml.safe_dump(data),
+    content_start=0,
+    content_end=0,
+  )
+
+
+def test_derive_revision_applies_to_block_sole_source() -> None:
+  """Block present → block is sole source (FM scope keys shadowed)."""
+  block = _rev_block(
+    {
+      "specs": [{"spec_id": "PROD-004", "action": "updated"}],
+      "requirements": [{"requirement_id": "PROD-004.FR-007", "action": "modify"}],
+    }
+  )
+  fm = {"applies_to": {"specs": ["FM-ONLY"], "requirements": ["FM-ONLY.FR-1"]}}
+  result = _derive_revision_applies_to([block], fm)
+  assert result == {"specs": ["PROD-004"], "requirements": ["PROD-004.FR-007"]}
+
+
+def test_derive_revision_applies_to_sorted_and_deduped() -> None:
+  """Duplicate + out-of-order ids collapse to a sorted unique set."""
+  block = _rev_block(
+    {
+      "specs": [
+        {"spec_id": "SPEC-200"},
+        {"spec_id": "PROD-004"},
+        {"spec_id": "PROD-004"},
+      ],
+      "requirements": [
+        {"requirement_id": "PROD-004.FR-007"},
+        {"requirement_id": "PROD-004.FR-007"},
+      ],
+    }
+  )
+  result = _derive_revision_applies_to([block], {})
+  assert result == {
+    "specs": ["PROD-004", "SPEC-200"],
+    "requirements": ["PROD-004.FR-007"],
+  }
+
+
+def test_derive_revision_applies_to_unions_multiple_blocks() -> None:
+  """Multiple blocks → union (extract_revision_blocks returns a list)."""
+  block_a = _rev_block({"specs": [{"spec_id": "PROD-004"}]})
+  block_b = _rev_block(
+    {
+      "specs": [{"spec_id": "SPEC-122"}],
+      "requirements": [{"requirement_id": "SPEC-122.FR-003"}],
+    }
+  )
+  result = _derive_revision_applies_to([block_a, block_b], {})
+  assert result == {
+    "specs": ["PROD-004", "SPEC-122"],
+    "requirements": ["SPEC-122.FR-003"],
+  }
+
+
+def test_derive_revision_applies_to_falls_back_to_fm_when_no_block() -> None:
+  """No block → FM-fallback (transition window for unmigrated revisions)."""
+  fm = {"applies_to": {"specs": ["PROD-004"], "requirements": ["PROD-004.FR-007"]}}
+  result = _derive_revision_applies_to([], fm)
+  assert result == {"specs": ["PROD-004"], "requirements": ["PROD-004.FR-007"]}
+
+
+def test_derive_revision_applies_to_empty_blocks_fall_through_to_fm() -> None:
+  """Blocks with no specs/reqs → treated as absent → FM-fallback."""
+  block = _rev_block({"specs": [], "requirements": []})
+  fm = {"applies_to": {"specs": ["PROD-004"]}}
+  assert _derive_revision_applies_to([block], fm) == {"specs": ["PROD-004"]}
+
+
+def test_derive_revision_applies_to_returns_empty_when_both_absent() -> None:
+  """No blocks + no FM applies_to → empty derived scope."""
+  assert not _derive_revision_applies_to([], {})
+
+
+def test_derive_revision_applies_to_fm_non_dict_returns_empty() -> None:
+  """Non-dict FM applies_to → empty (guards against bad payloads)."""
+  assert not _derive_revision_applies_to([], {"applies_to": "not-a-dict"})
+
+
+def test_load_revision_derives_applies_to_from_block(tmp_path: Path) -> None:
+  """Integration: kind=='revision' hook derives applies_to from the block,
+  shadowing legacy hand-rolled FM scope keys (VT-142-DERIVE-001 integration leg)."""
+  body = "# RE-050\n\n" + render_revision_change_block(
+    "RE-050",
+    specs=[{"spec_id": "PROD-004", "action": "updated"}],
+    requirements=[
+      {"requirement_id": "PROD-004.FR-007", "action": "modify"},
+    ],
+  )
+  path = tmp_path / "RE-050.md"
+  frontmatter = {
+    "id": "RE-050",
+    "slug": "example-revision",
+    "name": "Revision – Example",
+    "created": "2026-01-01",
+    "updated": "2026-01-01",
+    "status": "draft",
+    "kind": "revision",
+    "relations": [],
+    # Legacy hand-rolled scope keys — must be shadowed by the derived block.
+    "source_specs": ["FM-ONLY"],
+    "destination_specs": ["FM-ONLY"],
+    "requirements": ["FM-ONLY.FR-1"],
+  }
+  dump_markdown_file_update(path, frontmatter, body)
+  artifact = load_change_artifact(path)
+  assert artifact
+  assert artifact.applies_to == {
+    "specs": ["PROD-004"],
+    "requirements": ["PROD-004.FR-007"],
   }

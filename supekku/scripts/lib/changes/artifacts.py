@@ -16,6 +16,10 @@ from supekku.scripts.lib.blocks.plan import (
   extract_phase_overview,
   extract_plan_overview,
 )
+from supekku.scripts.lib.blocks.revision import (
+  RevisionChangeBlock,
+  extract_revision_blocks,
+)
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
@@ -84,6 +88,44 @@ def _derive_revision_link_relations(
     for target in revision_links.get(rel_type) or []:
       relations.append({"type": rel_type, "target": str(target)})
   return relations
+
+
+def _derive_revision_applies_to(
+  blocks: list[RevisionChangeBlock],
+  frontmatter: dict[str, Any],
+) -> dict[str, Any]:
+  """Synthesise ``applies_to`` from ``supekku:revision.change`` blocks (DR-142 §6).
+
+  Narrow scope (DEC-CONSULT-02, user-approved): ``specs`` ← unique
+  ``specs[].spec_id``, ``requirements`` ← unique ``requirements[].requirement_id``,
+  unioned across all blocks (``extract_revision_blocks`` returns a list) and
+  sorted for determinism. Block-first when any block contributes scope (FM scope
+  keys silently shadowed); FM-fallback only when no block does (transition window
+  for unmigrated revisions). Never stored — the validator separately reports FM
+  ``applies_to`` as a strict-mode error post-flip (DEC-138-10). The source /
+  destination split the list columns need is recomputed in the domain summary
+  (P03), not folded into derived scope.
+
+  Unparseable blocks are skipped (matching the delta branch's tolerant load);
+  strict validation surfaces malformed blocks separately.
+  """
+  specs: set[str] = set()
+  requirements: set[str] = set()
+  for block in blocks:
+    try:
+      data = block.parse()
+    except ValueError:
+      continue
+    for entry in data.get("specs") or []:
+      if isinstance(entry, dict) and entry.get("spec_id"):
+        specs.add(str(entry["spec_id"]))
+    for entry in data.get("requirements") or []:
+      if isinstance(entry, dict) and entry.get("requirement_id"):
+        requirements.add(str(entry["requirement_id"]))
+  if specs or requirements:
+    return {"specs": sorted(specs), "requirements": sorted(requirements)}
+  fm = frontmatter.get("applies_to") or {}
+  return dict(fm) if isinstance(fm, dict) else {}
 
 
 @dataclass(frozen=True)
@@ -255,6 +297,14 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
         "overview": plan_block.data if plan_block else {},
         "phases": phases_data,
       }
+
+  elif kind == "revision":
+    # applies_to derived from the change block, never read from FM scope keys
+    # (DEC-142-05 / DEC-138-10). extract_revision_blocks does not raise; the
+    # deriver tolerates unparseable blocks internally.
+    applies_to_mapping = _derive_revision_applies_to(
+      extract_revision_blocks(body), frontmatter
+    )
 
   return ChangeArtifact(
     id=artifact_id,

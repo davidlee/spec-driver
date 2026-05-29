@@ -1,5 +1,55 @@
 # Notes for DE-142
 
+## Session 2026-05-29 (4) — P02 executed (FM completion + applies_to derivation)
+
+### Done (TDD red→green→refactor)
+- **FM class** (`core/frontmatter_metadata/revision.py`): completed the DE-137 stub to
+  the NARROW shape via explicit BASE key-picks (id,name,slug,kind,status,created,
+  updated,relations,tags,ext_id,ext_url) — NOT a `**BASE` splat (which would re-admit
+  the universal-cut keys). `status` enum-replaced; docstring de-stubbed; 2 examples.
+- **`kind` enum pinned to `["revision"]`** — surfaced at RED: the shared BASE `kind`
+  enum OMITS `revision` (lists `design_revision`, not RE-* `revision`). Latent
+  pre-existing bug (never tripped — revision strict validation isn't on). Fixed
+  locally (no shared-BASE widening). Left the BASE omission as an observation.
+- **applies_to deriver** (`changes/artifacts.py`): `_derive_revision_applies_to(blocks,
+  frontmatter)` — unions `specs[].spec_id` / `requirements[].requirement_id` across all
+  blocks (`extract_revision_blocks` returns a list), `sorted(set())`, block-first /
+  FM-fallback, per-block `parse()` tolerant skip. Hooked `elif kind == "revision":` in
+  `load_change_artifact`. Kept local (POL-001 — 2 call sites, different block shapes).
+- **R-142-04 confirmed MINOR**: no kind-specific check code; the generic
+  `validator.py:128` declared-fields unknown-key check is armed for revision by the
+  narrow field set alone. VT-142-DERIVE-002 proves it (strict error / strict=False ok).
+- **Tests**: `revision_test.py` (FM-001/002 + DERIVE-002); 8 deriver cases + RE-050
+  integration leg in `artifacts_test.py` (DERIVE-001). 37 targeted + 9 subtests pass.
+
+### Verification evidence
+- Full `pytest supekku`: **5244 passed, 4 skipped**; only the **3 known pre-existing
+  failures** (2 width-wrap `ListDeltasMalformedFrontmatterTest`; 1 stray-telemetry
+  `show_test::test_path_and_json_mutually_exclusive`). Zero new.
+- ruff check/format + ty clean on touched files; whole-repo `ruff check` passes.
+  pylint **net-improved**: `use-implicit-booleaness-not-comparison` 4→0 (fixed my 2 +
+  4 pre-existing); zero new message types. `load_change_artifact`'s pre-existing
+  `too-complex`/`too-many-*` (present at HEAD) nudged by the 1-line `elif`, count
+  unchanged — left as pre-existing observation.
+- `validate file phase-02.md`: clean. Phase-02 → `completed`. IP §6 coverage
+  VT-142-FM-001/002 + DERIVE-001/002 → `verified`; IP §9 P02 checked.
+
+### Handoff → P03 (list enrichment)
+- Reuse `_rev_block(data)` fixture helper (artifacts_test.py) + RE-042/RE-040 corpus.
+- The source/destination SPLIT (origin vs `destination.spec`) is recomputed in
+  `changes/revision_check.py` (NEW), NOT read from `applies_to` (which is the deduped
+  union). `RevisionChangeBlock.parse()` is on-demand.
+- **Open UX consult (DEC-CONSULT-06)**: `list revisions` columns — Source is empty for
+  all 42 current records. Bring the rendered mockup before wiring the formatter.
+- P03 work is parallelisable (domain summary / column_defs / formatter / CLI / 4 list
+  tests) → candidate for a small implementation workflow.
+
+### Deferred (unchanged)
+- P04 block-pattern + `unknown`-enum decisions (DEC-CONSULT-03/04), drift-write
+  mechanism (05), flip timing (07), stray-dir deletion (08) — bring at P03/P04.
+
+---
+
 ## Session 2026-05-29 (3) — recon workflow + P02 planning + consult
 
 ### Done

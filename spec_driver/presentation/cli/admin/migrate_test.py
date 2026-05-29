@@ -20,6 +20,7 @@ from spec_driver.presentation.cli.admin.migrate import (
   _acquire_lock,
   _advance_watermark,
   _discover_steps,
+  _kind_files,
   _LockHeldError,
   _pending_steps,
   _read_last_applied,
@@ -321,6 +322,50 @@ class TestRunStep:
     _run_step(tmp_path, loaded, dry_run=False)
     for f in files:
       assert "de-137 raising-migration marker" in f.read_text(encoding="utf-8")
+
+
+class TestKindFiles:
+  """_kind_files frontmatter scan (DE-142 DEC-142-13)."""
+
+  def test_matches_kind_with_trailing_comment(self, tmp_path: Path) -> None:
+    """Template-stamped `kind: delta  # one of: ...` must still match."""
+    d = tmp_path / ".spec-driver" / "deltas" / "DE-009"
+    d.mkdir(parents=True)
+    path = d / "DE-009.md"
+    path.write_text(
+      "---\nid: DE-009\nkind: delta  # one of: audit | delta | spec\n"
+      "status: draft\n---\nbody\n",
+      encoding="utf-8",
+    )
+    assert _kind_files(tmp_path, "delta") == [path]
+
+  def test_does_not_match_other_kind_with_comment(self, tmp_path: Path) -> None:
+    d = tmp_path / ".spec-driver" / "specs" / "SPEC-001"
+    d.mkdir(parents=True)
+    path = d / "SPEC-001.md"
+    path.write_text(
+      "---\nid: SPEC-001\nkind: spec  # one of: ...\nstatus: draft\n---\nbody\n",
+      encoding="utf-8",
+    )
+    assert _kind_files(tmp_path, "delta") == []
+
+
+class TestDryRunCount:
+  """Dry-run echoes the previewed touch count, not the empty apply results."""
+
+  def test_dry_run_reports_touched_count(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    migrations = tmp_path / "migrations"
+    _write_fake_step(migrations, "v0_10_0_001_fake")
+    monkeypatch.setattr(orchestrator, "_migrations_dir", lambda: migrations)
+    _write_delta_artefact(tmp_path, "DE-001.md")
+    runner = CliRunner()
+    res = runner.invoke(
+      admin_app, ["migrate", "delta", "--dry-run", "--root", str(tmp_path)]
+    )
+    assert res.exit_code == 0
+    assert "would touch 1" in res.output
 
 
 class TestWatermark:

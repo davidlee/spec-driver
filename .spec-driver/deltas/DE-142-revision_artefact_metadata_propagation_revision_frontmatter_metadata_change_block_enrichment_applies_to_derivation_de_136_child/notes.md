@@ -28,6 +28,42 @@ chasing would fail. The P04 consult evidence ("no ADR refs") was about *requirem
 `source_specs`. Also RE-028 is source≠dest both-real (PROD-011→PROD-002, looks like a move but
 DEC-142-09 mandates `modify`). Need a focused decision on what `specs[]` is synthesised from.
 
+### DEC-142-12 (consult, 2026-05-29) — synthesise `specs[]` from `destination_specs` only
+User chose Opt 1 (recommended). Synthesised `specs[]` = one `{spec_id, action: updated}` per
+`destination_specs` id; **`source_specs` dropped entirely** (it is origin data — consistent with
+DEC-142-09's omit-origin; ADR-* sources have no valid block home; matches existing complete-delta
+synthesis which emits dest-only `spec_id`). Differs from DR §8's literal "source ∪ dest union" on
+exactly one record (RE-028 PROD-011 source dropped). `requirements[]` unchanged from plan: one
+`modify` entry per FM requirement, `destination.spec` = requirement container, `kind` from FR/NF
+token, no lifecycle/origin. **Updates DR §8 step 4.**
+
+### Done — group B (v0_10_0_005 migration step), TDD
+- **NEW `spec_driver/migrations/v0_10_0_005_revision_metadata/{__init__,migration,migration_test}.py`**
+  mirroring v004. `RevisionMetadataStep(applies_to_kind="revision")`. `_transform`: cut
+  `_CUT_KEYS = {lifecycle, aliases, auditers, source, source_specs, destination_specs, requirements}`;
+  FM-only (no block) + scope present → synthesise `supekku:revision.change@v1` block:
+  `specs[]` from `destination_specs` (DEC-142-12), `requirements[]` action=modify, kind from
+  FR/NF token, `destination.spec` = requirement container, no lifecycle/origin (DEC-142-09);
+  block-wins (no re-synth); idempotent; `drift_entries=[]` always (DEC-142-10). Isolation honoured
+  (stdlib + `_helpers` + `_protocol` + pyyaml; frozen-local `_MARKER/_SCHEMA/_VERSION/_CUT_KEYS`).
+  `applies_to` scans FM-only (split_frontmatter on head) so a migrated block's body `requirements:`
+  doesn't false-positive. VT-142-MIGRATE-001..004 + edges = 24 pass.
+
+### DEC-142-13 (consult, 2026-05-29) — fix two pre-existing orchestrator bugs in `migrate.py`
+Discovered at the dry-run: `admin migrate revision --dry-run` reported "would touch 0" though 40
+records need cutting. Root cause = TWO defects in `presentation/cli/admin/migrate.py`:
+1. **`_kind_files` kind-matcher didn't strip a trailing `# comment`** → records stamped
+   `kind: revision  # one of: ...` (RE-041, RE-042) were invisible to the sweep → they'd keep FM
+   keys and **fail strict after the flip**. Fixed: `value.split("#",1)[0].strip().strip("'\"")`.
+   (Latent for ALL kinds; prior delta/spec/prod/audit sweeps may have silently skipped commented
+   records too — watermark is past them so not auto-re-run. Out of DE-142 scope; candidate issue.)
+2. **dry-run touch-count summed `results`** (empty during dry-run) **instead of `previews`** →
+   always printed 0. Fixed: sum `previews`. Cosmetic but made dry-run useless for VA evidence.
+User approved fixing both (recommended) over hand-fixing 2 records. Tests: `TestKindFiles` (2) +
+`TestDryRunCount` (CLI-level, asserts "would touch 1"). Full migrations + admin suites: 201 pass.
+ruff/format clean; pylint 0 new (import-outside-toplevel are pre-existing deferred imports); ty 5
+pre-existing tomlkit `Item` false-positives (lines 180/538-540, untouched).
+
 ## Session 2026-05-29 (6) — P04 consult (migration design locked)
 
 P04 is the consult gate, not a mechanical phase. Ran a 4-agent read-only evidence

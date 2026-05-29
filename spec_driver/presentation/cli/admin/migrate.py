@@ -326,7 +326,8 @@ def _kind_files(repo_root: Path, kind: str) -> list[Path]:
       if stripped == "---":
         break
       if stripped.startswith("kind:"):
-        value = stripped.split(":", 1)[1].strip().strip("'\"")
+        value = stripped.split(":", 1)[1]
+        value = value.split("#", 1)[0].strip().strip("'\"")
         if value == kind:
           candidates.append(path)
         break
@@ -456,11 +457,11 @@ def migrate(
 
   try:
     for entry in selected:
-      results, _ = _run_step(repo_root, entry, dry_run=dry_run)
+      results, previews = _run_step(repo_root, entry, dry_run=dry_run)
       if dry_run:
         typer.echo(
           f"admin migrate: {entry.folder.name}: dry-run "
-          f"(would touch {sum(len(r.touched) for r in results)})"
+          f"(would touch {sum(len(p.touched) for p in previews)})"
         )
         continue
       _write_log(repo_root, entry, results)

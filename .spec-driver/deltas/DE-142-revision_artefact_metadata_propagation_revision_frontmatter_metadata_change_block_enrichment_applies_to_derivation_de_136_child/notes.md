@@ -1,5 +1,48 @@
 # Notes for DE-142
 
+## Session 2026-05-29 (5) — P03 executed (list revisions enrichment)
+
+### Done (TDD)
+- **Domain** `changes/revision_check.py` (NEW): `RevisionChangeSummary(sources,
+  destinations, requirements)` + cell methods + `revision_change_summary(artifact)`.
+  sources ← `requirements[].origin[].ref` (kind=spec); destinations ←
+  `requirements[].destination.spec`; requirements ← `requirement_id`. Sorted+deduped,
+  tolerant load, multi-block union. Mirrors `audit_check.AuditFindingsSummary`.
+- **Columns** `REVISION_COLUMNS` (ID, Name, Status, Source, Destination, Requirements).
+- **Formatter** `format_revision_list_row/json/table` (`change_formatters.py`). Strips
+  `"Spec Revision - "` name prefix. **Adaptive Source-hide** (DEC-CONSULT-06, user-approved):
+  Source column dropped in the TABLE view when no revision has an origin; TSV + JSON keep
+  the full schema. `RevisionChangeSummary` imported top-level (no cycle → cleaner than the
+  audit inner-import mirror).
+- **CLI** `list_revisions` wired thin: `{r.id: revision_change_summary(r)}` +
+  `format_revision_list_table` (replaced generic `format_change_list_table`). Filters kept.
+
+### User decision this session
+- **DEC-CONSULT-06 → adaptive Source column** (not fixed 6-col, not dropped). User asked
+  "can we cheaply hide it if no non-nil values?" — yes (~mirrors `show_external` pattern).
+
+### Verification
+- VT-142-LIST-001/002/003/004 + adaptive-hide: 82 targeted pass. Live `list revisions`:
+  Source HIDDEN (corpus has zero origins), Destination/Requirements populated; `--json`
+  stable schema. Regression (cli/list + changes + formatters): 770 passed, only the 2
+  pre-existing width-wrap delta-list failures. ruff/ty clean; pylint net **+1** (one
+  `too-complex` on `format_revision_list_table`, McCabe 12 == its `format_audit_list_table`
+  sibling — faithful mirror; no new message types). Phase-03 validated + `completed`;
+  IP §6 VT-142-LIST-* → verified, §9 P03 checked.
+
+### Housekeeping
+- Stray untracked telemetry dirs (`.spec-driver/deltas/.spec-driver/run/` + the DE-142
+  bundle one) **deleted** (user-approved) → `show_test::test_path_and_json_mutually_exclusive`
+  now passes (pre-existing failures: 3 → 2, both width-wrap). Underlying CWD-resolution bug
+  filed as **ISSUE-060**.
+
+### Future DRY (noted, not done)
+- `format_revision_list_table` + `format_audit_list_table` share an identical row-cell
+  styling loop (id/status markup). Extracting `_styled_change_cell` would drop both below
+  the `too-complex` threshold. Out of P03 scope (touches audit).
+
+---
+
 ## Session 2026-05-29 (4) — P02 executed (FM completion + applies_to derivation)
 
 ### Done (TDD red→green→refactor)
@@ -193,10 +236,45 @@
 ### Task card
 - **This delta**: `.spec-driver/deltas/DE-142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child/`
 - **Parent (umbrella)**: `.spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/` (DE-142 is the last per-artefact child; tracked in DE-136 phase-03 task 3.8)
-- **Status**: DE-142 `draft`; DR-142/IP-142 authored & validated; phase-01 sheet ready. Move DE-142 → `in-progress` when execution starts.
+- **Status**: DE-142 `in-progress`. **P01/P02/P03 COMPLETE** (commits `44c54f58`, `084e8616`, + P03). P04 NOT started — it is the consequential gate.
 
-### Next activity
-**`/execute-phase` for IP-142-P01** (engine + block conditional rules). TDD per `phases/phase-01.md` §7 tasks 1.1–1.6. Foundation phase; P02–P04 build on it.
+### Next activity — **P04 (migration + sweep + flip): CONSULT FIRST, then plan**
+P04 is NOT a mechanical mirror like P02/P03 — recon proved the DR §8 plan is partly
+unimplementable against the real corpus. **Do not start coding P04. Bring a focused
+consult round** (the user wants UX/schema/arch decisions unpacked with example YAML;
+lean narrow/strict unless the corpus shows real lossage — see memory
+`user-decision-density-preference`). Open decisions (DR-142 §13 + recon register):
+- **DEC-CONSULT-04 (SCHEMA, the big one)**: block ID patterns are SPEC-only
+  (`^SPEC-\d{3}`) but the corpus pervasively uses `PROD-*` (a first-class spec),
+  `ADR-*`, `ISSUE-*`, `NF-` (not `NFR-`). The sibling DELTA block uses `pattern=r".+"`.
+  Strict flip would drift-track ~38/42 legit records; dest-only synthesised `move`
+  (RE-030) trips P01's origin+dest rule. Decide: broaden patterns (likely right —
+  arguably additive, not a redefinition) vs SPEC-only + drift-track. Bring before/after YAML.
+- **DEC-CONSULT-03 (SCHEMA)**: `unknown` lifecycle status — DR DEC-142-04/§13.3 approved
+  the WIDE shared-`REQUIREMENT_STATUSES`-enum path; recon recommends narrowing. Overriding
+  the approved DEC needs ratification.
+- **DEC-CONSULT-05 (ARCH)**: DL drift-write has no mechanism in the generic `admin migrate`
+  orchestrator (only the bespoke migrate-requirements writes DLs). Recommend promoting
+  `write_drift_ledger` to a shared migration helper.
+- **DEC-CONSULT-07**: strict-flip timing — recommend manual `workflow.toml` flip AFTER
+  VA-142-CORPUS-001 disposition (decoupled from the migrate run).
+Then `/plan-phases` → author `phases/phase-04.md`; `/execute-phase`. Migration folder =
+`v0_10_0_005_revision_metadata` (DEC-142-07). Next DL = DL-075.
+
+### Corpus facts (verified — load-bearing for P04)
+- 42 revisions: 27 carry a `supekku:revision.change` block, 15 are FM-only (need synth).
+- ALL 42 carry hand-rolled `aliases` + (most) `source_specs`/`destination_specs`/
+  `requirements` FM keys → cut by migration. ZERO carry `lifecycle/auditers/source/owners/summary`.
+- ZERO have a populated `origin[]` (all completion-revisions, action=modify, dest only).
+- Pattern-violating blocks (PROD/ADR/ISSUE/NF refs) ≈ 25/27 existing + ~13/15 synth targets.
+
+### After P04 closes
+- `[validation.strict].revision = true` in `workflow.toml`; then DE-136 P03 tasks 3.9–3.11
+  (flip confirm, baseline) → DE-136 P04 umbrella close. Audit deferred to DE-136 umbrella
+  (VA-DE136-CLOSE-001). DE-142 has no standalone audit.
+
+### Historical (P01) — reference only
+The P01-specific reading list below is retained for context; P01/P02/P03 are done.
 
 ### Required reading (in order)
 1. `DR-142.md` §4 (engine extension + declared rules), §13 (adversarial residuals — esp. §13.1 behaviour-preservation, §13.2 applies_to composition, §13.3 alias blast radius)

@@ -87,6 +87,18 @@ PLAN_COLUMNS = [
   ColumnDef(label="Delta", field="delta"),
 ]
 
+# DR-142 §7.2 — enriched revision list view. ``Source`` is adaptively hidden in
+# the table view when no revision has an origin (DEC-CONSULT-06); JSON keeps the
+# full field set.
+REVISION_COLUMNS = [
+  ColumnDef(label="ID", field="id", style_key="change.id"),
+  ColumnDef(label="Name", field="name"),
+  ColumnDef(label="Status", field="status"),
+  ColumnDef(label="Source", field="source"),
+  ColumnDef(label="Destination", field="destination"),
+  ColumnDef(label="Requirements", field="requirements"),
+]
+
 REQUIREMENT_COLUMNS = [
   ColumnDef(label="Spec", field="spec"),
   ColumnDef(label="Label", field="label", style_key="requirement.id"),

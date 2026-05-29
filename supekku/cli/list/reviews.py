@@ -22,10 +22,11 @@ from supekku.cli.common import (
 from supekku.cli.list import app
 from supekku.scripts.lib.changes.audit_check import audit_findings_summary
 from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.changes.revision_check import revision_change_summary
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.formatters.change_formatters import (
   format_audit_list_table,
-  format_change_list_table,
+  format_revision_list_table,
 )
 from supekku.scripts.lib.relations.query import partition_by_reverse_references
 
@@ -142,12 +143,14 @@ def list_revisions(
     if not revisions:
       raise typer.Exit(EXIT_SUCCESS)
 
-    # Sort and format
+    # Sort and format (enriched per DR-142 §7)
     revisions.sort(key=lambda r: r.id)
-    output = format_change_list_table(
+    summaries = {r.id: revision_change_summary(r) for r in revisions}
+    output = format_revision_list_table(
       revisions,
-      format_type,
-      not truncate,
+      summaries,
+      format_type=format_type,
+      truncate=not truncate,
       show_external=external,
     )
     typer.echo(output)

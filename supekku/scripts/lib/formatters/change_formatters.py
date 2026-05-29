@@ -20,6 +20,7 @@ from supekku.scripts.lib.blocks.plan import (
   extract_phase_tracking,
 )
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
+from supekku.scripts.lib.changes.revision_check import RevisionChangeSummary
 from supekku.scripts.lib.core.frontmatter_metadata.delta import AUDIT_GATE_AUTO
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
@@ -31,6 +32,7 @@ from supekku.scripts.lib.formatters.column_defs import (
   PHASE_COLUMNS,
   PLAN_COLUMNS,
   REFS_COLUMN,
+  REVISION_COLUMNS,
   column_labels,
 )
 from supekku.scripts.lib.formatters.relation_formatters import (
@@ -990,6 +992,7 @@ def format_audit_list_table(
     from supekku.scripts.lib.changes.audit_check import (  # noqa: PLC0415
       AuditFindingsSummary as _Summary,
     )
+
     return _Summary(0, 0, 0, 0, 0)
 
   def _table_row(a: ChangeArtifact) -> list[str]:
@@ -1020,6 +1023,121 @@ def format_audit_list_table(
     audits,
     columns=column_labels(col_defs),
     title="Audits",
+    prepare_row=_table_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=_to_json,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
+def format_revision_list_row(
+  artifact: ChangeArtifact,
+  summary: RevisionChangeSummary,
+) -> dict[str, str]:
+  """Render one revision as a column-keyed cell dict (DR-142 §7.2)."""
+  display_name = artifact.name
+  prefix = "Spec Revision - "
+  if display_name.startswith(prefix):
+    display_name = display_name[len(prefix) :]
+  return {
+    "id": artifact.id,
+    "name": display_name,
+    "status": artifact.status,
+    "source": summary.source_cell(),
+    "destination": summary.destination_cell(),
+    "requirements": summary.requirements_cell(),
+  }
+
+
+def format_revision_list_json(
+  revisions: Sequence[ChangeArtifact],
+  summaries: Mapping[str, RevisionChangeSummary],
+) -> str:
+  """JSON output for revision list — enriched fields, stable schema."""
+  items: list[dict[str, Any]] = []
+  for r in revisions:
+    s = summaries.get(r.id)
+    item: dict[str, Any] = {
+      "id": r.id,
+      "kind": r.kind,
+      "status": r.status,
+      "name": r.name,
+      "slug": r.slug,
+      "path": r.path.as_posix(),
+    }
+    if s:
+      item["sources"] = s.sources
+      item["destinations"] = s.destinations
+      item["requirements"] = s.requirements
+    if r.applies_to:
+      item["applies_to"] = r.applies_to
+    if r.tags:
+      item["tags"] = r.tags
+    items.append(item)
+  return format_as_json(items)
+
+
+def format_revision_list_table(
+  revisions: Sequence[ChangeArtifact],
+  summaries: Mapping[str, RevisionChangeSummary],
+  *,
+  format_type: str = "table",
+  truncate: bool = False,
+  show_external: bool = False,
+) -> str:
+  """Render enriched revision list per DR-142 §7.2.
+
+  DEC-CONSULT-06: the ``Source`` column is dropped in the **table** view when no
+  revision has an origin; TSV and JSON keep the full field set (stable schema).
+  """
+
+  def _get_summary(r: ChangeArtifact) -> RevisionChangeSummary:
+    s = summaries.get(r.id)
+    if s:
+      return s
+    return RevisionChangeSummary([], [], [])
+
+  full_defs = list(REVISION_COLUMNS)
+  if show_external:
+    full_defs.insert(1, EXT_ID_COLUMN)
+  full_fields = [c.field for c in full_defs]
+
+  # Adaptive Source-hide (table view only). TSV/JSON keep the full schema.
+  hide_source = not any(_get_summary(r).sources for r in revisions)
+  table_defs = (
+    [c for c in full_defs if c.field != "source"] if hide_source else full_defs
+  )
+  table_fields = [c.field for c in table_defs]
+
+  def _table_row(r: ChangeArtifact) -> list[str]:
+    row = format_revision_list_row(r, _get_summary(r))
+    if show_external:
+      row["ext_id"] = r.ext_id
+    cells: list[str] = []
+    for field_name in table_fields:
+      cell = row.get(field_name, "")
+      if field_name == "id":
+        cell = f"[change.id]{cell}[/change.id]"
+      elif field_name == "status":
+        style = get_change_status_style(r.status)
+        cell = f"[{style}]{cell}[/{style}]"
+      cells.append(cell)
+    return cells
+
+  def _tsv_row(r: ChangeArtifact) -> list[str]:
+    row = format_revision_list_row(r, _get_summary(r))
+    if show_external:
+      row["ext_id"] = r.ext_id
+    return [row.get(field_name, "") for field_name in full_fields]
+
+  def _to_json(items: Sequence[ChangeArtifact]) -> str:
+    return format_revision_list_json(items, summaries)
+
+  return format_list_table(
+    revisions,
+    columns=column_labels(table_defs),
+    title="Revisions",
     prepare_row=_table_row,
     prepare_tsv_row=_tsv_row,
     to_json=_to_json,

@@ -9,6 +9,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
+from supekku.scripts.lib.changes.revision_check import RevisionChangeSummary
 from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.formatters.change_formatters import (
   _format_audit_gate_cell,
@@ -28,6 +29,8 @@ from supekku.scripts.lib.formatters.change_formatters import (
   format_plan_details,
   format_plan_list_table,
   format_revision_details,
+  format_revision_list_row,
+  format_revision_list_table,
 )
 
 
@@ -1221,6 +1224,94 @@ class TestDeltaListEnrichmentVTLIST001(unittest.TestCase):
     assert parsed[0]["audit_gate"] == "exempt"
     assert parsed[0]["audited"] is True
     assert parsed[0]["tags"] == ["meta"]
+
+
+class TestRevisionListFormatter(unittest.TestCase):
+  """DE-142 P03 — enriched `list revisions` (VT-142-LIST-001/004 + adaptive)."""
+
+  def _artifact(
+    self,
+    *,
+    name: str = "Spec Revision - Delta DE-138 completion",
+    status: str = "completed",
+    applies_to: dict | None = None,
+    tags: list[str] | None = None,
+  ) -> ChangeArtifact:
+    return ChangeArtifact(
+      id="RE-042",
+      kind="revision",
+      status=status,
+      name=name,
+      slug="re-042",
+      path=Path("/tmp/RE-042.md"),
+      updated="2026-05-21",
+      applies_to=applies_to or {},
+      tags=tags or [],
+    )
+
+  # -- VT-142-LIST-001 — row cells + name-prefix strip --
+
+  def test_row_cells_and_name_strip(self) -> None:
+    summary = RevisionChangeSummary(
+      sources=["SPEC-100"],
+      destinations=["PROD-004"],
+      requirements=["PROD-004.FR-007"],
+    )
+    row = format_revision_list_row(self._artifact(), summary)
+    assert row == {
+      "id": "RE-042",
+      "name": "Delta DE-138 completion",
+      "status": "completed",
+      "source": "1 (SPEC-100)",
+      "destination": "1 (PROD-004)",
+      "requirements": "1",
+    }
+
+  # -- VT-142-LIST-004 — JSON enriched + stable schema --
+
+  def test_json_includes_enriched_fields(self) -> None:
+    art = self._artifact(applies_to={"specs": ["PROD-004"]}, tags=["meta"])
+    summaries = {
+      "RE-042": RevisionChangeSummary(["SPEC-100"], ["PROD-004"], ["PROD-004.FR-007"])
+    }
+    out = format_revision_list_table([art], summaries, format_type="json")
+    data = json.loads(out)["items"]
+    assert data[0]["sources"] == ["SPEC-100"]
+    assert data[0]["destinations"] == ["PROD-004"]
+    assert data[0]["requirements"] == ["PROD-004.FR-007"]
+    assert data[0]["applies_to"] == {"specs": ["PROD-004"]}
+    assert data[0]["tags"] == ["meta"]
+
+  # -- VT-142-LIST-ADAPT (DEC-CONSULT-06) — adaptive Source column --
+
+  def test_table_hides_source_when_no_origins(self) -> None:
+    summaries = {"RE-042": RevisionChangeSummary([], ["PROD-004"], ["PROD-004.FR-007"])}
+    out = format_revision_list_table([self._artifact()], summaries, format_type="table")
+    assert "Source" not in out
+    assert "Destination" in out
+    assert "Requirements" in out
+
+  def test_table_shows_source_when_origin_present(self) -> None:
+    summaries = {
+      "RE-042": RevisionChangeSummary(["SPEC-100"], ["PROD-004"], ["PROD-004.FR-007"])
+    }
+    out = format_revision_list_table([self._artifact()], summaries, format_type="table")
+    assert "Source" in out
+
+  def test_tsv_keeps_source_column_even_when_empty(self) -> None:
+    summaries = {"RE-042": RevisionChangeSummary([], ["PROD-004"], ["PROD-004.FR-007"])}
+    out = format_revision_list_table([self._artifact()], summaries, format_type="tsv")
+    # TSV emits no header; the full 6-column schema is retained (Source as em-dash),
+    # unlike the adaptive table view which drops it.
+    fields = out.strip().split("\t")
+    assert fields == [
+      "RE-042",
+      "Delta DE-138 completion",
+      "completed",
+      "–",
+      "1 (PROD-004)",
+      "1",
+    ]
 
 
 if __name__ == "__main__":

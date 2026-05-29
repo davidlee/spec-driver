@@ -699,8 +699,8 @@ class WorkspaceValidatorTest(RepoTestCase):
     assert len(errors) == 1
     assert errors[0].artifact == "AUD-102/FIND-001"
 
-  def test_audit_disposition_errors_closure_override_no_rationale(self) -> None:
-    """closure_override without rationale emits an error."""
+  def test_audit_disposition_closure_override_no_rationale_warn(self) -> None:
+    """closure_override without rationale emits warning (non-strict)."""
     root = self._create_repo()
     self._write_completed_audit(
       root,
@@ -720,6 +720,33 @@ class WorkspaceValidatorTest(RepoTestCase):
     )
     ws = Workspace(root)
     issues = validate_workspace(ws)
+    warnings = [
+      i for i in issues if i.level == "warning" and "closure_override" in i.message
+    ]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "AUD-103/FIND-001"
+
+  def test_audit_disposition_closure_override_no_rationale_strict(self) -> None:
+    """closure_override without rationale emits error under strict."""
+    root = self._create_repo()
+    self._write_completed_audit(
+      root,
+      "AUD-103",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Override missing rationale",
+          "outcome": "drift",
+          "disposition": {
+            "status": "accepted",
+            "kind": "tolerated_drift",
+            "closure_override": {"effect": "warn"},
+          },
+        }
+      ],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
     errors = [
       i for i in issues if i.level == "error" and "closure_override" in i.message
     ]

@@ -287,7 +287,7 @@ def collect_gating_findings(
   audit_registry = workspace.audit_registry
   all_audits = audit_registry.collect()
 
-  qualifying: list[tuple[str, dict[str, Any]]] = []
+  qualifying: list[tuple[str, dict[str, Any], str]] = []
   for audit_id, audit in all_audits.items():
     fm = _load_audit_frontmatter(audit.path)
     if (
@@ -295,7 +295,10 @@ def collect_gating_findings(
       and fm.get("mode") == AUDIT_MODE_CONFORMANCE
       and audit.status == "completed"
     ):
-      qualifying.append((audit_id, fm))
+      body = ""
+      with contextlib.suppress(FileNotFoundError, ValueError, OSError):
+        _, body = load_markdown_file(audit.path)
+      qualifying.append((audit_id, fm, body))
 
   if not qualifying:
     return [], 0, []
@@ -304,9 +307,9 @@ def collect_gating_findings(
   seen_ids: dict[str, str] = {}  # finding_id -> first audit_id
   collisions: list[str] = []
 
-  for audit_id, fm in qualifying:
+  for audit_id, fm, body in qualifying:
     mode = fm.get("mode", AUDIT_MODE_CONFORMANCE)
-    for raw_finding in fm.get("findings", []):
+    for raw_finding in load_audit_findings(body, fm=fm):
       finding_id = raw_finding.get("id", "")
 
       # Track collisions (DEC-079-008)

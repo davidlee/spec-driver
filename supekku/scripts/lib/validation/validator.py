@@ -12,6 +12,7 @@ _SPEC_ID_PATTERN = re.compile(r"^(?:SPEC|PROD)-\d{3}$")
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
+from supekku.scripts.lib.blocks.audit_findings import load_audit_findings
 from supekku.scripts.lib.blocks.delta import (
   extract_delta_context_inputs,
   extract_delta_risk_register,
@@ -40,6 +41,7 @@ from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.enums import get_enum_values
 from supekku.scripts.lib.core.frontmatter_metadata.audit import (
   AUDIT_MODE_CONFORMANCE,
+  FINDING_OUTCOMES,
   VALID_OUTCOME_KINDS,
   VALID_STATUS_KIND_PAIRS,
 )
@@ -492,24 +494,46 @@ class WorkspaceValidator:
   ) -> None:
     """Validate finding dispositions in completed audits.
 
-    For each completed audit, checks every finding for:
-    - Missing disposition → warning
+    Checks per finding (DR-141 §4):
+    - Invalid outcome enum → error (strict) / warn (non-strict)
+    - Missing disposition on completed audit → error (strict) / warn
     - Invalid status×kind pair → error
     - Invalid outcome×kind pair → error
-    - closure_override without rationale → error
+    - closure_override without rationale → error (strict) / warn
+    - closure_override.effect escalation → error (strict)
+    - Undisposed finding on completed audit → error (strict)
     """
+    emit_strict = self._error if self.strict else self._warning
+
     for audit_id, audit in audit_registry.items():
       if audit.status != "completed":
         continue
 
-      fm, _ = load_markdown_file(audit.path)
-      for finding in fm.get("findings", []):
+      fm, body = load_markdown_file(audit.path)
+      findings = load_audit_findings(body, fm=fm)
+      seen_ids: set[str] = set()
+
+      for finding in findings:
         finding_id = finding.get("id", "?")
         label = f"{audit_id}/{finding_id}"
 
+        # Duplicate finding ID within this audit
+        if finding_id in seen_ids:
+          emit_strict(label, f"Duplicate finding ID '{finding_id}'")
+        seen_ids.add(finding_id)
+
+        # Invalid outcome enum
+        outcome = finding.get("outcome", "")
+        if outcome and outcome not in FINDING_OUTCOMES:
+          emit_strict(
+            label,
+            f"Invalid outcome '{outcome}'"
+            f" (valid: {', '.join(sorted(FINDING_OUTCOMES))})",
+          )
+
         disposition = finding.get("disposition")
         if not disposition:
-          self._warning(label, "Finding has no disposition")
+          emit_strict(label, "Finding has no disposition")
           continue
 
         if not isinstance(disposition, dict):
@@ -522,7 +546,10 @@ class WorkspaceValidator:
 
         status = disposition.get("status")
         kind = disposition.get("kind")
-        outcome = finding.get("outcome")
+
+        # Undisposed: pending status on completed audit
+        if status == "pending":
+          emit_strict(label, "Undisposed finding (status: pending)")
 
         # Validate status×kind
         if kind and status:
@@ -546,10 +573,19 @@ class WorkspaceValidator:
               f" (valid: {', '.join(sorted(valid_kinds))})",
             )
 
-        # Validate closure_override has rationale
+        # Validate closure_override
         override = disposition.get("closure_override")
-        if override and not override.get("rationale"):
-          self._error(label, "closure_override is missing rationale")
+        if override:
+          if not override.get("rationale"):
+            emit_strict(label, "closure_override is missing rationale")
+          # Escalation check: effect must not exceed derived gate
+          effect = override.get("effect")
+          if effect and effect not in ("warn", "none"):
+            emit_strict(
+              label,
+              f"closure_override.effect '{effect}' is not a valid"
+              " de-escalation (must be 'warn' or 'none')",
+            )
 
   def _validate_audit_gate_coverage(
     self,
@@ -583,34 +619,40 @@ class WorkspaceValidator:
 
   def _build_conformance_audit_index(
     self,
-  ) -> dict[str, list[tuple[str, dict]]]:
+  ) -> dict[str, list[tuple[str, dict, str]]]:
     """Index completed conformance audits by delta_ref."""
-    result: dict[str, list[tuple[str, dict]]] = {}
+    result: dict[str, list[tuple[str, dict, str]]] = {}
     for audit_id, audit in self.workspace.audit_registry.collect().items():
       if audit.status != "completed":
         continue
-      fm, _ = load_markdown_file(audit.path)
+      fm, body = load_markdown_file(audit.path)
       if fm.get("mode") != AUDIT_MODE_CONFORMANCE:
         continue
       delta_ref = fm.get("delta_ref")
       if delta_ref:
-        result.setdefault(delta_ref, []).append((audit_id, fm))
+        result.setdefault(delta_ref, []).append((audit_id, fm, body))
     return result
 
   def _check_finding_id_collisions(
     self,
     delta_id: str,
-    audits: list[tuple[str, dict]],
+    audits: list[tuple[str, dict, str]],
   ) -> None:
-    """Warn if finding IDs collide across multi-audit union."""
+    """Check finding ID collisions across multi-audit union.
+
+    Severity gated on strict (DR-141 §4).
+    """
+    emit = self._error if self.strict else self._warning
     seen: dict[str, str] = {}
-    for audit_id, fm in audits:
-      for finding in fm.get("findings", []):
+    for audit_id, fm, body in audits:
+      findings = load_audit_findings(body, fm=fm)
+      for finding in findings:
         fid = finding.get("id", "")
         if fid in seen:
-          self._warning(
+          emit(
             delta_id,
-            f"Finding ID '{fid}' collides across audits {seen[fid]} and {audit_id}",
+            f"Finding ID '{fid}' collides across audits"
+            f" {seen[fid]} and {audit_id}",
           )
         else:
           seen[fid] = audit_id

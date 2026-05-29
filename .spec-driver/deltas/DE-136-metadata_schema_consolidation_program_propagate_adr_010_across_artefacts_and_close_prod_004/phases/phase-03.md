@@ -94,8 +94,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x]    | 3.3 | Confirm `workflow.toml` `[validation.strict].spec = true` flipped       | [ ]       | Confirmed — `spec = true` + `schema_version spec = "0.10.0+003"` |
 | [x]    | 3.4 | Drive DE-140 to `completed` (requirements-in-spec block-ification)       | [ ]       | Completed; 5 phases; AUD-027 conformance audit completed |
 | [x]    | 3.5 | Confirm `workflow.toml` `[validation.strict].requirement = true` flipped | [ ]       | `[validation.strict_requirements]` flipped via DE-143 (bulk migration of 68 specs; separate config section per DEC-140-13 — requirements is feature-level, not kind-level) |
-| [ ]    | 3.6 | Drive DE-141 to `completed` (audit-kind; findings → block)               | [ ]       | F-C (`audit_window` optional) + F-D (per-finding outcome) honoured |
-| [ ]    | 3.7 | Confirm `workflow.toml` `[validation.strict].audit = true` flipped       | [ ]       | DE-141 close gate |
+| [x]    | 3.6 | Drive DE-141 to `completed` (audit-kind; findings → block)               | [ ]       | Completed 2026-05-29; 4 phases; `--force` (audit deferred to umbrella) |
+| [x]    | 3.7 | Confirm `workflow.toml` `[validation.strict].audit = true` flipped       | [ ]       | Confirmed — `audit = true` in `[validation.strict]` |
 | [ ]    | 3.8 | Drive DE-142 to `completed` (revision-kind; new metadata class)          | [ ]       | F-F coordination with DE-118 closed in DE-142 |
 | [ ]    | 3.9 | Confirm `workflow.toml` `[validation.strict].revision = true` flipped    | [ ]       | DE-142 close gate |
 | [ ]    | 3.10 | Workspace baseline check: `validate --strict` no new error class        | [ ]       | Compare against P02 wrap baseline |
@@ -159,6 +159,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - **DE-139** completed 2026-05-25; 4 phases; `[validation.strict].spec = true` flipped; audit deferred to DE-136 umbrella close
 - **DE-140** completed 2026-05-28; 5 phases; AUD-027 conformance audit (5 findings, all dispositioned); strict requirements flip deferred → DE-143
 - **DE-143** completed 2026-05-28; bulk migration of 68 specs to `spec.requirements@v1` blocks; `[validation.strict_requirements]` flipped; 25 drift ledgers (DL-050..DL-074)
+- **DE-141** completed 2026-05-29; 4 phases; `supekku:audit.findings@v1` block, strict enforcement, list enrichment, migration v0_10_0_004; `[validation.strict].audit = true` flipped; audit deferred to DE-136 umbrella
 
 ## 11. Wrap-up Checklist
 

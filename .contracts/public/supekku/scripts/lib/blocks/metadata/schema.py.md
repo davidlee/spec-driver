@@ -75,6 +75,11 @@ Attributes:
     ``BlockMetadata.field_aliases``. Carried on object-typed FieldMetadata
     so nested schemas (e.g. the relations item) can declare key renames at
     their own layer rather than only at the top-level block.
+  conditional_rules: Object-scoped if/then rules mirroring
+    ``BlockMetadata.conditional_rules``. Applied per object (top-level block,
+    nested object, or array item) so per-item conditionality (e.g.
+    ``action=move`` requires ``origin``) is declarative rather than
+    hand-rolled. Additive; default empty.
 
 ### ToleratedAlias
 

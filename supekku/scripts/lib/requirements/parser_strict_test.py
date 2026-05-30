@@ -105,9 +105,7 @@ class TestPostFlipNoBlock:
     body = _prose_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root, strict=True)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root, strict=True))
     assert len(records) == 0
 
   def test_strict_no_block_does_not_fall_back_to_regex(self) -> None:
@@ -116,9 +114,7 @@ class TestPostFlipNoBlock:
     body = _prose_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root, strict=True)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root, strict=True))
     assert len(records) == 0
 
   def test_non_strict_no_block_falls_back(self) -> None:
@@ -127,9 +123,7 @@ class TestPostFlipNoBlock:
     body = _prose_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root, strict=False)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root, strict=False))
     assert len(records) == 2
     assert records[0].source_kind == "prose"
 
@@ -139,9 +133,7 @@ class TestPostFlipNoBlock:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root, strict=True)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root, strict=True))
     assert len(records) == 1
     assert records[0].uid == "SPEC-100.FR-001"
     assert records[0].source_kind == "block"
@@ -163,7 +155,13 @@ class TestPreFlipExtractionFailure:
 
     records = list(
       records_from_spec(
-        "SPEC-100", {}, body, path, root, stats=stats, strict=False,
+        "SPEC-100",
+        {},
+        body,
+        path,
+        root,
+        stats=stats,
+        strict=False,
       )
     )
     assert len(records) >= 1
@@ -176,9 +174,7 @@ class TestPreFlipExtractionFailure:
     body = _malformed_block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert len(records) >= 1
 
 
@@ -198,7 +194,13 @@ class TestPostFlipExtractionFailure:
 
     records = list(
       records_from_spec(
-        "SPEC-100", {}, body, path, root, stats=stats, strict=True,
+        "SPEC-100",
+        {},
+        body,
+        path,
+        root,
+        stats=stats,
+        strict=True,
       )
     )
     assert len(records) == 0
@@ -211,7 +213,13 @@ class TestPostFlipExtractionFailure:
 
     list(
       records_from_spec(
-        "SPEC-100", {}, body, path, root, stats=stats, strict=True,
+        "SPEC-100",
+        {},
+        body,
+        path,
+        root,
+        stats=stats,
+        strict=True,
       )
     )
     assert stats.warnings >= 1

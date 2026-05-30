@@ -196,9 +196,12 @@ class TestDualPathBlockFirst:
   """VT-141-TRANSITION-001"""
 
   def test_block_wins_over_fm(self) -> None:
-    block_body = render_audit_findings_block("AUD-001", [
-      {"id": "F-001", "description": "From block", "outcome": "aligned"},
-    ])
+    block_body = render_audit_findings_block(
+      "AUD-001",
+      [
+        {"id": "F-001", "description": "From block", "outcome": "aligned"},
+      ],
+    )
     fm = {"findings": [{"id": "F-099", "description": "From FM", "outcome": "risk"}]}
     result = load_audit_findings(block_body, fm=fm)
     assert len(result) == 1

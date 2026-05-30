@@ -229,8 +229,12 @@ class TestEnumConstraints:
 
   def test_valid_lifecycle_values(self) -> None:
     valid = [
-      "pending", "in-progress", "active",
-      "retired", "deprecated", "superseded",
+      "pending",
+      "in-progress",
+      "active",
+      "retired",
+      "deprecated",
+      "superseded",
     ]
     for status in valid:
       data = self._entry(lifecycle=status)
@@ -240,10 +244,7 @@ class TestEnumConstraints:
   def test_invalid_lifecycle(self) -> None:
     data = self._entry(lifecycle="invalid")
     errors = _validate_strict(data)
-    assert any(
-      "lifecycle" in e.lower() or "allowed" in e.lower()
-      for e in errors
-    )
+    assert any("lifecycle" in e.lower() or "allowed" in e.lower() for e in errors)
 
   def test_valid_kind_values(self) -> None:
     pairs = [("functional", "FR"), ("non-functional", "NF")]
@@ -255,10 +256,7 @@ class TestEnumConstraints:
   def test_invalid_kind(self) -> None:
     data = self._entry(kind="invalid")
     errors = _validate_strict(data)
-    assert any(
-      "kind" in e.lower() or "allowed" in e.lower()
-      for e in errors
-    )
+    assert any("kind" in e.lower() or "allowed" in e.lower() for e in errors)
 
 
 # ---------------------------------------------------------------------------
@@ -288,23 +286,17 @@ class TestToleratedAliases:
 
   def test_fr_alias_accepted_default(self) -> None:
     data = self._entry_with_kind("FR")
-    errors = [
-      str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)
-    ]
+    errors = [str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)]
     assert errors == []
 
   def test_nf_alias_accepted_default(self) -> None:
     data = self._entry_with_kind("NF", req_id="NF-001")
-    errors = [
-      str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)
-    ]
+    errors = [str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)]
     assert errors == []
 
   def test_nfr_alias_accepted_default(self) -> None:
     data = self._entry_with_kind("NFR", req_id="NF-001")
-    errors = [
-      str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)
-    ]
+    errors = [str(e) for e in SPEC_REQUIREMENTS_VALIDATOR.validate(data, strict=False)]
     assert errors == []
 
   def test_alias_emits_warning_in_strict(self) -> None:
@@ -318,12 +310,9 @@ class TestToleratedAliases:
     errors = SPEC_REQUIREMENTS_VALIDATOR.validate(
       data, strict=True, accept_tolerated=False
     )
-    hard_errors = [
-      e for e in errors if e.severity == "error"
-    ]
+    hard_errors = [e for e in errors if e.severity == "error"]
     assert any(
-      "tolerated" in str(e).lower() or "kind" in str(e).lower()
-      for e in hard_errors
+      "tolerated" in str(e).lower() or "kind" in str(e).lower() for e in hard_errors
     )
 
 
@@ -336,68 +325,113 @@ class TestCrossFieldInvariant:
   """VT-140-006"""
 
   def test_fr_with_functional_valid(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "FR-001", "title": "T", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "FR-001",
+            "title": "T",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert not any("prefix" in e.lower() for e in errors)
 
   def test_nf_with_non_functional_valid(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "NF-001", "title": "T", "lifecycle": "pending",
-         "kind": "non-functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "NF-001",
+            "title": "T",
+            "lifecycle": "pending",
+            "kind": "non-functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert not any("prefix" in e.lower() for e in errors)
 
   def test_fr_with_non_functional_invalid(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "FR-001", "title": "T", "lifecycle": "pending",
-         "kind": "non-functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "FR-001",
+            "title": "T",
+            "lifecycle": "pending",
+            "kind": "non-functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert any("prefix" in e.lower() for e in errors)
 
   def test_nf_with_functional_invalid(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "NF-001", "title": "T", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "NF-001",
+            "title": "T",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert any("prefix" in e.lower() for e in errors)
 
   def test_tolerated_alias_still_checks_invariant(self) -> None:
     """FR alias with NF-prefixed ID should fail invariant."""
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "NF-001", "title": "T", "lifecycle": "pending",
-         "kind": "FR", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "NF-001",
+            "title": "T",
+            "lifecycle": "pending",
+            "kind": "FR",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block)
     assert any("prefix" in e.lower() for e in errors)
 
@@ -411,32 +445,62 @@ class TestDuplicateIds:
   """VT-140-027"""
 
   def test_duplicate_ids_error(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "FR-001", "title": "First", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-        {"id": "FR-001", "title": "Dupe", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "FR-001",
+            "title": "First",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+          {
+            "id": "FR-001",
+            "title": "Dupe",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert any("duplicate" in e.lower() for e in errors)
 
   def test_unique_ids_pass(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [
-        {"id": "FR-001", "title": "First", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-        {"id": "FR-002", "title": "Second", "lifecycle": "pending",
-         "kind": "functional", "description": "D", "acceptance_criteria": ["AC"]},
-      ],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [
+          {
+            "id": "FR-001",
+            "title": "First",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+          {
+            "id": "FR-002",
+            "title": "Second",
+            "lifecycle": "pending",
+            "kind": "functional",
+            "description": "D",
+            "acceptance_criteria": ["AC"],
+          },
+        ],
+      },
+    )
     errors = validate_spec_requirements(block, strict=True)
     assert not any("duplicate" in e.lower() for e in errors)
 
@@ -526,22 +590,28 @@ class TestSpecIdCrossValidation:
   """Spec ID cross-validation in wrapper."""
 
   def test_matching_spec_id_passes(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [],
+      },
+    )
     errors = validate_spec_requirements(block, spec_id="SPEC-100")
     assert not any("spec field" in e.lower() for e in errors)
 
   def test_mismatched_spec_id_errors(self) -> None:
-    block = SpecRequirementsBlock(raw_yaml="", data={
-      "schema": "supekku.spec.requirements",
-      "version": 1,
-      "spec": "SPEC-100",
-      "requirements": [],
-    })
+    block = SpecRequirementsBlock(
+      raw_yaml="",
+      data={
+        "schema": "supekku.spec.requirements",
+        "version": 1,
+        "spec": "SPEC-100",
+        "requirements": [],
+      },
+    )
     errors = validate_spec_requirements(block, spec_id="SPEC-999")
     assert any("does not match" in e.lower() for e in errors)
 

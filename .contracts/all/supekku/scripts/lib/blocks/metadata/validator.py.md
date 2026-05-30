@@ -53,6 +53,11 @@ recursion frame.
 
 - `validate(self, data) -> list[ValidationError]`: Validate data against metadata.
 - `__init__(self, metadata)`
+- `_apply_conditional_rules(self, obj, rules, path_prefix) -> list[ValidationError]`: Apply if/then rules to *obj*, prefixing error paths with *path_prefix*.
+
+Object-scoped: the top-level call passes ``path_prefix=""`` (so an error
+on ``origin`` reads ``origin``, no leading dot) while ``_validate_object``
+passes the array-item/nested path (so it reads ``requirements[2].origin``). - -- conditional rules ---------------------------------------------------
 - `_apply_field_aliases(self, data, field_aliases, parent_path) -> list[ValidationError]`: Report alias keys; emit collision errors and strict warnings (F-54).
 
 Pure: never mutates *data*. The diagnostic carries ``fix_hint`` /
@@ -72,9 +77,13 @@ block-or-property ``field_aliases`` map via the parent's
 ``BlockMetadata`` / ``FieldMetadata`` (already applied as warnings in
 ``_apply_field_aliases``). This helper just makes the per-field
 dispatch in ``_validate_fields`` find the value under the alias key.
+- `_validate_additional_keys(self, value, field_meta, field_path, declared) -> list[ValidationError]`: Validate keys not covered by declared properties (additional/strict pass).
+
+Keys present under declared properties (or under their alias keys) are
+already validated by ``_validate_fields``; this pass handles the rest via
+``additional_properties`` or the strict unknown-key rejection.
 - `_validate_array(self, value, field_meta, field_path) -> list[ValidationError]` - -- array ----------------------------------------------------------------
 - `_validate_bool(self, value, field_meta, field_path) -> list[ValidationError]`
-- `_validate_conditional_rules(self, data) -> list[ValidationError]`: Validate conditional rules (if/then logic). - -- conditional rules ---------------------------------------------------
 - `_validate_const(self, value, field_meta, field_path) -> list[ValidationError]` - -- scalar handlers ------------------------------------------------------
 - `_validate_enum(self, value, field_meta, field_path) -> list[ValidationError]`: Validate an enum value, honouring aliases, tolerated_aliases, did-you-mean. - -- enum -----------------------------------------------------------------
 - `_validate_field(self, value, field_meta, field_path) -> list[ValidationError]`: Dispatch validation for *value* against *field_meta*.

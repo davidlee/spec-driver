@@ -190,9 +190,7 @@ def _check_duplicate_ids(
     if req_id is None:
       continue
     if req_id in seen:
-      errors.append(
-        f"requirements[{idx}].id: duplicate requirement ID '{req_id}'"
-      )
+      errors.append(f"requirements[{idx}].id: duplicate requirement ID '{req_id}'")
     else:
       seen.add(req_id)
   return errors
@@ -252,9 +250,7 @@ def validate_spec_requirements(
 
   spec_value = str(data.get("spec", ""))
   if spec_id and spec_value and spec_value != spec_id:
-    errors.append(
-      f"spec field '{spec_value}' does not match expected '{spec_id}'"
-    )
+    errors.append(f"spec field '{spec_value}' does not match expected '{spec_id}'")
 
   return errors
 

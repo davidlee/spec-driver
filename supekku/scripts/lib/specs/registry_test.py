@@ -93,6 +93,7 @@ class SpecRegistryTest(RepoTestCase):
     registry.reload()
     assert registry.get("SPEC-002") is not None
 
+
 class TestSpecRegistryReverseQueries(RepoTestCase):
   """Test reverse relationship query methods for SpecRegistry."""
 

@@ -158,7 +158,8 @@ Test cases for workspace validation functionality.
 
 #### Methods
 
-- `test_audit_disposition_errors_closure_override_no_rationale(self) -> None`: closure_override without rationale emits an error.
+- `test_audit_disposition_closure_override_no_rationale_strict(self) -> None`: closure_override without rationale emits error under strict.
+- `test_audit_disposition_closure_override_no_rationale_warn(self) -> None`: closure_override without rationale emits warning (non-strict).
 - `test_audit_disposition_errors_invalid_outcome_kind(self) -> None`: Invalid outcome×kind pair emits an error.
 - `test_audit_disposition_errors_invalid_status_kind(self) -> None`: Invalid status×kind pair emits an error.
 - `test_audit_disposition_skips_draft_audits(self) -> None`: Draft audits are not checked for disposition validity.

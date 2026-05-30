@@ -11,6 +11,7 @@ Column order is display order.
 ## Constants
 
 - `ADR_COLUMNS`
+- `AUDIT_COLUMNS`
 - `BACKLOG_COLUMNS`
 - `CARD_COLUMNS`
 - `CHANGE_COLUMNS`
@@ -24,6 +25,7 @@ Column order is display order.
 - `POLICY_COLUMNS`
 - `REFS_COLUMN` - Shared optional columns (used with flags like --external, --refs)
 - `REQUIREMENT_COLUMNS`
+- `REVISION_COLUMNS` - full field set.
 - `SPEC_COLUMNS` - --- Per-artifact-type column definitions ---
 - `SPEC_TAGS_COLUMN`
 - `STANDARD_COLUMNS`

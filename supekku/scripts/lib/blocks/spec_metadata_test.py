@@ -334,75 +334,97 @@ class SpecConcernsValidationTest(unittest.TestCase):
     return SpecConcernsBlock(raw_yaml="", data=data)
 
   def test_valid_empty_concerns(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns",
-      "version": 1,
-      "spec": "SPEC-100",
-      "concerns": [],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [],
+      }
+    )
     assert validate_spec_concerns(b) == []
 
   def test_valid_populated_concerns(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns",
-      "version": 1,
-      "spec": "SPEC-100",
-      "concerns": [
-        {"name": "performance", "description": "Latency budget"},
-        {"name": "reliability", "description": "Uptime SLA"},
-      ],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [
+          {"name": "performance", "description": "Latency budget"},
+          {"name": "reliability", "description": "Uptime SLA"},
+        ],
+      }
+    )
     assert validate_spec_concerns(b) == []
 
   def test_missing_schema(self):
-    b = self._block({
-      "version": 1, "spec": "SPEC-100", "concerns": [],
-    })
+    b = self._block(
+      {
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [],
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("schema" in e.lower() for e in errors)
 
   def test_missing_spec(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns", "version": 1, "concerns": [],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "concerns": [],
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("spec" in e.lower() for e in errors)
 
   def test_missing_concerns_array(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns", "version": 1, "spec": "SPEC-100",
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("concerns" in e.lower() for e in errors)
 
   def test_concern_missing_name(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns",
-      "version": 1,
-      "spec": "SPEC-100",
-      "concerns": [{"description": "Missing name"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [{"description": "Missing name"}],
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("name" in e.lower() for e in errors)
 
   def test_concern_missing_description(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns",
-      "version": 1,
-      "spec": "SPEC-100",
-      "concerns": [{"name": "perf"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [{"name": "perf"}],
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("description" in e.lower() for e in errors)
 
   def test_unknown_key_rejected(self):
-    b = self._block({
-      "schema": "supekku.spec.concerns",
-      "version": 1,
-      "spec": "SPEC-100",
-      "concerns": [],
-      "extra": "bad",
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.concerns",
+        "version": 1,
+        "spec": "SPEC-100",
+        "concerns": [],
+        "extra": "bad",
+      }
+    )
     errors = validate_spec_concerns(b)
     assert any("extra" in e for e in errors)
 
@@ -414,79 +436,103 @@ class SpecHypothesesValidationTest(unittest.TestCase):
     return SpecHypothesesBlock(raw_yaml="", data=data)
 
   def test_valid_empty(self):
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "PROD-004",
-      "hypotheses": [],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "PROD-004",
+        "hypotheses": [],
+      }
+    )
     assert validate_spec_hypotheses(b) == []
 
   def test_valid_populated(self):
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "PROD-004",
-      "hypotheses": [{
-        "id": "HYP-01",
-        "statement": "Users prefer inline feedback",
-        "status": "proposed",
-      }],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "PROD-004",
+        "hypotheses": [
+          {
+            "id": "HYP-01",
+            "statement": "Users prefer inline feedback",
+            "status": "proposed",
+          }
+        ],
+      }
+    )
     assert validate_spec_hypotheses(b) == []
 
   def test_valid_all_statuses(self):
     for status in ("proposed", "validated", "invalid"):
-      b = self._block({
-        "schema": "supekku.spec.hypotheses",
-        "version": 1,
-        "spec": "SPEC-100",
-        "hypotheses": [{
-          "id": "HYP-01", "statement": "Test", "status": status,
-        }],
-      })
+      b = self._block(
+        {
+          "schema": "supekku.spec.hypotheses",
+          "version": 1,
+          "spec": "SPEC-100",
+          "hypotheses": [
+            {
+              "id": "HYP-01",
+              "statement": "Test",
+              "status": status,
+            }
+          ],
+        }
+      )
       assert validate_spec_hypotheses(b) == [], f"failed for {status}"
 
   def test_invalid_status_rejected(self):
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "SPEC-100",
-      "hypotheses": [{
-        "id": "HYP-01", "statement": "Test", "status": "maybe",
-      }],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "SPEC-100",
+        "hypotheses": [
+          {
+            "id": "HYP-01",
+            "statement": "Test",
+            "status": "maybe",
+          }
+        ],
+      }
+    )
     errors = validate_spec_hypotheses(b)
     assert len(errors) > 0
 
   def test_missing_id(self):
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "SPEC-100",
-      "hypotheses": [{"statement": "Test", "status": "proposed"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "SPEC-100",
+        "hypotheses": [{"statement": "Test", "status": "proposed"}],
+      }
+    )
     errors = validate_spec_hypotheses(b)
     assert any("id" in e.lower() for e in errors)
 
   def test_missing_statement(self):
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "SPEC-100",
-      "hypotheses": [{"id": "HYP-01", "status": "proposed"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "SPEC-100",
+        "hypotheses": [{"id": "HYP-01", "status": "proposed"}],
+      }
+    )
     errors = validate_spec_hypotheses(b)
     assert any("statement" in e.lower() for e in errors)
 
   def test_works_for_prod_id(self):
     """Shared schema accepts PROD-XXX IDs (DEC-139-01)."""
-    b = self._block({
-      "schema": "supekku.spec.hypotheses",
-      "version": 1,
-      "spec": "PROD-004",
-      "hypotheses": [],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.hypotheses",
+        "version": 1,
+        "spec": "PROD-004",
+        "hypotheses": [],
+      }
+    )
     assert validate_spec_hypotheses(b) == []
 
 
@@ -497,67 +543,84 @@ class SpecDecisionsValidationTest(unittest.TestCase):
     return SpecDecisionsBlock(raw_yaml="", data=data)
 
   def test_valid_with_rationale(self):
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "SPEC-116",
-      "decisions": [{
-        "id": "DEC-01",
-        "summary": "Single metadata class per kind",
-        "rationale": "Centralises schema definition",
-      }],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "SPEC-116",
+        "decisions": [
+          {
+            "id": "DEC-01",
+            "summary": "Single metadata class per kind",
+            "rationale": "Centralises schema definition",
+          }
+        ],
+      }
+    )
     assert validate_spec_decisions(b) == []
 
   def test_valid_without_rationale(self):
     """PROD decisions omit rationale (DEC-139-01)."""
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "PROD-004",
-      "decisions": [{
-        "id": "DEC-01", "summary": "Prioritise speed",
-      }],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "PROD-004",
+        "decisions": [
+          {
+            "id": "DEC-01",
+            "summary": "Prioritise speed",
+          }
+        ],
+      }
+    )
     assert validate_spec_decisions(b) == []
 
   def test_valid_empty(self):
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "SPEC-100",
-      "decisions": [],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "SPEC-100",
+        "decisions": [],
+      }
+    )
     assert validate_spec_decisions(b) == []
 
   def test_missing_id(self):
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "SPEC-100",
-      "decisions": [{"summary": "No id"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "SPEC-100",
+        "decisions": [{"summary": "No id"}],
+      }
+    )
     errors = validate_spec_decisions(b)
     assert any("id" in e.lower() for e in errors)
 
   def test_missing_summary(self):
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "SPEC-100",
-      "decisions": [{"id": "DEC-01"}],
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "SPEC-100",
+        "decisions": [{"id": "DEC-01"}],
+      }
+    )
     errors = validate_spec_decisions(b)
     assert any("summary" in e.lower() for e in errors)
 
   def test_unknown_key_rejected(self):
-    b = self._block({
-      "schema": "supekku.spec.decisions",
-      "version": 1,
-      "spec": "SPEC-100",
-      "decisions": [],
-      "extra": "bad",
-    })
+    b = self._block(
+      {
+        "schema": "supekku.spec.decisions",
+        "version": 1,
+        "spec": "SPEC-100",
+        "decisions": [],
+        "extra": "bad",
+      }
+    )
     errors = validate_spec_decisions(b)
     assert any("extra" in e for e in errors)
 

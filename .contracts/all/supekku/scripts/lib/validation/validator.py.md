@@ -31,18 +31,23 @@ Validates workspace consistency and artifact relationships.
 - `validate(self) -> list[ValidationIssue]`: Validate workspace for missing references and inconsistencies.
 - `__init__(self, workspace, strict) -> None`
 - `_block_issue(self, artifact, block_label, err) -> None`: Dispatch a block ValidationError into a ValidationIssue at its severity.
-- `_build_conformance_audit_index(self) -> dict[Tuple[str, list[tuple[Tuple[str, dict]]]]]`: Index completed conformance audits by delta_ref.
-- `_check_finding_id_collisions(self, delta_id, audits) -> None`: Warn if finding IDs collide across multi-audit union.
+- `_build_conformance_audit_index(self) -> dict[Tuple[str, list[tuple[Tuple[str, dict, str]]]]]`: Index completed conformance audits by delta_ref.
+- `_check_finding_id_collisions(self, delta_id, audits) -> None`: Check finding ID collisions across multi-audit union.
+
+Severity gated on strict (DR-141 §4).
 - `_check_strict_content_requirements(self, artifact, data) -> None`: Reject trimmed-empty description and blank acceptance_criteria (VT-140-022).
 - `_error(self, artifact, message) -> None`
 - `_info(self, artifact, message) -> None`
 - `_validate_audit_disposition(self, audit_registry) -> None`: Validate finding dispositions in completed audits.
 
-For each completed audit, checks every finding for:
-- Missing disposition → warning
+Checks per finding (DR-141 §4):
+- Invalid outcome enum → error (strict) / warn (non-strict)
+- Missing disposition on completed audit → error (strict) / warn
 - Invalid status×kind pair → error
 - Invalid outcome×kind pair → error
-- closure_override without rationale → error
+- closure_override without rationale → error (strict) / warn
+- closure_override.effect escalation → error (strict)
+- Undisposed finding on completed audit → error (strict)
 - `_validate_audit_gate_coverage(self, delta_registry) -> None`: Validate audit gate coverage for qualifying deltas.
 
 For each delta, resolves audit_gate. If required and no completed

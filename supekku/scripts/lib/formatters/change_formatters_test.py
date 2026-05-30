@@ -1147,7 +1147,6 @@ class TestDeltaListEnrichmentVTLIST001(unittest.TestCase):
     assert _format_phases_cell(None) == "–"
 
   def test_audit_gate_cell_empty_for_default(self) -> None:
-
     assert _format_audit_gate_cell(None) == ""
     assert _format_audit_gate_cell("auto") == ""
     assert _format_audit_gate_cell("exempt") == "exempt"

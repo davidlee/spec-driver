@@ -22,13 +22,21 @@ class TestAuditFindingsSummary:
 
   def test_findings_cell_with_data(self) -> None:
     s = AuditFindingsSummary(
-      total=7, aligned=3, drift=2, risk=2, disposed=5,
+      total=7,
+      aligned=3,
+      drift=2,
+      risk=2,
+      disposed=5,
     )
     assert s.findings_cell() == "7 (3a/2d/2r)"
 
   def test_disposed_cell_with_data(self) -> None:
     s = AuditFindingsSummary(
-      total=7, aligned=3, drift=2, risk=2, disposed=5,
+      total=7,
+      aligned=3,
+      drift=2,
+      risk=2,
+      disposed=5,
     )
     assert s.disposed_cell() == "5/7"
 

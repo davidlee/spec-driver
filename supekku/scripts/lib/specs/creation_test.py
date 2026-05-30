@@ -305,9 +305,7 @@ class SpecRequirementsEmptyBlockTest(unittest.TestCase):
     (root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
     (root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
     (templates / "spec.md").write_text(
-      "# {{ spec_id }} – {{ name }}\n\n"
-      "{{ spec_requirements_block }}\n\n"
-      "## Body\n",
+      "# {{ spec_id }} – {{ name }}\n\n{{ spec_requirements_block }}\n\n## Body\n",
       encoding="utf-8",
     )
     os.chdir(root)

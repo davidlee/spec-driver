@@ -358,9 +358,7 @@ def records_from_spec(
   breakout_meta = _load_breakout_metadata(spec_path)
 
   if block is not None:
-    records = _records_from_block(
-      spec_id, block, spec_path, repo_root, stats=stats
-    )
+    records = _records_from_block(spec_id, block, spec_path, repo_root, stats=stats)
   elif strict:
     return
   else:

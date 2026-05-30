@@ -651,8 +651,7 @@ class WorkspaceValidator:
         if fid in seen:
           emit(
             delta_id,
-            f"Finding ID '{fid}' collides across audits"
-            f" {seen[fid]} and {audit_id}",
+            f"Finding ID '{fid}' collides across audits {seen[fid]} and {audit_id}",
           )
         else:
           seen[fid] = audit_id

@@ -4,11 +4,6 @@ List deltas command.
 
 ## Functions
 
-- `_collect_audited_delta_ids(root) -> set[str]`: Set of DE-* ids covered by a completed audit (DR-138 §8.3, DEC-138-13).
-
-Reads ``delta_ref`` directly from audit frontmatter — the audit-glyph keys
-on the audited delta id, not the AUD-* id (F-138-19). When a future delta
-surfaces ``delta_ref`` on ``ChangeArtifact``, this collapses to a generator.
 - @app.command(deltas) `list_deltas(root, ids, status, implements, substring, spec_filter, related_to, relation, referenced_by, not_referenced_by, unaudited, refs, show_tags, tag, regexp, case_insensitive, format_type, json_output, truncate, details, external, show_all) -> None`: List deltas with optional filtering and status grouping.
 
 By default, completed deltas are hidden. Use --all to show them.

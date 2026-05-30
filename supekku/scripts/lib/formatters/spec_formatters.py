@@ -123,12 +123,14 @@ def format_spec_list_table(
     row.append(spec.name)
     if show_tags:
       row.append(format_tags_cell(spec.tags))
-    row.extend([
-      styled_status,
-      spec.category or "—",
-      format_c4_glyph(spec.c4_level),
-      format_sources_cell(spec.sources),
-    ])
+    row.extend(
+      [
+        styled_status,
+        spec.category or "—",
+        format_c4_glyph(spec.c4_level),
+        format_sources_cell(spec.sources),
+      ]
+    )
     if show_refs:
       row.append(format_refs_count(collect_references(spec)))
     return row
@@ -140,12 +142,14 @@ def format_spec_list_table(
     row.append(spec.name)
     if show_tags:
       row.append(",".join(spec.tags))
-    row.extend([
-      spec.status,
-      spec.category or "—",
-      format_c4_glyph(spec.c4_level),
-      format_sources_cell(spec.sources),
-    ])
+    row.extend(
+      [
+        spec.status,
+        spec.category or "—",
+        format_c4_glyph(spec.c4_level),
+        format_sources_cell(spec.sources),
+      ]
+    )
     if show_refs:
       row.append(format_refs_tsv(collect_references(spec)))
     return row

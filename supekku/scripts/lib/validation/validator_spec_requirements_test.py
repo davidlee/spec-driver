@@ -88,25 +88,20 @@ class SpecRequirementsValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     req_issues = [
-      i for i in issues
-      if i.artifact == "SPEC-800" and "spec.requirements" in i.message
+      i for i in issues if i.artifact == "SPEC-800" and "spec.requirements" in i.message
     ]
     assert len(req_issues) == 0
 
   def test_malformed_yaml_block_errors(self) -> None:
     """Malformed YAML in requirements block produces an error."""
     root = self._create_repo()
-    block = (
-      f"```yaml {REQUIREMENTS_MARKER}\n"
-      "schema: [\n"
-      "  broken yaml\n"
-      "```"
-    )
+    block = f"```yaml {REQUIREMENTS_MARKER}\nschema: [\n  broken yaml\n```"
     self._write_spec_with_requirements_block(root, "SPEC-801", block)
     ws = Workspace(root)
     issues = validate_workspace(ws)
     errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-801"
       and i.level == "error"
       and "extraction failed" in i.message
@@ -126,14 +121,10 @@ class SpecRequirementsValidationTest(RepoTestCase):
     self._write_spec_with_requirements_block(root, "SPEC-802", block)
     ws = Workspace(root)
     issues = validate_workspace(ws)
-    errors = [
-      i for i in issues
-      if i.artifact == "SPEC-802" and i.level == "error"
-    ]
+    errors = [i for i in issues if i.artifact == "SPEC-802" and i.level == "error"]
     assert len(errors) >= 1
     assert any(
-      "spec" in e.message.lower() and "required" in e.message.lower()
-      for e in errors
+      "spec" in e.message.lower() and "required" in e.message.lower() for e in errors
     )
 
   def test_no_block_no_issues(self) -> None:
@@ -143,8 +134,7 @@ class SpecRequirementsValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     req_issues = [
-      i for i in issues
-      if i.artifact == "SPEC-803" and "spec.requirements" in i.message
+      i for i in issues if i.artifact == "SPEC-803" and "spec.requirements" in i.message
     ]
     assert len(req_issues) == 0
 
@@ -170,7 +160,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-804"
       and i.level == "error"
       and "SPEC-999" in i.message
@@ -186,7 +177,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     mismatch_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-805"
       and i.level == "error"
       and "does not match" in i.message
@@ -201,8 +193,7 @@ class SpecRequirementsValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     req_issues = [
-      i for i in issues
-      if i.artifact == "PROD-800" and "spec.requirements" in i.message
+      i for i in issues if i.artifact == "PROD-800" and "spec.requirements" in i.message
     ]
     assert len(req_issues) == 0
 
@@ -232,7 +223,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Non-strict: permitted
     issues = validate_workspace(ws, strict=False)
     empty_desc_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-806"
       and i.level == "error"
       and "description" in i.message.lower()
@@ -243,7 +235,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Strict: rejected
     issues = validate_workspace(ws, strict=True)
     empty_desc_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-806"
       and i.level == "error"
       and "description" in i.message.lower()
@@ -276,7 +269,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Non-strict: permitted
     issues = validate_workspace(ws, strict=False)
     blank_ac_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-807"
       and i.level == "error"
       and "acceptance_criteria" in i.message
@@ -287,7 +281,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Strict: rejected
     issues = validate_workspace(ws, strict=True)
     blank_ac_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-807"
       and i.level == "error"
       and "acceptance_criteria" in i.message
@@ -318,7 +313,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Non-strict: permitted
     issues = validate_workspace(ws, strict=False)
     empty_ac_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-808"
       and i.level == "error"
       and "acceptance_criteria" in i.message
@@ -329,7 +325,8 @@ class SpecRequirementsValidationTest(RepoTestCase):
     # Strict: rejected
     issues = validate_workspace(ws, strict=True)
     empty_ac_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-808"
       and i.level == "error"
       and "acceptance_criteria" in i.message
@@ -357,10 +354,7 @@ class SpecRequirementsValidationTest(RepoTestCase):
     self._write_spec_with_requirements_block(root, "SPEC-809", block)
     ws = Workspace(root)
     issues = validate_workspace(ws, strict=False)
-    req_errors = [
-      i for i in issues
-      if i.artifact == "SPEC-809" and i.level == "error"
-    ]
+    req_errors = [i for i in issues if i.artifact == "SPEC-809" and i.level == "error"]
     assert len(req_errors) == 0
 
 
@@ -407,7 +401,8 @@ class StrictMissingBlockTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws, strict=True)
     missing_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-850"
       and i.level == "error"
       and "missing" in i.message.lower()
@@ -421,7 +416,8 @@ class StrictMissingBlockTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws, strict=False)
     missing_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "SPEC-851"
       and "missing" in i.message.lower()
       and "spec.requirements" in i.message.lower()
@@ -435,7 +431,8 @@ class StrictMissingBlockTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws, strict=True)
     missing_errors = [
-      i for i in issues
+      i
+      for i in issues
       if i.artifact == "PROD-850"
       and i.level == "error"
       and "missing" in i.message.lower()
@@ -532,11 +529,7 @@ class OperationalGuardTest(RepoTestCase):
       "c4_level": "component",
     }
     body = (
-      "# SPEC-902\n\n"
-      f"```yaml {REQUIREMENTS_MARKER}\n"
-      "schema: [\n"
-      "  broken yaml\n"
-      "```\n"
+      f"# SPEC-902\n\n```yaml {REQUIREMENTS_MARKER}\nschema: [\n  broken yaml\n```\n"
     )
     dump_markdown_file_update(spec_path, frontmatter, body)
     ws = Workspace(root)

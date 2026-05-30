@@ -141,9 +141,7 @@ def collect_audited_delta_ids(
   Uses ChangeArtifact.delta_ref (populated from FM at load time).
   """
   return {
-    a.delta_ref
-    for a in audits.values()
-    if a.status == "completed" and a.delta_ref
+    a.delta_ref for a in audits.values() if a.status == "completed" and a.delta_ref
   }
 
 

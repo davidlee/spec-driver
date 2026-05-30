@@ -15,6 +15,9 @@ Args:
 
 Returns:
   Formatted string with all audit details
+- `format_audit_list_json(audits, summaries) -> str`: JSON output for audit list — includes enriched fields.
+- `format_audit_list_row(artifact, summary) -> dict[Tuple[str, str]]`: Render one audit as a column-keyed cell dict (DR-141 §5.4).
+- `format_audit_list_table(audits, summaries) -> str`: Render enriched audit list per DR-141 §5.5.
 - `format_change_list_item(artifact) -> str`: Format change artifact as basic list item: id, kind, status, name.
 
 Args:
@@ -116,3 +119,9 @@ Args:
 
 Returns:
   Formatted string with all revision details
+- `format_revision_list_json(revisions, summaries) -> str`: JSON output for revision list — enriched fields, stable schema.
+- `format_revision_list_row(artifact, summary) -> dict[Tuple[str, str]]`: Render one revision as a column-keyed cell dict (DR-142 §7.2).
+- `format_revision_list_table(revisions, summaries) -> str`: Render enriched revision list per DR-142 §7.2.
+
+DEC-CONSULT-06: the ``Source`` column is dropped in the **table** view when no
+revision has an origin; TSV and JSON keep the full field set (stable schema).

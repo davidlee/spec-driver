@@ -13314,11 +13314,11 @@ deltas:
         status: completed
   DE-136:
     kind: delta
-    status: in-progress
+    status: completed
     name: 'Delta - metadata schema consolidation program: propagate ADR-010 across
       artefacts and close PROD-004'
     slug: metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004
-    updated: '2026-05-09'
+    updated: '2026-05-30'
     path: .spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/DE-136.md
     applies_to:
       specs:
@@ -13428,9 +13428,11 @@ deltas:
       - plan: IP-136
         delta: DE-136
         phase: IP-136-P03
-        status: in-progress
-      - id: IP-136-P04
+        status: completed
+      - plan: IP-136
+        delta: DE-136
         phase: IP-136-P04
+        status: in-progress
   DE-137:
     kind: delta
     status: completed

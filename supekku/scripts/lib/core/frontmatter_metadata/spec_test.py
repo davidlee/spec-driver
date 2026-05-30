@@ -671,10 +671,7 @@ class SpecTaxonomyStrictTest(unittest.TestCase):
 
   def _validate(self, data: dict, *, strict: bool = True) -> list[str]:
     v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    return [
-      str(e) for e in v.validate(data, strict=strict)
-      if e.severity == "error"
-    ]
+    return [str(e) for e in v.validate(data, strict=strict) if e.severity == "error"]
 
   def test_category_unit_accepted(self):
     data = {**self.BASE, "category": "unit"}
@@ -703,12 +700,7 @@ class SpecTaxonomyStrictTest(unittest.TestCase):
   def test_category_unknown_rejected_no_tolerated(self):
     v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
     data = {**self.BASE, "category": "unknown"}
-    errors = [
-      str(e)
-      for e in v.validate(
-        data, strict=True, accept_tolerated=False
-      )
-    ]
+    errors = [str(e) for e in v.validate(data, strict=True, accept_tolerated=False)]
     assert len(errors) > 0
 
   def test_c4_level_valid_values(self):

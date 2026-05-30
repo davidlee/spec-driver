@@ -71,6 +71,7 @@
           python3Packages.ty
           pyright
           ruff
+          libnotify # tell me when you're done
 
           nodejs_latest
 

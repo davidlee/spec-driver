@@ -177,6 +177,26 @@ Test object (nested) field validation.
 - `test_object_field_missing_required_property(self)`: Object field reports missing required nested property.
 - `test_object_field_valid(self)`: Object field accepts dict with correct properties.
 
+### ObjectScopedConditionalRuleTest
+
+Object-scoped conditional rules on FieldMetadata (DE-142 P01).
+
+Rules declared on an object/array-item FieldMetadata fire per object, with
+error paths prefixed by the object's path (VT-142-ENGINE-001/002/003).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_nested_object_rule_fires(self)`: VT-142-ENGINE-002: rule on a non-array nested object also fires.
+- `test_no_conditional_rules_is_no_change(self)`: VT-142-ENGINE-003: object without conditional_rules validates clean.
+
+Regression guard: the shared helper must not fabricate errors when an
+object declares no rules (default empty list).
+- `test_per_item_rule_fires_with_indexed_path(self)`: VT-142-ENGINE-001: array item action=move without origin errors.
+
+Error path is prefixed with the array index (no leading dot).
+
 ### RequiredFieldValidationTest
 
 Test required field enforcement.

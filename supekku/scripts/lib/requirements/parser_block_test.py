@@ -98,9 +98,7 @@ class TestBlockFirst:
     path = _write_spec(root, "SPEC-100", body)
     fm = {"id": "SPEC-100"}
 
-    records = list(
-      records_from_spec("SPEC-100", fm, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", fm, body, path, root))
     assert len(records) == 2
     assert records[0].uid == "SPEC-100.FR-001"
     assert records[0].title == "Block requirement"
@@ -111,9 +109,7 @@ class TestBlockFirst:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert records[0].status == "active"
     assert records[1].status == "pending"
 
@@ -131,9 +127,7 @@ class TestRegexFallback:
     body = _prose_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert len(records) == 2
     assert records[0].uid == "SPEC-100.FR-001"
     assert records[0].title == "Prose requirement"
@@ -174,9 +168,7 @@ class TestMutualExclusion:
     """)
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert len(records) == 1
     assert records[0].uid == "SPEC-100.FR-001"
     assert records[0].source_kind == "block"
@@ -195,9 +187,7 @@ class TestFieldMapping:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     fr = records[0]
     assert fr.status == "active"
 
@@ -206,9 +196,7 @@ class TestFieldMapping:
     body = _block_body("PROD-004")
     path = _write_spec(root, "PROD-004", body, subdir="product")
 
-    records = list(
-      records_from_spec("PROD-004", {}, body, path, root)
-    )
+    records = list(records_from_spec("PROD-004", {}, body, path, root))
     assert records[0].uid == "PROD-004.FR-001"
     assert records[0].label == "FR-001"
 
@@ -217,9 +205,7 @@ class TestFieldMapping:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert records[0].kind == "functional"
     assert records[1].kind == "non-functional"
 
@@ -243,9 +229,7 @@ class TestFieldMapping:
     """)
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert records[0].category == "core"
 
   def test_tags_from_block(self) -> None:
@@ -253,9 +237,7 @@ class TestFieldMapping:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert "block" in records[0].tags
 
 
@@ -267,9 +249,7 @@ class TestFieldMapping:
 class TestBreakoutMerge:
   """VT-140-013: breakout metadata merges for both block and prose."""
 
-  def _write_breakout(
-    self, spec_path: Path, req_id: str, ext_id: str
-  ) -> None:
+  def _write_breakout(self, spec_path: Path, req_id: str, ext_id: str) -> None:
     req_dir = spec_path.parent / "requirements"
     req_dir.mkdir(parents=True, exist_ok=True)
     content = textwrap.dedent(f"""\
@@ -290,9 +270,7 @@ class TestBreakoutMerge:
     path = _write_spec(root, "SPEC-100", body)
     self._write_breakout(path, "SPEC-100.FR-001", "EXT-42")
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     fr = next(r for r in records if r.uid == "SPEC-100.FR-001")
     assert fr.ext_id == "EXT-42"
     assert "external" in fr.tags
@@ -304,9 +282,7 @@ class TestBreakoutMerge:
     path = _write_spec(root, "SPEC-100", body)
     self._write_breakout(path, "SPEC-100.FR-001", "EXT-99")
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     fr = next(r for r in records if r.uid == "SPEC-100.FR-001")
     assert fr.ext_id == "EXT-99"
     assert "external" in fr.tags
@@ -325,9 +301,7 @@ class TestSourceKindTracking:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     for r in records:
       assert r.source_kind == "block"
       assert r.source_type == "spec"
@@ -337,9 +311,7 @@ class TestSourceKindTracking:
     body = _prose_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     for r in records:
       assert r.source_kind == "prose"
       assert r.source_type == "spec"
@@ -370,9 +342,7 @@ class TestOrphanedBreakout:
     """)
     (req_dir / "fr-999.md").write_text(orphan)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     uids = {r.uid for r in records}
     assert "SPEC-100.FR-999" not in uids
     assert len(records) == 2
@@ -391,9 +361,7 @@ class TestBlockOnlyFields:
     body = _block_body()
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     fr = records[0]
     assert not hasattr(fr, "description")
     assert not hasattr(fr, "acceptance_criteria")
@@ -426,11 +394,7 @@ class TestEdgeCases:
     path = _write_spec(root, "SPEC-100", body)
     stats = SyncStats()
 
-    records = list(
-      records_from_spec(
-        "SPEC-100", {}, body, path, root, stats=stats
-      )
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root, stats=stats))
     assert len(records) == 1
     assert records[0].uid == "SPEC-100.FR-001"
     assert records[0].source_kind == "prose"
@@ -448,9 +412,7 @@ class TestEdgeCases:
     """)
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert records == []
 
   def test_stats_tracks_validation_warnings(self) -> None:
@@ -480,11 +442,7 @@ class TestEdgeCases:
     path = _write_spec(root, "SPEC-100", body)
     stats = SyncStats()
 
-    list(
-      records_from_spec(
-        "SPEC-100", {}, body, path, root, stats=stats
-      )
-    )
+    list(records_from_spec("SPEC-100", {}, body, path, root, stats=stats))
     assert stats.warnings >= 1
 
   def test_tolerated_kind_alias_canonicalized(self) -> None:
@@ -506,7 +464,5 @@ class TestEdgeCases:
     """)
     path = _write_spec(root, "SPEC-100", body)
 
-    records = list(
-      records_from_spec("SPEC-100", {}, body, path, root)
-    )
+    records = list(records_from_spec("SPEC-100", {}, body, path, root))
     assert records[0].kind == "functional"

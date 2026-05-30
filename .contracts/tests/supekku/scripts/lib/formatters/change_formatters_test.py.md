@@ -198,3 +198,18 @@ VT-131-enrich-*: objective from phase file when plan dict omits it (DE-131).
 - `test_objective_from_phase_overview_block(self) -> None`: VT-131-enrich-overview: legacy phase.overview objective when FM has none.
 - `test_plan_dict_objective_not_clobbered(self) -> None`: VT-131-enrich-no-clobber: existing dict objective wins over file.
 - `_write_delta_bundle(self, root) -> Path`
+
+### TestRevisionListFormatter
+
+DE-142 P03 — enriched `list revisions` (VT-142-LIST-001/004 + adaptive).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_json_includes_enriched_fields(self) -> None` - -- VT-142-LIST-004 — JSON enriched + stable schema --
+- `test_row_cells_and_name_strip(self) -> None` - -- VT-142-LIST-001 — row cells + name-prefix strip --
+- `test_table_hides_source_when_no_origins(self) -> None` - -- VT-142-LIST-ADAPT (DEC-CONSULT-06) — adaptive Source column --
+- `test_table_shows_source_when_origin_present(self) -> None`
+- `test_tsv_keeps_source_column_even_when_empty(self) -> None`
+- `_artifact(self) -> ChangeArtifact`

@@ -8,6 +8,7 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 ## Constants
 
 - `_EMPTY_CELL`
+- `_MODE_GLYPHS`
 - `_PHASE_SEQ_FROM_ID`
 
 ## Functions
@@ -30,6 +31,7 @@ Returns:
 - `_format_audit_gate_cell(audit_gate) -> str`: Render DR-138 §8.1 Audit Gate column. Empty when default (``auto``).
 - `_format_audit_glyph(delta_id, audited_delta_ids) -> str`: Render DR-138 §8.1 Audit column. Glyph keys on delta_id (DEC-138-13).
 - `_format_change_basic_fields(artifact) -> list[str]`: Format basic change artifact fields.
+- `_format_delta_ref(artifact) -> str`
 - `_format_delta_reverse_lookups(linked_audits, linked_revisions) -> list[str]`: Format reverse lookup section for delta details.
 
 Args:
@@ -39,6 +41,7 @@ Args:
 Returns:
   Lines for the reverse lookup section, or empty if none.
 - `_format_file_path_for_change(artifact, root) -> list[str]`: Format file path section for change artifact.
+- `_format_mode_glyph(artifact) -> str`
 - `_format_other_files(artifact, root) -> list[str]`: Format other files in delta bundle.
 - `_format_phases_cell(plan) -> str`: Render DR-138 §8.1 Phases column: completed/total or em-dash if no plan.
 - `_format_plan_overview(artifact, root) -> list[str]`: Format plan overview section if present.
@@ -63,6 +66,9 @@ Args:
 
 Returns:
   Formatted string with all audit details
+- `format_audit_list_json(audits, summaries) -> str`: JSON output for audit list — includes enriched fields.
+- `format_audit_list_row(artifact, summary) -> dict[Tuple[str, str]]`: Render one audit as a column-keyed cell dict (DR-141 §5.4).
+- `format_audit_list_table(audits, summaries) -> str`: Render enriched audit list per DR-141 §5.5.
 - `format_change_list_item(artifact) -> str`: Format change artifact as basic list item: id, kind, status, name.
 
 Args:
@@ -164,3 +170,9 @@ Args:
 
 Returns:
   Formatted string with all revision details
+- `format_revision_list_json(revisions, summaries) -> str`: JSON output for revision list — enriched fields, stable schema.
+- `format_revision_list_row(artifact, summary) -> dict[Tuple[str, str]]`: Render one revision as a column-keyed cell dict (DR-142 §7.2).
+- `format_revision_list_table(revisions, summaries) -> str`: Render enriched revision list per DR-142 §7.2.
+
+DEC-CONSULT-06: the ``Source`` column is dropped in the **table** view when no
+revision has an origin; TSV and JSON keep the full field set (stable schema).

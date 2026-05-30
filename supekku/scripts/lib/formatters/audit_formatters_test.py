@@ -40,7 +40,11 @@ def _mock_audit(
 
 
 SAMPLE_SUMMARY = AuditFindingsSummary(
-  total=5, aligned=3, drift=1, risk=1, disposed=4,
+  total=5,
+  aligned=3,
+  drift=1,
+  risk=1,
+  disposed=4,
 )
 EMPTY_SUMMARY = AuditFindingsSummary(0, 0, 0, 0, 0)
 
@@ -56,37 +60,47 @@ class TestFormatAuditListRow:
   def test_all_columns_present(self) -> None:
     row = format_audit_list_row(_mock_audit(), SAMPLE_SUMMARY)
     assert set(row.keys()) == {
-      "id", "name", "status", "mode",
-      "delta_ref", "findings", "disposed",
+      "id",
+      "name",
+      "status",
+      "mode",
+      "delta_ref",
+      "findings",
+      "disposed",
     }
 
   def test_mode_glyph_conformance(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(mode="conformance"), SAMPLE_SUMMARY,
+      _mock_audit(mode="conformance"),
+      SAMPLE_SUMMARY,
     )
     assert row["mode"] == "C"
 
   def test_mode_glyph_discovery(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(mode="discovery"), SAMPLE_SUMMARY,
+      _mock_audit(mode="discovery"),
+      SAMPLE_SUMMARY,
     )
     assert row["mode"] == "D"
 
   def test_mode_em_dash_when_none(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(mode=None), SAMPLE_SUMMARY,
+      _mock_audit(mode=None),
+      SAMPLE_SUMMARY,
     )
     assert row["mode"] == "–"
 
   def test_delta_ref_shown(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(delta_ref="DE-140"), SAMPLE_SUMMARY,
+      _mock_audit(delta_ref="DE-140"),
+      SAMPLE_SUMMARY,
     )
     assert row["delta_ref"] == "DE-140"
 
   def test_delta_ref_em_dash_when_none(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(delta_ref=None), SAMPLE_SUMMARY,
+      _mock_audit(delta_ref=None),
+      SAMPLE_SUMMARY,
     )
     assert row["delta_ref"] == "–"
 
@@ -100,7 +114,8 @@ class TestFormatAuditListRow:
 
   def test_name_strips_prefix(self) -> None:
     row = format_audit_list_row(
-      _mock_audit(name="Audit - Some name"), SAMPLE_SUMMARY,
+      _mock_audit(name="Audit - Some name"),
+      SAMPLE_SUMMARY,
     )
     assert row["name"] == "Some name"
 
@@ -117,7 +132,9 @@ class TestFormatAuditListJson:
     audit = _mock_audit()
     summaries = {audit.id: SAMPLE_SUMMARY}
     output = format_audit_list_table(
-      [audit], summaries, format_type="json",
+      [audit],
+      summaries,
+      format_type="json",
     )
     data = json.loads(output)
     items = data["items"]
@@ -144,7 +161,9 @@ class TestFormatAuditListTsv:
     audit = _mock_audit()
     summaries = {audit.id: SAMPLE_SUMMARY}
     output = format_audit_list_table(
-      [audit], summaries, format_type="tsv",
+      [audit],
+      summaries,
+      format_type="tsv",
     )
     lines = output.strip().splitlines()
     assert len(lines) == 1

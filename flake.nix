@@ -43,6 +43,7 @@
 
           dependencies = with pkgs.python3Packages; [
             jinja2
+            packaging
             pyyaml
             python-frontmatter
             pydantic

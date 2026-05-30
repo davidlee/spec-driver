@@ -14,7 +14,6 @@ managed file, controlled by `[integration]` in `workflow.toml`.
 
 from __future__ import annotations
 
-import shutil
 import sys
 import warnings
 from pathlib import Path
@@ -23,7 +22,7 @@ import yaml
 
 from supekku.scripts.lib.core.config import load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_package_skills_dir
-from supekku.scripts.lib.file_ops import copytree_with_write_permission
+from supekku.scripts.lib.file_ops import copytree_with_write_permission, remove_tree
 
 # Canonical install location (relative to repo root)
 CANONICAL_SKILLS_DIR = Path(SPEC_DRIVER_DIR) / "skills"
@@ -261,8 +260,7 @@ def install_skills_to_target(
       up_to_date.append(name)
       continue
     # Copy entire skill directory
-    if dest.exists():
-      shutil.rmtree(dest)
+    remove_tree(dest)
     copytree_with_write_permission(src, dest)
     installed.append(name)
 
@@ -291,7 +289,7 @@ def prune_skills_from_target(
     name = child.name
     # Only prune if it's a known package skill AND not in the allowlist
     if name in package_skill_names and name not in allowed_set:
-      shutil.rmtree(child)
+      remove_tree(child)
       pruned.append(name)
   return pruned
 
@@ -363,7 +361,7 @@ def _ensure_target_symlinks(
 
       if target_skill.is_dir():
         if pre_migration:
-          shutil.rmtree(target_skill)
+          remove_tree(target_skill)
           target_skill.symlink_to(link_target)
           skill_outcomes[skill_name] = "migrated"
         else:

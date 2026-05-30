@@ -6,6 +6,7 @@ from spec_driver.core.file_ops import (
   copytree_with_write_permission,
   format_change_summary,
   format_detailed_changes,
+  remove_tree,
   scan_directory_changes,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
   "copytree_with_write_permission",
   "format_change_summary",
   "format_detailed_changes",
+  "remove_tree",
   "scan_directory_changes",
 ]

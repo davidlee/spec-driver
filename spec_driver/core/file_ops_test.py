@@ -1,6 +1,7 @@
 """Tests for file_ops module."""
 
 import os
+import shutil
 from pathlib import Path
 
 from spec_driver.core.file_ops import (
@@ -9,6 +10,7 @@ from spec_driver.core.file_ops import (
   copytree_with_write_permission,
   format_change_summary,
   format_detailed_changes,
+  remove_tree,
   scan_directory_changes,
 )
 
@@ -357,3 +359,58 @@ def test_copytree_with_write_permission_readonly_source(tmp_path):
   assert os.access(dest_dir / "a.txt", os.W_OK)
   assert (dest_dir / "sub" / "b.txt").read_text() == "bbb"
   assert os.access(dest_dir / "sub" / "b.txt", os.W_OK)
+
+
+def test_copytree_with_write_permission_readonly_source_dirs(tmp_path):
+  """Dest dirs are writable so a later rmtree can unlink their children.
+
+  Reproduces the install failure where skills copied from the read-only
+  Nix store could not be removed on re-install.
+  """
+  src_dir = tmp_path / "src"
+  sub = src_dir / "sub"
+  sub.mkdir(parents=True)
+  (sub / "b.txt").write_text("bbb")
+  # Read-only dirs first, as a read-only source (e.g. Nix store) would be.
+  (sub / "b.txt").chmod(0o444)
+  sub.chmod(0o555)
+  src_dir.chmod(0o555)
+
+  dest_dir = tmp_path / "dest"
+  try:
+    copytree_with_write_permission(src_dir, dest_dir)
+    assert os.access(dest_dir, os.W_OK)
+    assert os.access(dest_dir / "sub", os.W_OK)
+    # The real failure mode: rmtree must succeed without PermissionError.
+    shutil.rmtree(dest_dir)
+    assert not dest_dir.exists()
+  finally:
+    src_dir.chmod(0o755)
+    sub.chmod(0o755)
+
+
+def test_remove_tree_readonly_dirs(tmp_path):
+  """remove_tree deletes a tree whose directories are read-only.
+
+  Rescues a prior bad install: skills already on disk from a read-only
+  source could not be pruned/overwritten with a plain rmtree.
+  """
+  root = tmp_path / "tree"
+  sub = root / "sub"
+  sub.mkdir(parents=True)
+  (sub / "b.txt").write_text("bbb")
+  (sub / "b.txt").chmod(0o444)
+  sub.chmod(0o555)
+  root.chmod(0o555)
+  try:
+    remove_tree(root)
+    assert not root.exists()
+  finally:
+    for p in (sub, root):
+      if p.exists():
+        p.chmod(0o755)
+
+
+def test_remove_tree_missing_path_is_noop(tmp_path):
+  """remove_tree on a nonexistent path does nothing and does not raise."""
+  remove_tree(tmp_path / "nope")

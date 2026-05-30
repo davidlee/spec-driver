@@ -28,15 +28,37 @@ def copy_with_write_permission(src: Path, dest: Path) -> None:
 
 
 def copytree_with_write_permission(src: Path, dest: Path) -> None:
-  """Copy a directory tree, ensuring all destination files have ``u+w``.
+  """Copy a directory tree, ensuring all destination dirs and files have ``u+w``.
 
   Wraps :func:`shutil.copytree` and then walks the result to add
-  ``S_IWUSR`` to any file lacking it.
+  ``S_IWUSR`` to any directory or file lacking it. Directories must be
+  writable so a later :func:`shutil.rmtree` can unlink their children —
+  e.g. when re-installing over a tree copied from a read-only source
+  (the Nix store).
   """
   shutil.copytree(src, dest)
-  for dirpath, _dirnames, filenames in os.walk(dest):
-    for fname in filenames:
-      _ensure_writable(Path(dirpath) / fname)
+  _ensure_writable(dest)
+  for dirpath, dirnames, filenames in os.walk(dest):
+    for name in (*dirnames, *filenames):
+      _ensure_writable(Path(dirpath) / name)
+
+
+def remove_tree(path: Path) -> None:
+  """Remove a directory tree, forcing ``u+w`` so children can be unlinked.
+
+  :func:`shutil.rmtree` unlinks each child via its *parent* directory, which
+  must be writable. A tree copied from a read-only source (e.g. the Nix store)
+  may have read-only directories, causing ``PermissionError``. This walks the
+  tree adding ``S_IWUSR`` to every directory and file before removal. A no-op
+  if *path* does not exist.
+  """
+  if not path.exists():
+    return
+  for dirpath, dirnames, filenames in os.walk(path):
+    _ensure_writable(Path(dirpath))
+    for name in (*dirnames, *filenames):
+      _ensure_writable(Path(dirpath) / name)
+  shutil.rmtree(path)
 
 
 @dataclass

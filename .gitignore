@@ -2,8 +2,9 @@
 /pi-mono
 /result
 .spec-driver/run/*
-.spec-driver/registry/backlog.yml
-.spec-driver/registry/requirements.yml
+.spec-driver/registry/backlog.yaml
+.spec-driver/registry/requirements.yaml
+.spec-driver/registry/deltas.yaml
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -14,6 +15,7 @@ __pycache__/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 
+.contracts
 
 .gemini
 .codex

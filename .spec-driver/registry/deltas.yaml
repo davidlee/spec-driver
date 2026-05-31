@@ -12952,25 +12952,21 @@ deltas:
         status: completed
   DE-128:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Migrate genuine core modules to spec_driver.core
     slug: migrate_genuine_core_modules_to_spec_driver_core
-    updated: '2026-03-24'
+    updated: '2026-06-01'
     path: .spec-driver/deltas/DE-128-migrate_genuine_core_modules_to_spec_driver_core/DE-128.md
     relations:
-    - type: follows_from
+    - type: relates_to
       target: DE-127
-      attributes:
-        description: DE-127 confirmed all 22 remaining core/ modules are genuinely
-          foundational.
-    - type: follows_from
+      attributes: {}
+    - type: relates_to
       target: DE-125
-      attributes:
-        description: DE-125 established the migration pattern and import-linter contracts.
-    - type: operationalises
+      attributes: {}
+    - type: implements
       target: POL-003
-      attributes:
-        description: Makes the outer layer contract truthful by populating spec_driver.core.
+      attributes: {}
     plan:
       id: IP-128
       overview:
@@ -12996,19 +12992,19 @@ deltas:
       - plan: IP-128
         delta: DE-128
         phase: IP-128-P01
-        status: draft
+        status: completed
       - plan: IP-128
         delta: DE-128
         phase: IP-128-P02
-        status: draft
+        status: completed
       - plan: IP-128
         delta: DE-128
         phase: IP-128-P03
-        status: draft
+        status: completed
       - plan: IP-128
         delta: DE-128
         phase: IP-128-P04
-        status: draft
+        status: completed
   DE-129:
     kind: delta
     status: completed
@@ -13432,7 +13428,7 @@ deltas:
       - plan: IP-136
         delta: DE-136
         phase: IP-136-P04
-        status: in-progress
+        status: completed
   DE-137:
     kind: delta
     status: completed
@@ -13989,3 +13985,51 @@ deltas:
       phases:
       - id: IP-143-P01
         phase: IP-143-P01
+  DE-144:
+    kind: delta
+    status: completed
+    name: 'Delta - fix Nix install: missing packaging dep + read-only dir perms'
+    slug: fix_nix_install_missing_packaging_dep_read_only_dir_perms
+    updated: '2026-05-30'
+    path: .spec-driver/deltas/DE-144-fix_nix_install_missing_packaging_dep_read_only_dir_perms/DE-144.md
+    applies_to:
+      specs:
+      - SPEC-129
+      requirements: []
+  DE-145:
+    kind: delta
+    status: draft
+    name: Delta - Requirement scanner false-positive warnings + sync/validate coverage
+      parity
+    slug: requirement_scanner_false_positive_warnings_sync_validate_coverage_parity
+    updated: '2026-05-30'
+    path: .spec-driver/deltas/DE-145-requirement_scanner_false_positive_warnings_sync_validate_coverage_parity/DE-145.md
+    applies_to:
+      specs:
+      - SPEC-122
+      - SPEC-125
+      requirements:
+      - SPEC-122.FR-004
+    plan:
+      id: IP-145
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-145
+        delta: DE-145
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-122
+          - SPEC-125
+          collaborators: []
+        requirements:
+          targets:
+          - SPEC-122.FR-004
+          dependencies: []
+        phases:
+        - id: IP-145-P01
+      phases:
+      - id: IP-145-P01
+        phase: IP-145-P01

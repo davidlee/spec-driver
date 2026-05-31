@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from supekku.scripts.lib.core.templates import (
+from spec_driver.core.templates import (
   TemplateNotFoundError,
   extract_template_body,
   get_package_templates_dir,
@@ -45,7 +45,7 @@ def mock_templates_dir(tmp_path: Path) -> Path:
   return templates_dir
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
 def test_get_template_environment(
   mock_get_templates_dir: MagicMock,
   mock_templates_dir: Path,
@@ -60,7 +60,7 @@ def test_get_template_environment(
   assert env.keep_trailing_newline
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
 def test_load_template_simple(
   mock_get_templates_dir: MagicMock,
   mock_templates_dir: Path,
@@ -74,7 +74,7 @@ def test_load_template_simple(
   assert template.name == "simple.md"
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
 def test_load_template_not_found(
   mock_get_templates_dir: MagicMock,
   mock_templates_dir: Path,
@@ -89,7 +89,7 @@ def test_load_template_not_found(
     load_template("nonexistent.md")
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
 def test_render_template_simple(
   mock_get_templates_dir: MagicMock,
   mock_templates_dir: Path,
@@ -102,7 +102,7 @@ def test_render_template_simple(
   assert result == "Hello World!"
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
 def test_render_template_complex(
   mock_get_templates_dir: MagicMock,
   mock_templates_dir: Path,
@@ -183,8 +183,8 @@ def test_get_package_templates_dir() -> None:
   assert (package_dir / "delta.md").exists()
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
-@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_package_templates_dir")
 def test_fallback_to_package_templates_when_user_dir_missing(
   mock_get_package_dir: MagicMock,
   mock_get_templates_dir: MagicMock,
@@ -216,8 +216,8 @@ def test_fallback_to_package_templates_when_user_dir_missing(
   assert template.render(var="value") == "Package: value"
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
-@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_package_templates_dir")
 def test_user_templates_override_package_templates(
   mock_get_package_dir: MagicMock,
   mock_get_templates_dir: MagicMock,
@@ -247,8 +247,8 @@ def test_user_templates_override_package_templates(
   assert template.render(var="value") == "User: value"
 
 
-@patch("supekku.scripts.lib.core.templates.get_templates_dir")
-@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+@patch("spec_driver.core.templates.get_templates_dir")
+@patch("spec_driver.core.templates.get_package_templates_dir")
 def test_fallback_to_package_for_missing_user_template(
   mock_get_package_dir: MagicMock,
   mock_get_templates_dir: MagicMock,

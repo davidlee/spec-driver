@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from supekku.scripts.lib.core.preboot import (
+from spec_driver.core.preboot import (
   BOOT_SEQUENCE,
   GENERATED_HEADER,
   GOVERNANCE_LISTINGS,
@@ -20,7 +20,7 @@ from supekku.scripts.lib.core.preboot import (
   write_preboot_file,
 )
 
-_SUBPROCESS_TARGET = "supekku.scripts.lib.core.preboot.subprocess.run"
+_SUBPROCESS_TARGET = "spec_driver.core.preboot.subprocess.run"
 
 
 @contextmanager

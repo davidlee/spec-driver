@@ -16,6 +16,7 @@ from spec_driver.core.spec_utils import (  # noqa: F401 — re-exported for test
   append_unique,
   dump_markdown_file_update,
   ensure_list_entry,
+  extract_h1_title,
   load_markdown_file,
   load_validated_markdown_file,
   validate_frontmatter,
@@ -240,6 +241,41 @@ class DumpUpdateTest(unittest.TestCase):
       dump_markdown_file_update(path, {"id": "DE-001", "kind": "delta"}, "body\n")
       text = path.read_text(encoding="utf-8")
     assert "#" not in text
+
+
+class TestExtractH1Title:
+  """Tests for extract_h1_title."""
+
+  def test_matches_prefixed_h1(self) -> None:
+    content = "---\nfrontmatter: yes\n---\n# ADR-001 My Decision\nBody text."
+    assert extract_h1_title(content, "ADR-") == "# ADR-001 My Decision"
+
+  def test_no_prefix_matches_any_h1(self) -> None:
+    content = "# Some Title\nBody."
+    assert extract_h1_title(content) == "# Some Title"
+
+  def test_returns_empty_string_when_not_found(self) -> None:
+    content = "No heading here.\nJust text."
+    assert extract_h1_title(content, "ADR-") == ""
+
+  def test_returns_empty_string_on_empty_content(self) -> None:
+    assert extract_h1_title("", "ADR-") == ""
+
+  def test_ignores_h2_and_deeper(self) -> None:
+    content = "## Not H1\n### Also not\n# ADR-005 Found\n"
+    assert extract_h1_title(content, "ADR-") == "# ADR-005 Found"
+
+  def test_returns_first_match_when_multiple_headings(self) -> None:
+    content = "# ADR-001 First\n# ADR-002 Second\n"
+    assert extract_h1_title(content, "ADR-") == "# ADR-001 First"
+
+  def test_prefix_mismatch_returns_empty(self) -> None:
+    content = "# POL-001 A Policy\n"
+    assert extract_h1_title(content, "ADR-") == ""
+
+  def test_no_prefix_with_multiple_headings_returns_first(self) -> None:
+    content = "# First\n# Second\n"
+    assert extract_h1_title(content) == "# First"
 
 
 if __name__ == "__main__":

@@ -260,7 +260,9 @@ def file_cmd(
   # F-48: per-kind strict default from workflow.toml; CLI --strict overrides.
   try:
     repo_root = find_repo_root(path.parent)
-    strict_map = get_strict_map(load_workflow_config(repo_root))
+    known = set(FRONTMATTER_METADATA_REGISTRY.keys())
+    cfg = load_workflow_config(repo_root, known_kinds=known)
+    strict_map = get_strict_map(cfg, known_kinds=known)
   except (OSError, ValueError):
     strict_map = {}
   effective_strict = strict or strict_map.get(kind, False)

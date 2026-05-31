@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from supekku.scripts.lib.core.config import (
+from spec_driver.core.config import (
   DEFAULT_CONFIG,
   _is_project_dependency,
   detect_exec_command,
@@ -18,7 +18,11 @@ from supekku.scripts.lib.core.config import (
   is_strict_mode,
   load_workflow_config,
 )
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+from spec_driver.core.paths import SPEC_DRIVER_DIR
+
+# Known kinds used by strict-kind tests (mirrors the real registry keys
+# without importing the domain-level frontmatter_metadata subpackage).
+_STUB_KINDS: set[str] = {"delta", "spec", "adr", "phase"}
 
 
 def test_missing_file_returns_defaults(tmp_path: Path) -> None:
@@ -477,7 +481,7 @@ class TestDetectExecCommand:
       '[project]\ndependencies = ["spec-driver"]\n',
       encoding="utf-8",
     )
-    with patch("supekku.scripts.lib.core.config.which", return_value="/usr/bin/uv"):
+    with patch("spec_driver.core.config.which", return_value="/usr/bin/uv"):
       assert detect_exec_command(tmp_path) == "uv run spec-driver"
 
   def test_global_install(self, tmp_path: Path) -> None:
@@ -490,7 +494,7 @@ class TestDetectExecCommand:
     with (
       patch("sys.argv", ["/home/u/.cache/uv/tool/spec-driver", "install"]),
       patch(
-        "supekku.scripts.lib.core.config.which",
+        "spec_driver.core.config.which",
         side_effect=lambda cmd: "/usr/bin/uvx" if cmd == "uvx" else None,
       ),
     ):
@@ -505,21 +509,24 @@ class TestDetectExecCommand:
     """Transient binary, no uvx → bare command as last resort."""
     with (
       patch("sys.argv", ["/proj/.venv/bin/spec-driver", "install"]),
-      patch("supekku.scripts.lib.core.config.which", return_value=None),
+      patch("spec_driver.core.config.which", return_value=None),
     ):
       assert detect_exec_command(tmp_path) == "spec-driver"
+
+
+# --- strict-kind validation tests ---
 
 
 class TestStrictKindValidation:
   """F-47 / VT-CC-033: unknown kinds in [validation.strict] warn at load."""
 
   def test_unknown_kind_emits_warning(self, tmp_path: Path) -> None:
-    """workflow.toml with foo=true (not a registered kind) ⇒ warning."""
+    """workflow.toml with foo=true (not in known_kinds) ⇒ warning."""
     toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
     toml_path.parent.mkdir(parents=True)
     toml_path.write_text("[validation.strict]\nfoo = true\n", encoding="utf-8")
     with pytest.warns(UserWarning, match="unknown kind .foo."):
-      load_workflow_config(tmp_path)
+      load_workflow_config(tmp_path, known_kinds={"delta", "spec"})
 
   def test_unknown_key_preserved_in_memory_config(self, tmp_path: Path) -> None:
     """No auto-correct — the typo persists so the user sees it next run."""
@@ -527,7 +534,7 @@ class TestStrictKindValidation:
     toml_path.parent.mkdir(parents=True)
     toml_path.write_text("[validation.strict]\nfoo = true\n", encoding="utf-8")
     with pytest.warns(UserWarning):
-      config = load_workflow_config(tmp_path)
+      config = load_workflow_config(tmp_path, known_kinds={"delta", "spec"})
     assert config["validation"]["strict"].get("foo") is True
 
   def test_known_kind_no_warning(self, tmp_path: Path) -> None:
@@ -540,7 +547,9 @@ class TestStrictKindValidation:
     )
     with warnings.catch_warnings():
       warnings.simplefilter("error", UserWarning)
-      config = load_workflow_config(tmp_path)
+      config = load_workflow_config(
+        tmp_path, known_kinds={"delta", "spec"}
+      )
     assert config["validation"]["strict"] == {"delta": True, "spec": False}
 
   def test_mixed_warns_only_for_unknown(self, tmp_path: Path) -> None:
@@ -552,27 +561,63 @@ class TestStrictKindValidation:
       encoding="utf-8",
     )
     with pytest.warns(UserWarning) as captured:
-      load_workflow_config(tmp_path)
+      load_workflow_config(tmp_path, known_kinds={"delta", "spec"})
     messages = [str(w.message) for w in captured]
     assert any("foo" in m for m in messages)
     assert any("bar" in m for m in messages)
     assert not any("delta" in m for m in messages)
+
+  # VT: silent-when-no-known_kinds (infra config reads)
+  def test_no_warning_when_known_kinds_is_none(self, tmp_path: Path) -> None:
+    """Infra config reads (known_kinds=None) emit no strict-kind warning."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text(
+      "[validation.strict]\nfoo = true\nbar = false\n",
+      encoding="utf-8",
+    )
+    with warnings.catch_warnings():
+      warnings.simplefilter("error", UserWarning)
+      config = load_workflow_config(tmp_path)  # no known_kinds
+    assert config["validation"]["strict"]["foo"] is True
+    assert config["validation"]["strict"]["bar"] is False
+
+  # VT: warn-when-known_kinds-provided (validating entrypoints)
+  def test_warning_when_known_kinds_provided(self, tmp_path: Path) -> None:
+    """Validating entrypoints that pass known_kinds DO get the warning."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text(
+      "[validation.strict]\nfoo = true\n",
+      encoding="utf-8",
+    )
+    with pytest.warns(UserWarning, match="unknown kind .foo."):
+      load_workflow_config(tmp_path, known_kinds=_STUB_KINDS)
 
 
 class TestGetStrictMap:
   """F-48 helper: get_strict_map filters unknown kinds; coerces bools."""
 
   def test_returns_only_known_kinds(self) -> None:
-    config = {"validation": {"strict": {"delta": True, "spec": False, "foo": True}}}
-    out = get_strict_map(config)
+    config = {
+      "validation": {"strict": {"delta": True, "spec": False, "foo": True}}
+    }
+    out = get_strict_map(config, known_kinds={"delta", "spec"})
     assert "foo" not in out
     assert out["delta"] is True
     assert out["spec"] is False
 
   def test_empty_config_returns_empty(self) -> None:
-    assert get_strict_map({}) == {}
-    assert get_strict_map({"validation": {}}) == {}
-    assert get_strict_map({"validation": {"strict": {}}}) == {}
+    assert get_strict_map({}, known_kinds={"delta"}) == {}
+    assert get_strict_map({"validation": {}}, known_kinds={"delta"}) == {}
+    assert (
+      get_strict_map({"validation": {"strict": {}}}, known_kinds={"delta"}) == {}
+    )
 
   def test_non_dict_strict_section_returns_empty(self) -> None:
-    assert get_strict_map({"validation": {"strict": "oops"}}) == {}
+    assert (
+      get_strict_map(
+        {"validation": {"strict": "oops"}}, known_kinds={"delta"}
+      )
+      == {}
+    )

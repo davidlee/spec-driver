@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import tomlkit
 
-from supekku.scripts.lib.core.sync_preferences import (
+from spec_driver.core.sync_preferences import (
   persist_spec_autocreate,
   spec_autocreate_enabled,
 )

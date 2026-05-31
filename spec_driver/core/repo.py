@@ -17,9 +17,7 @@ def find_repo_root(start: Path | None = None) -> Path:
   Raises:
     RuntimeError: If repository root cannot be found.
   """
-  from supekku.scripts.lib.core.paths import (  # noqa: PLC0415
-    SPEC_DRIVER_DIR,  # TODO(DE-128-P02): repoint to spec_driver.core.paths
-  )
+  from .paths import SPEC_DRIVER_DIR  # noqa: PLC0415
 
   current = (start or Path.cwd()).resolve()
   for candidate in [current, *current.parents]:

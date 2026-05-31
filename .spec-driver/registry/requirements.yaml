@@ -4837,6 +4837,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-129
+    - DE-145
     verified_by:
     - AUD-024
     coverage_evidence:

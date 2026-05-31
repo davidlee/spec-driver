@@ -10,11 +10,10 @@ from pathlib import Path
 import pytest
 import yaml
 
-from supekku.scripts.lib.core.frontmatter_schema import FrontmatterValidationError
-from supekku.scripts.lib.core.spec_utils import (
+from spec_driver.core.frontmatter_schema import FrontmatterValidationError
+from spec_driver.core.spec_utils import (  # noqa: F401 — re-exported for test
   MarkdownLoadError,
   append_unique,
-  dump_markdown_file_create,
   dump_markdown_file_update,
   ensure_list_entry,
   load_markdown_file,
@@ -211,32 +210,8 @@ class SpecUtilsTestCase(unittest.TestCase):
     assert loaded_body == body
 
 
-class DumpCreateUpdateSplitTest(unittest.TestCase):
-  """IP-137-P02 task 2.5 — `_create` / `_update` semantics."""
-
-  def test_create_renders_enum_comment_hints(self) -> None:
-    fm = {
-      "id": "DE-001",
-      "name": "split test",
-      "slug": "split-test",
-      "kind": "delta",
-      "status": "draft",
-      "created": "2026-01-01",
-      "updated": "2026-01-01",
-    }
-    with tempfile.TemporaryDirectory() as tmpdir:
-      path = Path(tmpdir) / "DE-001.md"
-      dump_markdown_file_create(path, fm, "# body\n", kind="delta")
-      text = path.read_text(encoding="utf-8")
-    assert "status: draft  # one of:" in text
-    assert "# body" in text
-
-  def test_create_refuses_existing_path(self) -> None:
-    with tempfile.TemporaryDirectory() as tmpdir:
-      path = Path(tmpdir) / "DE-001.md"
-      path.write_text("existing", encoding="utf-8")
-      with pytest.raises(FileExistsError):
-        dump_markdown_file_create(path, {"id": "DE-001"}, "body\n", kind="delta")
+class DumpUpdateTest(unittest.TestCase):
+  """IP-137-P02 task 2.5 — `_update` semantics (create tests live in orchestration)."""
 
   def test_update_preserves_existing_trailing_comments(self) -> None:
     initial = (
@@ -265,16 +240,6 @@ class DumpCreateUpdateSplitTest(unittest.TestCase):
       dump_markdown_file_update(path, {"id": "DE-001", "kind": "delta"}, "body\n")
       text = path.read_text(encoding="utf-8")
     assert "#" not in text
-
-  def test_update_idempotent_round_trip(self) -> None:
-    fm = {"id": "DE-001", "kind": "delta", "status": "draft"}
-    with tempfile.TemporaryDirectory() as tmpdir:
-      path = Path(tmpdir) / "DE-001.md"
-      dump_markdown_file_create(path, fm, "body\n", kind="delta")
-      first = path.read_text(encoding="utf-8")
-      dump_markdown_file_update(path, fm, "body\n")
-      second = path.read_text(encoding="utf-8")
-    assert first == second
 
 
 if __name__ == "__main__":

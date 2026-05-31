@@ -284,3 +284,45 @@ class TestDelta138TplVT:
     text = p.read_text(encoding="utf-8")
     assert "status: draft  # one of:" in text
     assert "kind: delta  # one of:" in text
+
+
+class DumpMarkdownFileCreateTest:
+  """IP-128-P02 — `dump_markdown_file_create` relocated from core spec_utils."""
+
+  def test_create_renders_enum_comment_hints(self, tmp_path: Path) -> None:
+    from .templates import dump_markdown_file_create
+
+    fm = {
+      "id": "DE-001",
+      "name": "split test",
+      "slug": "split-test",
+      "kind": "delta",
+      "status": "draft",
+      "created": "2026-01-01",
+      "updated": "2026-01-01",
+    }
+    path = tmp_path / "DE-001.md"
+    dump_markdown_file_create(path, fm, "# body\n", kind="delta")
+    text = path.read_text(encoding="utf-8")
+    assert "status: draft  # one of:" in text
+    assert "# body" in text
+
+  def test_create_refuses_existing_path(self, tmp_path: Path) -> None:
+    from .templates import dump_markdown_file_create
+
+    path = tmp_path / "DE-001.md"
+    path.write_text("existing", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+      dump_markdown_file_create(path, {"id": "DE-001"}, "body\n", kind="delta")
+
+  def test_update_idempotent_round_trip(self, tmp_path: Path) -> None:
+    from spec_driver.core.spec_utils import dump_markdown_file_update
+    from .templates import dump_markdown_file_create
+
+    fm = {"id": "DE-001", "kind": "delta", "status": "draft"}
+    path = tmp_path / "DE-001.md"
+    dump_markdown_file_create(path, fm, "body\n", kind="delta")
+    first = path.read_text(encoding="utf-8")
+    dump_markdown_file_update(path, fm, "body\n")
+    second = path.read_text(encoding="utf-8")
+    assert first == second

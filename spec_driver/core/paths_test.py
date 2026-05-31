@@ -6,8 +6,8 @@ import unittest
 import warnings
 from pathlib import Path
 
-import supekku.scripts.lib.core.paths as paths_mod
-from supekku.scripts.lib.core.paths import (
+import spec_driver.core.paths as paths_mod
+from spec_driver.core.paths import (
   AUDITS_SUBDIR,
   BACKLOG_DIR,
   DECISIONS_SUBDIR,

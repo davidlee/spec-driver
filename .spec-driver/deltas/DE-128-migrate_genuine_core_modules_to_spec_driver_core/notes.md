@@ -1,5 +1,69 @@
 # Notes for DE-128
 
+## 2026-05-31 — P02 executed (tier-1 migration + spec_utils decoupling + domain repoint)
+
+**Status**: completed. 4 tier-1 modules migrated, spec_utils decoupled,
+domain imports repointed.
+
+### What's done
+
+**Chain B (paths + events):**
+- `paths.py` → `spec_driver/core/paths.py` (import already relative).
+  40 test pass; shim at legacy.
+- `spec_driver/core/repo.py` lazy import repointed: `supekku.scripts.lib.core.paths` → `.paths`.
+- `events.py` → `spec_driver/core/events.py`; lazy imports of `repo`/`paths` repointed
+  to `spec_driver.core.{repo,paths}`. Shim at legacy.
+
+**Chain A (spec_utils + frontmatter_writer):**
+- New `spec_driver/core/spec_utils.py`: all pure functions + `write_markdown_file`
+  primitive (wrapping `_normalise_body` + `_atomic_write`).
+  `dump_markdown_file_update` re-expressed on `write_markdown_file`.
+  Imports: `from .frontmatter_schema`, `from spec_driver.core.yaml_emit`.
+  No orchestration/domain imports — core is provably clean.
+- `dump_markdown_file_create` relocated to `spec_driver/orchestration/templates.py`
+  (beside `render_frontmatter_for_kind`). Calls `core.spec_utils.write_markdown_file`.
+- Legacy `supekku/scripts/lib/core/spec_utils.py` shim: re-exports pure funcs from
+  `spec_driver.core.spec_utils` + `dump_markdown_file_create` from
+  `spec_driver.orchestration.templates`. All 12 call sites unchanged.
+- Test split: `SpecUtilsTestCase` + `DumpUpdateTest` → `spec_driver/core/spec_utils_test.py`;
+  `DumpMarkdownFileCreateTest` → `spec_driver/orchestration/templates_test.py`.
+- `frontmatter_writer.py` → `spec_driver/core/frontmatter_writer.py`; imports
+  converted to relative (`.yaml_emit`, `.spec_utils`). Shim at legacy.
+
+**Domain debt eliminated:**
+- `domain/relations/manager.py`: `supekku.scripts.lib.core.{frontmatter_schema,spec_utils}` →
+  `spec_driver.core.{frontmatter_schema,spec_utils}`.
+- `domain/relations/graph.py`: `supekku.scripts.lib.core.artifact_ids` →
+  `spec_driver.core.artifact_ids`.
+- Zero `supekku.scripts.lib.core` imports remain in `spec_driver/domain/`.
+
+### Verification
+- `uvx import-linter lint`: 3/3 contracts KEPT (153 files, 492 deps).
+  Core→orchestration edge eliminated (linter-verified).
+- `grep 'supekku.scripts.lib.core' spec_driver/domain/ --include='*.py'`: empty.
+- `grep 'orchestration\|domain' spec_driver/core/spec_utils.py`: only docstring mentions.
+- `uv run ruff check spec_driver/core/ supekku/scripts/lib/core/`: clean.
+- `uv run pytest spec_driver/core/paths_test.py`: 40/40 pass.
+  (spec_utils_test, frontmatter_writer_test, events_test need yaml/click/typer —
+  pre-existing nix-env issue, same as yaml_emit_test.py.)
+- `spec-driver validate file phase-02.md`: clean.
+
+### Surprises
+- **nix-env test gap**: `spec_utils_test.py`, `frontmatter_writer_test.py`,
+  `events_test.py` cannot be collected in this nix shell (missing yaml, click,
+  typer). Same class as `yaml_emit_test.py` (264/264 reported in P01 excluded
+  those). Full suite in real env should catch any regressions.
+- **Legacy `supekku/scripts/lib/spec_utils_test.py`** was at `supekku/scripts/lib/`
+  (not `supekku/scripts/lib/core/`). Deleted; test now at
+  `spec_driver/core/spec_utils_test.py`.
+- **`frontmatter_writer.py` already imported `spec_driver.core.yaml_emit`**
+  (absolute). Converted to relative per DR-128 rule.
+
+### Uncommitted
+All P02 changes uncommitted (cumulative with P01 uncommitted).
+
+---
+
 ## 2026-05-31 — P01 executed (tier-0 leaf migration)
 
 **Status**: completed. 15 modules + `strings` merged → `string_utils`.

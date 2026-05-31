@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, Any
 
-from supekku.scripts.lib.core.frontmatter_schema import Relation
-from supekku.scripts.lib.core.spec_utils import (
+from spec_driver.core.frontmatter_schema import Relation
+from spec_driver.core.spec_utils import (
   dump_markdown_file_update,
   load_markdown_file,
 )

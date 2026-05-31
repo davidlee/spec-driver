@@ -17,7 +17,7 @@ import click
 import typer
 from typer.testing import CliRunner
 
-from supekku.scripts.lib.core import events
+from spec_driver.core import events
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -214,8 +214,8 @@ class TestEventsConfig(unittest.TestCase):
     """User can set events.enabled = false in workflow.toml."""
     import tempfile  # noqa: PLC0415
 
+    from spec_driver.core.paths import SPEC_DRIVER_DIR  # noqa: PLC0415
     from supekku.scripts.lib.core.config import load_workflow_config  # noqa: PLC0415
-    from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR  # noqa: PLC0415
 
     with tempfile.TemporaryDirectory() as td:
       tmp_path = Path(td)

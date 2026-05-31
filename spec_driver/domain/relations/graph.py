@@ -16,7 +16,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
-from supekku.scripts.lib.core.artifact_ids import normalize_artifact_id
+from spec_driver.core.artifact_ids import normalize_artifact_id
 
 from .query import ReferenceHit, collect_references
 

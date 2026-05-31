@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from .frontmatter_writer import (
+from spec_driver.core.frontmatter_writer import (
   FieldUpdateResult,
   ListUpdateResult,
   add_frontmatter_list_items,
@@ -17,7 +17,7 @@ from .frontmatter_writer import (
   update_frontmatter_fields,
   update_frontmatter_status,
 )
-from .spec_utils import load_markdown_file
+from spec_driver.core.spec_utils import load_markdown_file
 
 SAMPLE_FRONTMATTER = """\
 ---

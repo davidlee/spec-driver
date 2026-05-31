@@ -16,6 +16,7 @@ from difflib import unified_diff
 from pathlib import Path
 from typing import Any
 
+from spec_driver.core.spec_utils import write_markdown_file
 from spec_driver.core.yaml_emit import emit_yaml_block
 
 # Jinja-style placeholder strings emitted when render is invoked in reference
@@ -239,6 +240,33 @@ def render_frontmatter_for_kind(
   return emit_yaml_block(data, comments=comments)
 
 
+def dump_markdown_file_create(
+  path: Path | str,
+  frontmatter: Mapping[str, Any],
+  body: str,
+  *,
+  kind: str,
+) -> None:
+  """Write a NEW artefact at *path*, rendering frontmatter with enum hints.
+
+  Routes through `render_frontmatter_for_kind(kind, data=frontmatter)` so
+  enum-comment hints appear inline (POL-001). For kinds without a registered
+  metadata entry (e.g. spec testing companions, improvement backlog items)
+  falls through to plain `emit_yaml_block` — no hints, but still atomic and
+  consistent with the rest of the create path. Errors if *path* already
+  exists.
+  """
+  path = Path(path)
+  if path.exists():
+    msg = f"refusing to overwrite existing artefact: {path} (use _update)"
+    raise FileExistsError(msg)
+  try:
+    fm_yaml = render_frontmatter_for_kind(kind, data=dict(frontmatter))
+  except UnknownKindError:
+    fm_yaml = emit_yaml_block(dict(frontmatter))
+  write_markdown_file(path, fm_yaml, body)
+
+
 @dataclass(frozen=True)
 class TemplateDrift:
   """Difference between an on-disk template and the canonical rendered shape."""
@@ -383,6 +411,7 @@ __all__ = [
   "TEMPLATE_PLACEHOLDERS",
   "TemplateDrift",
   "UnknownKindError",
+  "dump_markdown_file_create",
   "regenerate_template",
   "render_frontmatter_for_kind",
   "validate_templates",

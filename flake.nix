@@ -33,6 +33,19 @@
           then inputs.pub.lib.${system}.mkJailedAgents {inherit (inputs) llm-agents;}
           else {};
 
+        pyDeps = with pkgs.python3Packages; [
+          jinja2
+          packaging
+          pyyaml
+          python-frontmatter
+          pydantic
+          ty
+          textual
+          tomlkit
+          typer
+          watchfiles
+        ];
+
         spec-driver = pkgs.python3Packages.buildPythonApplication {
           pname = "spec-driver";
           version = builtins.replaceStrings ["\n"] [""] (builtins.readFile ./VERSION);
@@ -41,48 +54,39 @@
 
           build-system = with pkgs.python3Packages; [hatchling];
 
-          dependencies = with pkgs.python3Packages; [
-            jinja2
-            packaging
-            pyyaml
-            python-frontmatter
-            pydantic
-            ty
-            textual
-            tomlkit
-            typer
-            watchfiles
-          ];
+          dependencies = pyDeps;
 
           doCheck = false;
           meta.mainProgram = "spec-driver";
         };
 
-        projectPkgs = with pkgs; [
-          spec-driver
+        projectPkgs = with pkgs;
+          [
+            spec-driver
 
-          tree-sitter
-          prettier
+            tree-sitter
+            prettier
 
-          uv
-          python3
-          python3Packages.pylint
-          python3Packages.pytest
-          python3Packages.pydantic
-          python3Packages.ty
-          pyright
-          ruff
-          libnotify # tell me when you're done
+            uv
+            python3
+            python3Packages.pylint
+            python3Packages.pytest
+            python3Packages.pydantic
+            python3Packages.ty
+            pyright
+            ruff
+            libnotify # tell me when you're done
 
-          nodejs_latest
+            nodejs_latest
 
-          go
-          #gomarkdoc
+            go
+            #gomarkdoc
 
-          d2
+            d2
 
-          codex
-        ];
+            codex
+          ]
+          ++ pyDeps;
 
         # sibling repos to bind-mount (for editable deps / source inspection)
         workspaceDeps = ["/home/david/dev/autobahn"];
@@ -159,6 +163,13 @@
             ])
             ++ lib.optionals isLinux (lib.attrValues jailPkgs);
           commands = [
+            {
+              name = "jpi";
+              help = "op run -- jailed-pi $@";
+              command = ''
+                op run -- jailed-pi $@
+              '';
+            }
             {
               name = "sdr";
               help = "uv run spec-driver $@";

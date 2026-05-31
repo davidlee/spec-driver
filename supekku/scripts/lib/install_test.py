@@ -416,7 +416,7 @@ def test_initialize_detects_project_dep_exec(tmp_path: Path) -> None:
     encoding="utf-8",
   )
 
-  with mock.patch("supekku.scripts.lib.core.config.which", return_value="/usr/bin/uv"):
+  with mock.patch("spec_driver.core.config.which", return_value="/usr/bin/uv"):
     initialize_workspace(tmp_path, auto_yes=True)
 
   content = (tmp_path / SPEC_DRIVER_DIR / "workflow.toml").read_text(encoding="utf-8")

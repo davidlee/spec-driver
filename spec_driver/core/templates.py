@@ -26,9 +26,9 @@ def get_package_templates_dir() -> Path:
   Returns:
     Path to package templates directory (supekku/templates/).
   """
-  # This file is in supekku/scripts/lib/core/templates.py
+  # This file is in spec_driver/core/templates.py
   # Package templates are in supekku/templates/
-  return Path(__file__).parent.parent.parent.parent / "templates"
+  return Path(__file__).parent.parent.parent / "supekku" / "templates"
 
 
 def get_template_environment(repo_root: Path | None = None) -> Environment:

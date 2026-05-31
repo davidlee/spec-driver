@@ -14,8 +14,8 @@ from .paths import SPEC_DRIVER_DIR
 from .templates import render_template
 
 # Package root: supekku/ is three levels up from this file
-# (supekku/scripts/lib/core/agent_docs.py)
-_PACKAGE_ROOT = Path(__file__).parent.parent.parent.parent
+# (spec_driver/core/agent_docs.py → repo_root/supekku/)
+_PACKAGE_ROOT = Path(__file__).parent.parent.parent / "supekku"
 
 
 def _discover_agent_templates(package_root: Path) -> list[str]:

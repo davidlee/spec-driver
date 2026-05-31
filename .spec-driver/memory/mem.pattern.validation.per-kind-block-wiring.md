@@ -4,17 +4,16 @@ name: Per-kind block validation wiring in WorkspaceValidator
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-05-21'
-updated: '2026-05-21'
-verified: '2026-05-21'
+created: "2026-05-21"
+updated: "2026-05-21"
+verified: "2026-05-21"
 confidence: high
-tags:
-- validation
-- workspace-validator
-- blocks
-summary: "Template for wiring per-kind block validators (context_inputs, risk_register)\
-  \ into WorkspaceValidator \u2014 established by DE-138 P04; DE-139..142 follow same\
-  \ shape"
+tags: [validation, workspace-validator, blocks]
+summary: "Template for wiring per-kind block validators (context_inputs, risk_register) into WorkspaceValidator — established by DE-138 P04; DE-139..142 follow same shape"
+links:
+  missing:
+    - raw: DEC-138-14
+    - raw: DR-138
 ---
 
 # Per-kind block validation wiring in WorkspaceValidator

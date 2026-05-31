@@ -4,19 +4,14 @@ name: MarkdownLoadError is a ValueError so existing except clauses keep working
 kind: memory
 status: active
 memory_type: fact
-created: '2026-05-01'
-updated: '2026-05-01'
-verified: '2026-05-01'
+created: "2026-05-01"
+updated: "2026-05-01"
+verified: "2026-05-01"
 confidence: high
-tags:
-- core
-- spec_utils
-- invariant
-- error-handling
-summary: "core/spec_utils.py raises MarkdownLoadError(ValueError) for malformed YAML frontmatter; subclassing ValueError is load-bearing \u2014 existing except (ValueError, OSError) clauses across changes/, drift/, requirements/ depend on it."
+tags: [core, spec_utils, invariant, error-handling]
+summary: "core/spec_utils.py raises MarkdownLoadError(ValueError) for malformed YAML frontmatter; subclassing ValueError is load-bearing — existing except (ValueError, OSError) clauses across changes/, drift/, requirements/ depend on it."
 scope:
-  paths:
-    - supekku/scripts/lib/core/spec_utils.py
+  paths: [supekku/scripts/lib/core/spec_utils.py]
   globs:
     - supekku/scripts/lib/changes/**
     - supekku/scripts/lib/drift/**
@@ -27,6 +22,9 @@ provenance:
     - DR-135
     - supekku/scripts/lib/core/spec_utils.py
     - supekku/scripts/lib/core/frontmatter_schema.py
+links:
+  missing:
+    - raw: DR-135
 ---
 
 # MarkdownLoadError is a ValueError so existing except clauses keep working

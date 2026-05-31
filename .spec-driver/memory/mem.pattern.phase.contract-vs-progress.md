@@ -9,14 +9,12 @@ updated: "2026-03-22"
 verified: "2026-03-22"
 confidence: high
 tags: [phase, frontmatter, dr-106, contract]
-summary: >-
-  Frontmatter records planning contract; markdown checkboxes track execution
-  progress. Never conflate in structured data.
+summary: Frontmatter records planning contract; markdown checkboxes track execution progress. Never conflate in structured data.
 scope:
   globs:
     - supekku/scripts/lib/changes/phase_model.py
     - supekku/templates/phase.md
-    - "**/.spec-driver/deltas/*/phases/*.md"
+    - '**/.spec-driver/deltas/*/phases/*.md'
 provenance:
   sources:
     - kind: delta
@@ -25,6 +23,9 @@ provenance:
     - kind: adr
       note: ADR-010 — placement heuristic
       ref: ADR-010
+links:
+  missing:
+    - raw: DR-106
 ---
 
 # Phase contract vs progress separation

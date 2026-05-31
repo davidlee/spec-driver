@@ -4,29 +4,25 @@ name: Domain module migration pattern
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-03-24'
-updated: '2026-03-24'
-verified: '2026-03-24'
+created: "2026-03-24"
+updated: "2026-03-24"
+verified: "2026-03-24"
 confidence: high
-tags:
-- architecture
-- migration
-- domain
-- import-linter
-summary: How to migrate modules into spec_driver.domain with re-export shims, ordered
-  internal layers contract, and incremental verification.
+tags: [architecture, migration, domain, import-linter]
+summary: "How to migrate modules into spec_driver.domain with re-export shims, ordered internal layers contract, and incremental verification."
 scope:
   globs:
-  - spec_driver/domain/**
-  - supekku/scripts/lib/relations/**
-  - supekku/scripts/lib/policies/registry.py
-  - supekku/scripts/lib/standards/registry.py
-  paths:
-  - pyproject.toml
+    - spec_driver/domain/**
+    - supekku/scripts/lib/relations/**
+    - supekku/scripts/lib/policies/registry.py
+    - supekku/scripts/lib/standards/registry.py
+  paths: [pyproject.toml]
 provenance:
-  sources:
-  - DE-125
-  - DR-125
+  sources: [DE-125, DR-125]
+links:
+  missing:
+    - raw: DR-125
+    - raw: POL-003
 ---
 
 # Domain module migration pattern

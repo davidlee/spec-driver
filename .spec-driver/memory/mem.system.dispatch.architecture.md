@@ -4,16 +4,12 @@ name: Dispatch sub-agent orchestration
 kind: memory
 status: active
 memory_type: system
-created: '2026-04-16'
-updated: '2026-04-16'
-verified: '2026-04-16'
+created: "2026-04-16"
+updated: "2026-04-16"
+verified: "2026-04-16"
 confidence: high
-tags:
-- dispatch
-- skills
-- sub-agents
-- orchestration
-summary: 'How /dispatch works: orchestrator skill + dispatch-worker agent + sub-driver tourist skill. Key constraints and design decisions.'
+tags: [dispatch, skills, sub-agents, orchestration]
+summary: "How /dispatch works: orchestrator skill + dispatch-worker agent + sub-driver tourist skill. Key constraints and design decisions."
 priority:
   severity: high
   weight: 8
@@ -28,6 +24,9 @@ provenance:
       ref: DE-132
     - kind: design_revision
       ref: DR-132
+links:
+  missing:
+    - raw: DR-132
 ---
 
 # Dispatch sub-agent orchestration

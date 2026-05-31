@@ -8,13 +8,11 @@ created: "2026-03-22"
 updated: "2026-03-22"
 verified: "2026-03-22"
 confidence: high
-tags:
-  - architecture
-  - autobahn
-  - boundary
-summary:
-  spec-driver must never depend on autobahn for basic functionality; the dependency
-  is strictly one-directional
+tags: [architecture, autobahn, boundary]
+summary: spec-driver must never depend on autobahn for basic functionality; the dependency is strictly one-directional
+links:
+  missing:
+    - raw: POL-003
 ---
 
 # spec-driver must not depend on autobahn

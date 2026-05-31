@@ -8,26 +8,25 @@ created: "2026-03-22"
 updated: "2026-03-22"
 verified: "2026-03-22"
 confidence: high
-tags:
-  - workflow
-  - sharp-edge
-  - pydantic
+tags: [workflow, sharp-edge, pydantic]
 summary: "FindingDisposition requires authority: DispositionAuthority — not optional. Every disposition dict must include it."
 scope:
   globs:
     - supekku/scripts/lib/workflow/review_state_machine.py
     - supekku/scripts/lib/workflow/review_io.py
     - supekku/cli/workflow.py
-  paths:
-    - supekku/scripts/lib/workflow/review_state_machine.py
+  paths: [supekku/scripts/lib/workflow/review_state_machine.py]
 provenance:
   sources:
     - kind: code
       ref: supekku/scripts/lib/workflow/review_state_machine.py
-      note: "FindingDisposition(BaseModel) — authority field is not Optional"
+      note: FindingDisposition(BaseModel) — authority field is not Optional
     - kind: commit
-      ref: 1fa074fc
-      note: "DE-109 Phase 3 — discovered during implementation"
+      ref: "1fa074fc"
+      note: DE-109 Phase 3 — discovered during implementation
+links:
+  missing:
+    - raw: DR-109
 ---
 
 # FindingDisposition authority field is required

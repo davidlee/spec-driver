@@ -3,7 +3,7 @@ id: IP-128-P04
 slug: "128-migrate_genuine_core_modules_to_spec_driver_core-phase-04"
 name: "Tier 3 — migrate agent_docs, preboot, sync_preferences"
 created: "2026-03-24"
-updated: "2026-03-24"
+updated: "2026-05-31"
 status: draft
 kind: phase
 plan: IP-128
@@ -22,8 +22,9 @@ objective: >-
 entrance_criteria:
   - Phase 3 complete (tier 0 + 1 + 2 landed)
 exit_criteria:
-  - agent_docs, preboot, sync_preferences in spec_driver/core/
+  - agent_docs, preboot, sync_preferences (+ tests) in spec_driver/core/
   - Internal imports use relative paths
+  - No genuine core module remains only in supekku/scripts/lib/core/ (shims aside)
   - All tests pass
   - Both import-linter contracts pass
   - No genuine core module remains only in supekku/scripts/lib/core/
@@ -57,14 +58,17 @@ risks:
 
 ## 2. Exit Criteria
 
-- [ ] All 3 modules in `spec_driver/core/` with relative imports
+- [ ] All 3 modules (+ tests) in `spec_driver/core/` with relative imports
 - [ ] Re-export shims at legacy locations
 - [ ] All tests pass
 - [ ] Both contracts pass
-- [ ] Migration complete: 23 modules in `spec_driver/core/`
+- [ ] Migration complete: ~28 core modules in `spec_driver/core/` (26 migrated
+      units atop the original file_ops/string_utils/yaml_emit; `slugify` folded in)
 
 ## 3. Post-migration checklist
 
 - [ ] `spec_driver/core/__init__.py` updated if public API surface changes
+- [ ] Decoupling holds: `core/spec_utils.py` + `core/config.py` import no
+      orchestration/domain symbols (linter-verified)
 - [ ] `spec-driver validate` passes
 - [ ] Notes updated with final module count and any surprises

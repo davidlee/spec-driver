@@ -6,7 +6,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: functional
-    category: null
+    category: authentication
     status: pending
     tags: []
     introduced: null
@@ -24,7 +24,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: non-functional
-    category: null
+    category: performance
     status: pending
     tags: []
     introduced: null
@@ -208,7 +208,7 @@ requirements:
     - ISSUE-020
     primary_spec: ISSUE-020
     kind: functional
-    category: null
+    category: PROD-010
     status: pending
     tags: []
     introduced: null
@@ -2064,17 +2064,21 @@ requirements:
     primary_spec: PROD-010
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-135
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-ERROR-001
+    - VT-DR135-001
+    - VT-DR135-002
     coverage_entries:
-    - artefact: VT-PROD010-ERROR-001
-      status: planned
+    - artefact: VT-DR135-001
+      status: verified
+      kind: VT
+    - artefact: VT-DR135-002
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
     source_kind: block

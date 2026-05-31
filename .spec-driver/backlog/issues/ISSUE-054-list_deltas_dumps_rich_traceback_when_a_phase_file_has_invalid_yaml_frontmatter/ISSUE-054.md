@@ -2,8 +2,8 @@
 id: ISSUE-054
 name: list deltas dumps Rich traceback when a phase file has invalid YAML frontmatter
 created: "2026-05-01"
-updated: "2026-05-01"
-status: open
+updated: "2026-06-01"
+status: resolved
 kind: issue
 categories: []
 severity: p3

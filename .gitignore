@@ -2,6 +2,8 @@
 /pi-mono
 /result
 .spec-driver/run/*
+.spec-driver/registry/backlog.yml
+.spec-driver/registry/requirements.yml
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -532,11 +532,21 @@ entries:
     status: planned
     notes: Test pagination/streaming for large result sets
 
-  - artefact: VT-PROD010-ERROR-001
+  - artefact: VT-DR135-001
     kind: VT
     requirement: PROD-010.FR-010
-    status: planned
-    notes: Test error message quality (suggestions, valid values, examples)
+    status: verified
+    notes: Unit test for MarkdownLoadError (spec_driver/core/spec_utils_test.py). Asserts malformed YAML raises MarkdownLoadError with path, line, column; __cause__ is yaml.YAMLError; MarkdownLoadError is a ValueError.
+    implemented_by: DE-135
+    verified_by: AUD-031
+
+  - artefact: VT-DR135-002
+    kind: VT
+    requirement: PROD-010.FR-010
+    status: verified
+    notes: Integration test for list deltas with malformed phase YAML (supekku/cli/list_test.py::ListDeltasMalformedFrontmatterTest). Default and --json modes. Asserts exit 0, friendly stderr warning naming file + line/column, no Python traceback, well-formed delta still listed, JSON output valid.
+    implemented_by: DE-135
+    verified_by: AUD-031
 
   - artefact: VT-PROD010-BACKLOG-001
     kind: VT

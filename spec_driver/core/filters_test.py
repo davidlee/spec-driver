@@ -1,6 +1,6 @@
 """Tests for core filter utilities."""
 
-from supekku.scripts.lib.core.filters import matches_pattern, parse_multi_value_filter
+from spec_driver.core.filters import matches_pattern, parse_multi_value_filter
 
 
 class TestMatchesPattern:

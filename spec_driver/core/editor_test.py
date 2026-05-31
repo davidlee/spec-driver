@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from .editor import (
+from spec_driver.core.editor import (
   EditorInvocationError,
   EditorNotFoundError,
   find_editor,
@@ -42,9 +42,9 @@ class TestInvokeEditor:
     """Test successful editor invocation and content return."""
     # Mock subprocess to simulate editor saving content
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run") as mock_run,
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run") as mock_run,
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "/usr/bin/vim"
 
@@ -68,9 +68,9 @@ class TestInvokeEditor:
   def test_with_instructions(self, tmp_path: Path) -> None:
     """Test that instructions are prepended to content."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run"),
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run"),
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "vi"
 
@@ -102,9 +102,9 @@ class TestInvokeEditor:
   def test_empty_content_returns_none(self, tmp_path: Path) -> None:
     """Test that empty edited content returns None (cancellation)."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run"),
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run"),
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "vi"
 
@@ -125,9 +125,9 @@ class TestInvokeEditor:
   def test_whitespace_only_returns_none(self, tmp_path: Path) -> None:
     """Test that whitespace-only content returns None."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run"),
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run"),
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "vi"
 
@@ -146,7 +146,7 @@ class TestInvokeEditor:
 
   def test_editor_not_found_raises(self) -> None:
     """Test that missing editor raises EditorNotFoundError."""
-    with patch("supekku.scripts.lib.core.editor.find_editor") as mock_find:
+    with patch("spec_driver.core.editor.find_editor") as mock_find:
       mock_find.return_value = None
 
       with pytest.raises(EditorNotFoundError, match="No editor found"):
@@ -155,9 +155,9 @@ class TestInvokeEditor:
   def test_subprocess_failure_raises(self, tmp_path: Path) -> None:
     """Test that subprocess failure raises EditorInvocationError."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run") as mock_run,
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run") as mock_run,
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "vim"
       mock_run.side_effect = subprocess.CalledProcessError(1, ["vim"])
@@ -175,9 +175,9 @@ class TestInvokeEditor:
   def test_editor_executable_not_found_raises(self, tmp_path: Path) -> None:
     """Test that missing editor executable raises EditorNotFoundError."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run") as mock_run,
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run") as mock_run,
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "/nonexistent/editor"
       mock_run.side_effect = FileNotFoundError("editor not found")
@@ -195,9 +195,9 @@ class TestInvokeEditor:
   def test_custom_suffix(self, tmp_path: Path) -> None:
     """Test that custom file suffix is used."""
     with (
-      patch("supekku.scripts.lib.core.editor.find_editor") as mock_find,
-      patch("supekku.scripts.lib.core.editor.subprocess.run"),
-      patch("supekku.scripts.lib.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
+      patch("spec_driver.core.editor.find_editor") as mock_find,
+      patch("spec_driver.core.editor.subprocess.run"),
+      patch("spec_driver.core.editor.tempfile.NamedTemporaryFile") as mock_temp,
     ):
       mock_find.return_value = "vi"
 

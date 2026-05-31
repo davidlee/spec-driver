@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import pytest
 
-from supekku.scripts.lib.core.dates import parse_date
+from spec_driver.core.dates import parse_date
 
 
 class TestParseDate:

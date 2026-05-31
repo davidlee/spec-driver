@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from supekku.scripts.lib.core.artifact_ids import (
+from spec_driver.core.artifact_ids import (
   classify_artifact_id,
   is_artifact_id,
   is_kind,

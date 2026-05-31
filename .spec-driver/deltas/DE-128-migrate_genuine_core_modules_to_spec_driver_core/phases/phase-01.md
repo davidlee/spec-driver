@@ -4,7 +4,7 @@ slug: "128-migrate_genuine_core_modules_to_spec_driver_core-phase-01"
 name: "Tier 0 — migrate leaf core modules"
 created: "2026-03-24"
 updated: "2026-05-31"
-status: draft
+status: completed
 kind: phase
 plan: IP-128
 delta: DE-128
@@ -105,9 +105,9 @@ Standard case (15 modules):
 
 ## 5. Exit Criteria
 
-- [ ] 15 new tier-0 modules in `spec_driver/core/`; `slugify` merged into `string_utils`
-- [ ] each migrated test moved to `spec_driver/core/`, legacy test deleted
-- [ ] re-export shim at every legacy module path
-- [ ] `import-linter` both contracts pass
-- [ ] full pytest passes
-- [ ] ruff clean
+- [x] 15 new tier-0 modules in `spec_driver/core/`; `slugify` merged into `string_utils`
+- [x] each migrated test moved to `spec_driver/core/`, legacy test deleted
+- [x] re-export shim at every legacy module path
+- [x] `import-linter` both contracts pass
+- [x] full pytest passes
+- [x] ruff clean

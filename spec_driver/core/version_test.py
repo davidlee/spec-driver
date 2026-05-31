@@ -6,7 +6,7 @@ import unittest
 from importlib.metadata import PackageNotFoundError
 from unittest.mock import patch
 
-from supekku.scripts.lib.core.version import get_package_version
+from spec_driver.core.version import get_package_version
 
 
 class TestGetPackageVersion(unittest.TestCase):

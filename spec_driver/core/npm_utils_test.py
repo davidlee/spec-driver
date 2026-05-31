@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from supekku.scripts.lib.core.npm_utils import (
+from spec_driver.core.npm_utils import (
   PackageManager,
   PackageManagerInfo,
   detect_package_manager,
@@ -28,14 +28,14 @@ class TestModuleImports:
 class TestIsNpmAvailable:
   """Test is_npm_available function."""
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_npm_available(self, mock_which):
     """Test when npm is available in PATH."""
     mock_which.return_value = "/usr/bin/npm"
     assert is_npm_available() is True
     mock_which.assert_called_once_with("npm")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_npm_not_available(self, mock_which):
     """Test when npm is not available in PATH."""
     mock_which.return_value = None
@@ -46,14 +46,14 @@ class TestIsNpmAvailable:
 class TestIsPnpmAvailable:
   """Test is_pnpm_available function."""
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_pnpm_available(self, mock_which):
     """Test when pnpm is available in PATH."""
     mock_which.return_value = "/usr/bin/pnpm"
     assert is_pnpm_available() is True
     mock_which.assert_called_once_with("pnpm")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_pnpm_not_available(self, mock_which):
     """Test when pnpm is not available in PATH."""
     mock_which.return_value = None
@@ -64,14 +64,14 @@ class TestIsPnpmAvailable:
 class TestIsBunAvailable:
   """Test is_bun_available function."""
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_bun_available(self, mock_which):
     """Test when bun is available in PATH."""
     mock_which.return_value = "/usr/bin/bun"
     assert is_bun_available() is True
     mock_which.assert_called_once_with("bun")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_bun_not_available(self, mock_which):
     """Test when bun is not available in PATH."""
     mock_which.return_value = None
@@ -164,8 +164,8 @@ class TestDetectPackageManager:
 class TestGetPackageManagerInfo:
   """Test get_package_manager_info function and PackageManagerInfo dataclass."""
 
-  @patch("supekku.scripts.lib.core.npm_utils.is_npm_available")
-  @patch("supekku.scripts.lib.core.npm_utils.detect_package_manager")
+  @patch("spec_driver.core.npm_utils.is_npm_available")
+  @patch("spec_driver.core.npm_utils.detect_package_manager")
   def test_returns_npm_info_when_npm_detected(self, mock_detect, mock_is_npm, tmp_path):
     """Test npm PackageManagerInfo returned for npm project."""
     mock_detect.return_value = "npm"
@@ -182,8 +182,8 @@ class TestGetPackageManagerInfo:
     cmd = info.build_npx_command("ts-doc-extract")
     assert cmd == ["npx", "--yes", "ts-doc-extract"]
 
-  @patch("supekku.scripts.lib.core.npm_utils.is_pnpm_available")
-  @patch("supekku.scripts.lib.core.npm_utils.detect_package_manager")
+  @patch("spec_driver.core.npm_utils.is_pnpm_available")
+  @patch("spec_driver.core.npm_utils.detect_package_manager")
   def test_returns_pnpm_info_when_pnpm_detected_and_available(
     self, mock_detect, mock_is_pnpm, tmp_path
   ):
@@ -201,8 +201,8 @@ class TestGetPackageManagerInfo:
     cmd = info.build_npx_command("ts-doc-extract")
     assert cmd == ["pnpm", "dlx", "--package=ts-doc-extract", "ts-doc-extract"]
 
-  @patch("supekku.scripts.lib.core.npm_utils.is_bun_available")
-  @patch("supekku.scripts.lib.core.npm_utils.detect_package_manager")
+  @patch("spec_driver.core.npm_utils.is_bun_available")
+  @patch("spec_driver.core.npm_utils.detect_package_manager")
   def test_returns_bun_info_when_bun_detected_and_available(
     self, mock_detect, mock_is_bun, tmp_path
   ):
@@ -220,8 +220,8 @@ class TestGetPackageManagerInfo:
     cmd = info.build_npx_command("ts-doc-extract")
     assert cmd == ["bunx", "--yes", "ts-doc-extract"]
 
-  @patch("supekku.scripts.lib.core.npm_utils.is_pnpm_available")
-  @patch("supekku.scripts.lib.core.npm_utils.detect_package_manager")
+  @patch("spec_driver.core.npm_utils.is_pnpm_available")
+  @patch("spec_driver.core.npm_utils.detect_package_manager")
   def test_falls_back_to_npm_when_pnpm_not_available(
     self, mock_detect, mock_is_pnpm, tmp_path
   ):
@@ -235,8 +235,8 @@ class TestGetPackageManagerInfo:
     cmd = info.build_npx_command("pkg")
     assert cmd == ["npx", "--yes", "pkg"]
 
-  @patch("supekku.scripts.lib.core.npm_utils.is_bun_available")
-  @patch("supekku.scripts.lib.core.npm_utils.detect_package_manager")
+  @patch("spec_driver.core.npm_utils.is_bun_available")
+  @patch("spec_driver.core.npm_utils.detect_package_manager")
   def test_falls_back_to_npm_when_bun_not_available(
     self, mock_detect, mock_is_bun, tmp_path
   ):
@@ -266,7 +266,7 @@ class TestIsNpmPackageAvailable:
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is True
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_package_not_executable_local(self, mock_which, tmp_path):
     """Test package exists locally but is not executable (should be False)."""
     # Create node_modules/.bin/ts-doc-extract without execute permission
@@ -283,7 +283,7 @@ class TestIsNpmPackageAvailable:
     assert result is False
     mock_which.assert_called_once_with("ts-doc-extract")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_package_available_globally(self, mock_which, tmp_path):
     """Test package found globally via which() when not in local node_modules."""
     mock_which.return_value = "/usr/local/bin/ts-doc-extract"
@@ -292,7 +292,7 @@ class TestIsNpmPackageAvailable:
     assert result is True
     mock_which.assert_called_once_with("ts-doc-extract")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_package_not_available_anywhere(self, mock_which, tmp_path):
     """Test package not found locally or globally."""
     mock_which.return_value = None
@@ -300,7 +300,7 @@ class TestIsNpmPackageAvailable:
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is False
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_package_check_global_only_when_no_root(self, mock_which):
     """Test only checks global when package_root is None."""
     mock_which.return_value = "/usr/local/bin/pkg"
@@ -309,7 +309,7 @@ class TestIsNpmPackageAvailable:
     assert result is True
     mock_which.assert_called_once_with("pkg")
 
-  @patch("supekku.scripts.lib.core.npm_utils.which")
+  @patch("spec_driver.core.npm_utils.which")
   def test_local_takes_priority_over_global(self, mock_which, tmp_path):
     """Test local installation found first, global check never called."""
     # Create local installation

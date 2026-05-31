@@ -1,6 +1,46 @@
 # Notes for DE-128
 
-## 2026-05-31 — Re-validation against current reality (plan was drafted 2026-03-24)
+## 2026-05-31 — P01 executed (tier-0 leaf migration)
+
+**Status**: completed. 15 modules + `strings` merged → `string_utils`.
+
+### What's done
+- 15 verbatim copies to `spec_driver/core/`: `repo`, `version`, `relation_types`,
+  `ids`, `io`, `dates`, `filters`, `artifact_ids`, `cli_utils`, `editor`, `git`,
+  `go_utils`, `npm_utils`, `pylint_report`, `frontmatter_schema`.
+- `slugify` from `strings.py` merged into `spec_driver/core/string_utils.py`
+  (alongside existing `closest_match`); tests merged into `string_utils_test.py`.
+- 11 test files moved to `spec_driver/core/` with imports repointed to
+  `spec_driver.core.*`. No tests existed for `repo`, `relation_types`, `cli_utils`,
+  `frontmatter_schema`.
+- 16 re-export shims at legacy `supekku/scripts/lib/core/` paths.
+- 0 test files remain at legacy `core/` for migrated modules.
+
+### Verification
+- `spec_driver/core/`: 264/264 tests pass (excl. pre-existing `yaml_emit_test.py` yaml import error)
+- Full suite: 3,793 passed (excl. cli/tui needing click/textual)
+- `uvx import-linter lint`: 3/3 contracts KEPT
+- `uv run ruff check spec_driver/core/ supekku/scripts/lib/core/`: clean
+- `spec-driver validate file phase-01.md`: clean
+
+### Surprises
+- **`repo.py` lazy-imports `.paths`**: Bridges `SPEC_DRIVER_DIR` via
+  `supekku.scripts.lib.core.paths` (with `# noqa: PLC0415` + P02 TODO). Will
+  break if `find_repo_root()` called between phases, but no consumers do so
+  outside tests (which all go through shims). Will repoint in P02.
+- **`filters_test.py` bug**: `parse_multi_value_filter` call was inadvertently
+  spread to 3 args during manual test migration. Caught and fixed.
+
+### Follow-ups (P02)
+- Repoint `spec_driver/core/repo.py` lazy import to `spec_driver.core.paths`.
+
+### Uncommitted
+All changes uncommitted. Total: 31 new files in `spec_driver/core/`,
+16 modified files in `supekku/scripts/lib/core/`, plus phase/notes edits.
+
+---
+
+## 2026-05-31 — Re-validation (plan drafted 2026-03-24, never executed)
 
 Migration **not started**: `spec_driver/core/` still holds only `file_ops`,
 `string_utils`, `yaml_emit`. All 22 original targets remain in

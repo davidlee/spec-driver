@@ -5,7 +5,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from supekku.scripts.lib.core.io import atomic_write
+from spec_driver.core.io import atomic_write
 
 
 class TestAtomicWrite:

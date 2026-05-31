@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.lib.core.pylint_report import (
+from spec_driver.core.pylint_report import (
   load_pylint_json,
   render_pylint_summary,
   summarize_pylint_report,

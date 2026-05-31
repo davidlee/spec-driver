@@ -1,19 +1,5 @@
-"""Package version utilities."""
+"""Legacy re-export shim — see spec_driver.core.version."""
 
-from __future__ import annotations
+from spec_driver.core.version import get_package_version
 
-
-def get_package_version() -> str:
-  """Get the installed spec-driver package version.
-
-  Prefers ``importlib.metadata`` (installed package), falls back to
-  ``supekku.__version__`` for editable/dev installs.
-  """
-  from importlib.metadata import PackageNotFoundError, version  # noqa: PLC0415
-
-  try:
-    return version("spec-driver")
-  except PackageNotFoundError:
-    from supekku import __version__  # noqa: PLC0415
-
-    return __version__
+__all__ = ["get_package_version"]

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from .go_utils import (
+from spec_driver.core.go_utils import (
   GoToolchainError,
   get_go_module_name,
   is_go_available,
@@ -22,14 +22,14 @@ class TestIsGoAvailable:
 
   def test_go_available(self) -> None:
     """Test when Go is available in PATH."""
-    with patch("supekku.scripts.lib.core.go_utils.which") as mock_which:
+    with patch("spec_driver.core.go_utils.which") as mock_which:
       mock_which.return_value = "/usr/bin/go"
       assert is_go_available() is True
       mock_which.assert_called_once_with("go")
 
   def test_go_not_available(self) -> None:
     """Test when Go is not in PATH."""
-    with patch("supekku.scripts.lib.core.go_utils.which") as mock_which:
+    with patch("spec_driver.core.go_utils.which") as mock_which:
       mock_which.return_value = None
       assert is_go_available() is False
       mock_which.assert_called_once_with("go")
@@ -44,7 +44,7 @@ class TestGetGoModuleName:
     mock_result = MagicMock()
     mock_result.stdout = "github.com/user/repo\n"
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.return_value = mock_result
 
       result = get_go_module_name(repo_root)
@@ -64,7 +64,7 @@ class TestGetGoModuleName:
     mock_result = MagicMock()
     mock_result.stdout = "  github.com/user/repo  \n  "
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.return_value = mock_result
 
       result = get_go_module_name(repo_root)
@@ -76,7 +76,7 @@ class TestGetGoModuleName:
     repo_root = Path("/repo")
     stderr = "go: no go.mod file found"
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.side_effect = subprocess.CalledProcessError(
         1,
         ["go", "list", "-m"],
@@ -96,7 +96,7 @@ class TestRunGoList:
     mock_result = MagicMock()
     mock_result.stdout = "github.com/user/repo\ngithub.com/user/repo/internal/foo\n"
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.return_value = mock_result
 
       result = run_go_list(repo_root)
@@ -119,7 +119,7 @@ class TestRunGoList:
     mock_result = MagicMock()
     mock_result.stdout = "github.com/user/repo/internal/foo\n"
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.return_value = mock_result
 
       result = run_go_list(repo_root, "./internal/...")
@@ -139,7 +139,7 @@ class TestRunGoList:
     mock_result = MagicMock()
     mock_result.stdout = ""
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.return_value = mock_result
 
       result = run_go_list(repo_root)
@@ -151,7 +151,7 @@ class TestRunGoList:
     repo_root = Path("/repo")
     stderr = "package ./... matched no packages"
 
-    with patch("supekku.scripts.lib.core.go_utils.subprocess.run") as mock_run:
+    with patch("spec_driver.core.go_utils.subprocess.run") as mock_run:
       mock_run.side_effect = subprocess.CalledProcessError(
         1,
         ["go", "list", "./..."],

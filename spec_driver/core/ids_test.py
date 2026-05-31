@@ -1,6 +1,6 @@
 """Tests for sequential ID generation."""
 
-from supekku.scripts.lib.core.ids import next_sequential_id
+from spec_driver.core.ids import next_sequential_id
 
 
 class TestNextSequentialId:

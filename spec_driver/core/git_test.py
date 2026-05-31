@@ -9,7 +9,12 @@ from unittest.mock import patch
 
 import pytest
 
-from .git import DEFAULT_SHORT_SHA_LENGTH, SHA_HEX_PATTERN, get_head_sha, short_sha
+from spec_driver.core.git import (
+  DEFAULT_SHORT_SHA_LENGTH,
+  SHA_HEX_PATTERN,
+  get_head_sha,
+  short_sha,
+)
 
 SAMPLE_SHA = "a" * 40
 
@@ -18,7 +23,7 @@ class TestGetHeadSha:
   """Tests for get_head_sha()."""
 
   def test_returns_sha_on_success(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=0,
@@ -29,7 +34,7 @@ class TestGetHeadSha:
     assert result == SAMPLE_SHA
 
   def test_strips_whitespace(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=0,
@@ -38,7 +43,7 @@ class TestGetHeadSha:
       assert get_head_sha() == SAMPLE_SHA
 
   def test_returns_none_on_nonzero_exit(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=128,
@@ -48,18 +53,18 @@ class TestGetHeadSha:
       assert get_head_sha() is None
 
   def test_returns_none_when_git_not_found(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.side_effect = FileNotFoundError("git")
       assert get_head_sha() is None
 
   def test_returns_none_on_timeout(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.side_effect = subprocess.TimeoutExpired("git", 5)
       assert get_head_sha() is None
 
   def test_passes_root_as_cwd(self) -> None:
     root = Path("/some/repo")
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=0,
@@ -71,7 +76,7 @@ class TestGetHeadSha:
     assert kwargs["cwd"] == root
 
   def test_defaults_to_none_cwd(self) -> None:
-    with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
+    with patch("spec_driver.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
         args=[],
         returncode=0,

@@ -391,7 +391,7 @@ def _make_change_registry(root: Path, kind: str) -> Any:
 
 
 def _make_decision_registry(root: Path) -> Any:
-  from supekku.scripts.lib.decisions.registry import DecisionRegistry  # noqa: PLC0415
+  from spec_driver.domain.registries.decision import DecisionRegistry  # noqa: PLC0415
 
   return DecisionRegistry(root=root)
 

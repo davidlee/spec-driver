@@ -78,3 +78,27 @@ class RegistryProtocol(Protocol[T_co]):
 - tests: 14/14 pass ✅
 
 **Ready for P2** — PolicyRegistry + StandardRegistry + Workspace backlink hoist.
+
+## P2 — Policy + Standard registries + Workspace backlink hoist (completed 2026-06-02)
+
+**Outcome**: All 9 tasks complete. 36/36 tests pass. R is landable.
+
+- `spec_driver/domain/registries/policy.py`, `standard.py` collapsed onto base
+- `supekku/scripts/lib/policies/registry.py`, `standards/registry.py` → re-export shims
+- `supekku/scripts/lib/workspace.py` → `_sync_governance` + `_registry_for` (backlink hoist)
+- `spec_driver/orchestration/artifact_view.py` → Policy/Standard canonical imports
+- Golden-YAML: 4/4, shim-compat: 18/18
+- Gates: no-relations=0, core-import=0, internal-consumer=0, zero-duplication=0
+
+## P3 — Creation impl-only unification (completed 2026-06-02)
+
+Shared private `_create_governance_artifact` engine. 3 public wrappers ~15 lines each.
+All public symbols, error messages preserved. OQ-2 closed.
+
+## P4 — Verification sweep (completed 2026-06-02)
+
+All gates green. Follow-ups: shim-debt, DriftLedger.filter, AR-4 magic strings.
+
+---
+
+**Summary**: DE-116 all 5 phases complete. 36/36 tests pass. Delta ready for audit/close.

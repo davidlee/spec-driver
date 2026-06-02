@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from spec_driver.domain.relations.backlinks import build_backlinks_multi
+
 from .changes.registry import ChangeRegistry
 from .core.paths import (
   get_audits_dir,
@@ -20,8 +22,6 @@ from .policies.registry import PolicyRegistry
 from .requirements.registry import RequirementsRegistry
 from .specs.registry import SpecRegistry
 from .standards.registry import StandardRegistry
-
-from spec_driver.domain.relations.backlinks import build_backlinks_multi
 
 if TYPE_CHECKING:
   from pathlib import Path

@@ -1,4 +1,4 @@
-"""Re-export shim → spec_driver.domain.records.decision / spec_driver.domain.registries.decision.
+"""Re-export shim → spec_driver.domain.records.decision / .registries.decision.
 
 DO NOT add new code here. Canonical homes:
   - DecisionRecord: spec_driver.domain.records.decision

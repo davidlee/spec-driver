@@ -1,18 +1,21 @@
 """Private shared creation engine for governance artifacts (DEC-116-6 / DR §4).
 
 DO NOT import from this module externally. Public API is:
-  - supekku.scripts.lib.decisions.creation  → create_adr,  ADRCreationOptions,  etc.
-  - supekku.scripts.lib.policies.creation   → create_policy, PolicyCreationOptions, etc.
-  - supekku.scripts.lib.standards.creation  → create_standard, StandardCreationOptions, etc.
+  - supekku.scripts.lib.decisions.creation  → create_adr, ADRCreationOptions, etc.
+  - supekku.scripts.lib.policies.creation   → create_policy, PolicyCreationOptions,
+    etc.
+  - supekku.scripts.lib.standards.creation  → create_standard,
+    StandardCreationOptions, etc.
 
 Those modules are thin wrappers around _create_governance_artifact.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Protocol
+from typing import Any
 
 import yaml
 from jinja2 import Template
@@ -40,7 +43,7 @@ class _GovernanceArtifactSpec:
   # (artifact_id, options) -> frontmatter dict
 
 
-class _AlreadyExists(Exception):
+class _AlreadyExistsError(Exception):
   """Raised when the target file already exists. Message includes label."""
 
 
@@ -80,7 +83,7 @@ def _create_governance_artifact(
   # Check for existing file
   if file_path.exists():
     msg = f"{spec.label} file already exists: {file_path}"
-    raise _AlreadyExists(msg)
+    raise _AlreadyExistsError(msg)
 
   # Build frontmatter via per-kind builder
   frontmatter = spec.build_frontmatter(artifact_id, options)
@@ -105,4 +108,8 @@ def _create_governance_artifact(
   return artifact_id, file_path
 
 
-__all__ = ["_GovernanceArtifactSpec", "_AlreadyExists", "_create_governance_artifact"]
+__all__ = [
+  "_GovernanceArtifactSpec",
+  "_AlreadyExistsError",
+  "_create_governance_artifact",
+]

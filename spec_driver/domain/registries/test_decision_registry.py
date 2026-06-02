@@ -74,7 +74,7 @@ class TestDecisionRegistryIter:
     assert all(isinstance(r, DecisionRecord) for r in records)
 
   def test_iter_filtered_by_status(self, registry: DecisionRegistry) -> None:
-    accepted = [r for r in registry.iter(status="accepted")]
+    accepted = list(registry.iter(status="accepted"))
     for r in accepted:
       assert r.status == "accepted"
 
@@ -99,7 +99,9 @@ class TestDecisionRegistryFilter:
         return
     pytest.skip("No ADRs with tags found")
 
-  def test_filter_nonexistent_tag_returns_empty(self, registry: DecisionRegistry) -> None:
+  def test_filter_nonexistent_tag_returns_empty(
+    self, registry: DecisionRegistry,
+  ) -> None:
     result = registry.filter(tag="__nonexistent_tag_xyz__")
     assert result == []
 
@@ -114,7 +116,9 @@ class TestDecisionRegistryWrite:
     content = output.read_text()
     assert "decisions:" in content
 
-  def test_write_is_idempotent(self, registry: DecisionRegistry, tmp_path: Path) -> None:
+  def test_write_is_idempotent(
+    self, registry: DecisionRegistry, tmp_path: Path,
+  ) -> None:
     output = tmp_path / "decisions.yaml"
     records = registry.collect()
     registry.write(path=output, records=records)

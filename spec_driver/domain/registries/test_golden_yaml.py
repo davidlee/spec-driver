@@ -14,6 +14,7 @@ import yaml
 from spec_driver.domain.registries.decision import DecisionRegistry
 from spec_driver.domain.registries.policy import PolicyRegistry
 from spec_driver.domain.registries.standard import StandardRegistry
+from spec_driver.domain.relations.backlinks import build_backlinks_multi
 
 
 def _write_md(path: Path, frontmatter: str) -> None:
@@ -83,8 +84,6 @@ class TestGoldenYamlBacklinks:
     root = _build_fixture_corpus(Path(tempfile.mkdtemp()))
 
     # Simulate Workspace._sync_governance for policies
-    from spec_driver.domain.relations.backlinks import build_backlinks_multi
-
     decisions_reg = DecisionRegistry(root=root)
     policies_reg = PolicyRegistry(root=root)
 
@@ -115,8 +114,6 @@ class TestGoldenYamlBacklinks:
   def test_standard_has_decision_and_policy_backlinks(self) -> None:
     """STD-001 should have backlinks from ADR-001 and POL-001."""
     root = _build_fixture_corpus(Path(tempfile.mkdtemp()))
-
-    from spec_driver.domain.relations.backlinks import build_backlinks_multi
 
     decisions_reg = DecisionRegistry(root=root)
     policies_reg = PolicyRegistry(root=root)

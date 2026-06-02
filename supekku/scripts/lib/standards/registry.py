@@ -1,4 +1,4 @@
-"""Re-export shim → spec_driver.domain.records.standard / spec_driver.domain.registries.standard.
+"""Re-export shim → spec_driver.domain.records.standard / .registries.standard.
 
 DO NOT add new code here. Canonical homes:
   - StandardRecord: spec_driver.domain.records.standard

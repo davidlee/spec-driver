@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from spec_driver.core.dates import parse_date
 from spec_driver.core.paths import get_policies_dir
 from spec_driver.domain.records.policy import PolicyRecord
 from spec_driver.domain.registries.frontmatter import FrontmatterFileRegistry
@@ -40,8 +41,6 @@ class PolicyRegistry(FrontmatterFileRegistry[PolicyRecord]):
     status: str,
     path: Path,
   ) -> PolicyRecord:
-    from spec_driver.core.dates import parse_date
-
     return PolicyRecord(
       id=record_id,
       title=title,

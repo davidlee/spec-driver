@@ -12,12 +12,11 @@ from pathlib import Path
 from typing import Any
 
 from supekku.scripts.lib.creation import (
-  _AlreadyExists,
-  _GovernanceArtifactSpec,
+  _AlreadyExistsError,
   _create_governance_artifact,
+  _GovernanceArtifactSpec,
 )
 from supekku.scripts.lib.policies.registry import PolicyRegistry
-
 
 # ── Public surface (preserved verbatim) ────────────────────────────────────
 
@@ -48,7 +47,9 @@ class PolicyAlreadyExistsError(Exception):
 # ── Per-kind frontmatter builder (Policy-specific fields) ──────────────────
 
 
-def _build_policy_frontmatter(policy_id: str, options: PolicyCreationOptions) -> dict[str, Any]:
+def _build_policy_frontmatter(
+  policy_id: str, options: PolicyCreationOptions
+) -> dict[str, Any]:
   """Build frontmatter dictionary for policy."""
   today = date.today().isoformat()
   frontmatter: dict[str, Any] = {
@@ -105,7 +106,7 @@ def create_policy(
     policy_id, path = _create_governance_artifact(
       _POLICY_SPEC, registry, options, sync_registry=sync_registry
     )
-  except _AlreadyExists as exc:
+  except _AlreadyExistsError as exc:
     raise PolicyAlreadyExistsError(str(exc)) from exc
   return PolicyCreationResult(policy_id=policy_id, path=path, filename=path.name)
 
@@ -115,7 +116,7 @@ def create_policy(
 
 def generate_next_policy_id(registry: PolicyRegistry) -> str:
   """Generate the next available policy ID."""
-  from supekku.scripts.lib.core.ids import next_sequential_id
+  from supekku.scripts.lib.core.ids import next_sequential_id  # noqa: PLC0415
 
   return next_sequential_id(registry.collect(), "POL")
 
@@ -130,7 +131,9 @@ def build_policy_frontmatter(
   """Build frontmatter dictionary for policy (legacy signature)."""
   return _build_policy_frontmatter(
     policy_id,
-    PolicyCreationOptions(title=title, status=status, author=author, author_email=author_email),
+    PolicyCreationOptions(
+      title=title, status=status, author=author, author_email=author_email
+    ),
   )
 
 

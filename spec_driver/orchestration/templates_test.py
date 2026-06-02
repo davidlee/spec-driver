@@ -290,7 +290,7 @@ class DumpMarkdownFileCreateTest:
   """IP-128-P02 — `dump_markdown_file_create` relocated from core spec_utils."""
 
   def test_create_renders_enum_comment_hints(self, tmp_path: Path) -> None:
-    from .templates import dump_markdown_file_create
+    from .templates import dump_markdown_file_create  # noqa: PLC0415
 
     fm = {
       "id": "DE-001",
@@ -308,7 +308,7 @@ class DumpMarkdownFileCreateTest:
     assert "# body" in text
 
   def test_create_refuses_existing_path(self, tmp_path: Path) -> None:
-    from .templates import dump_markdown_file_create
+    from .templates import dump_markdown_file_create  # noqa: PLC0415
 
     path = tmp_path / "DE-001.md"
     path.write_text("existing", encoding="utf-8")
@@ -316,8 +316,9 @@ class DumpMarkdownFileCreateTest:
       dump_markdown_file_create(path, {"id": "DE-001"}, "body\n", kind="delta")
 
   def test_update_idempotent_round_trip(self, tmp_path: Path) -> None:
-    from spec_driver.core.spec_utils import dump_markdown_file_update
-    from .templates import dump_markdown_file_create
+    from spec_driver.core.spec_utils import dump_markdown_file_update  # noqa: PLC0415
+
+    from .templates import dump_markdown_file_create  # noqa: PLC0415
 
     fm = {"id": "DE-001", "kind": "delta", "status": "draft"}
     path = tmp_path / "DE-001.md"

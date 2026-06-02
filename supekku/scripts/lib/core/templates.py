@@ -1,4 +1,5 @@
 """Re-export shim — see spec_driver.core.templates."""
+
 from spec_driver.core.templates import (
   TemplateNotFoundError,
   extract_template_body,

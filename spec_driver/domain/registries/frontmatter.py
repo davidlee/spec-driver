@@ -13,17 +13,24 @@ import re
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, Protocol, TypeVar, runtime_checkable
+from typing import (
+  TYPE_CHECKING,
+  Any,
+  ClassVar,
+  Generic,
+  Protocol,
+  TypeVar,
+  runtime_checkable,
+)
 
 import yaml
 
-from spec_driver.core.dates import parse_date
 from spec_driver.core.paths import get_registry_dir
 from spec_driver.core.repo import find_repo_root
 from spec_driver.core.spec_utils import extract_h1_title, load_markdown_file
 
 if TYPE_CHECKING:
-  from typing import Never
+  pass
 
 T_co = TypeVar("T_co", covariant=True)
 T = TypeVar("T")
@@ -34,14 +41,14 @@ T = TypeVar("T")
 
 @runtime_checkable
 class RegistryProtocol(Protocol[T_co]):
-  """ADR-009 canonical read surface. Covers find/collect/iter only; filter excluded (ER-1).
+  """ADR-009 canonical read surface: find/collect/iter only; filter excluded (ER-1).
 
   Signature locked by P0 spike (DE-116/phase-01.md §9):
-    - ``find(self, id, /)`` positional-only absorbs decision_id/policy_id/standard_id divergence.
+    - ``find(self, record_id, /)`` positional-only absorbs id-field divergence.
     - ``iter(self, status=None)`` positional-or-keyword per ADR-009 §1.
   """
 
-  def find(self, id: str, /) -> T_co | None:
+  def find(self, record_id: str, /) -> T_co | None:
     ...
 
   def collect(self) -> dict[str, T_co]:
@@ -54,7 +61,7 @@ class RegistryProtocol(Protocol[T_co]):
 # ── Frontmatter-File Registry Base ───────────────────────────────────────────
 
 
-class FrontmatterFileRegistry(ABC, Generic[T]):
+class FrontmatterFileRegistry(ABC, Generic[T]):  # noqa: UP046
   """Template-method ABC for a registry backed by frontmatter markdown files.
 
   Subclasses define ``_prefix``, ``_yaml_root_key``, ``_build_record``, and
@@ -89,14 +96,14 @@ class FrontmatterFileRegistry(ABC, Generic[T]):
     return records
 
   def iter(self, status: str | None = None) -> Iterator[T]:
-    """Iterate records, optionally filtered by status. Positional-or-keyword (ADR-009 §1)."""
+    """Iterate records, optionally filtered by status (ADR-009 §1)."""
     for record in self.collect().values():
       if status is None or getattr(record, "status", None) == status:
         yield record
 
-  def find(self, id: str, /) -> T | None:
+  def find(self, record_id: str, /) -> T | None:
     """Find a specific record by ID. Positional-only."""
-    return self.collect().get(id)
+    return self.collect().get(record_id)
 
   # ── Persistence (pure — no backlinks) ───────────────────────────────────
 
@@ -127,7 +134,7 @@ class FrontmatterFileRegistry(ABC, Generic[T]):
     path.write_text(yaml.safe_dump(registry_data, sort_keys=False), encoding="utf-8")
 
   def sync(self) -> None:
-    """Sync registry: collect and write (no backlinks — orchestration owns composition)."""
+    """Sync registry: collect and write (backlinks owned by orchestration)."""
     self.write(records=self.collect())
 
   # ── Template-method hooks ───────────────────────────────────────────────
@@ -187,9 +194,9 @@ class FrontmatterFileRegistry(ABC, Generic[T]):
       return False
     if delta and delta not in getattr(record, "deltas", ()):
       return False
-    if requirement and requirement not in getattr(record, "requirements", ()):
-      return False
-    return True
+    return not (
+      requirement and requirement not in getattr(record, "requirements", ())
+    )
 
   def _filter(
     self,

@@ -1,4 +1,4 @@
-"""Re-export shim → spec_driver.domain.records.policy / spec_driver.domain.registries.policy.
+"""Re-export shim → spec_driver.domain.records.policy / .registries.policy.
 
 DO NOT add new code here. Canonical homes:
   - PolicyRecord: spec_driver.domain.records.policy

@@ -5,12 +5,9 @@ Tests import from supekku.* registry paths, not canonical paths.
 
 from __future__ import annotations
 
-import pytest
-
 from spec_driver.domain.registries.frontmatter import RegistryProtocol
 
 # ── Legacy-path imports (the shims under test) ──────────────────────────────
-
 from supekku.scripts.lib.decisions.registry import (  # noqa: E402
   DecisionRecord,
   DecisionRegistry,
@@ -119,21 +116,21 @@ class TestShimAll:
   """Shim modules expose __all__."""
 
   def test_decision_all(self) -> None:
-    from supekku.scripts.lib.decisions import registry as mod
+    from supekku.scripts.lib.decisions import registry as mod  # noqa: PLC0415
 
     assert hasattr(mod, "__all__")
     assert "DecisionRecord" in mod.__all__
     assert "DecisionRegistry" in mod.__all__
 
   def test_policy_all(self) -> None:
-    from supekku.scripts.lib.policies import registry as mod
+    from supekku.scripts.lib.policies import registry as mod  # noqa: PLC0415
 
     assert hasattr(mod, "__all__")
     assert "PolicyRecord" in mod.__all__
     assert "PolicyRegistry" in mod.__all__
 
   def test_standard_all(self) -> None:
-    from supekku.scripts.lib.standards import registry as mod
+    from supekku.scripts.lib.standards import registry as mod  # noqa: PLC0415
 
     assert hasattr(mod, "__all__")
     assert "StandardRecord" in mod.__all__

@@ -8,12 +8,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from spec_driver.core.dates import parse_date
 from spec_driver.core.paths import get_decisions_dir
 from spec_driver.domain.records.decision import DecisionRecord
 from spec_driver.domain.registries.frontmatter import FrontmatterFileRegistry
 
 if TYPE_CHECKING:
-  from collections.abc import Iterator
+  pass
 
 
 class DecisionRegistry(FrontmatterFileRegistry[DecisionRecord]):
@@ -38,8 +39,6 @@ class DecisionRegistry(FrontmatterFileRegistry[DecisionRecord]):
     status: str,
     path: Path,
   ) -> DecisionRecord:
-    from spec_driver.core.dates import parse_date
-
     return DecisionRecord(
       id=record_id,
       title=title,
@@ -81,7 +80,9 @@ class DecisionRegistry(FrontmatterFileRegistry[DecisionRecord]):
 
   def _infer_from_dirs(self, path: Path) -> str:
     """Infer ADR status from symlink directory membership."""
-    from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES  # noqa: PLC0415 (lazy — avoids circular import through supekku init → workspace → shim)
+    from supekku.scripts.lib.decisions.lifecycle import (  # noqa: PLC0415
+      ADR_STATUSES,
+    )
 
     for status_dir_name in ADR_STATUSES:
       if (self.directory / status_dir_name / path.name).exists():
@@ -131,7 +132,9 @@ class DecisionRegistry(FrontmatterFileRegistry[DecisionRecord]):
 
   def _cleanup_all_status_directories(self, decisions_dir: Path) -> None:
     """Remove all symlinks from existing status directories."""
-    from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES  # noqa: PLC0415 (lazy)
+    from supekku.scripts.lib.decisions.lifecycle import (  # noqa: PLC0415
+      ADR_STATUSES,
+    )
 
     for status in ADR_STATUSES:
       status_dir = decisions_dir / status

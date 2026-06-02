@@ -1,4 +1,5 @@
 """Re-export shim — see spec_driver.core.config."""
+
 from spec_driver.core.config import (
   DEFAULT_CONFIG,
   detect_exec_command,

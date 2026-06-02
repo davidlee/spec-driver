@@ -12,12 +12,11 @@ from pathlib import Path
 from typing import Any
 
 from supekku.scripts.lib.creation import (
-  _AlreadyExists,
-  _GovernanceArtifactSpec,
+  _AlreadyExistsError,
   _create_governance_artifact,
+  _GovernanceArtifactSpec,
 )
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
-
 
 # ── Public surface (preserved verbatim) ────────────────────────────────────
 
@@ -111,7 +110,7 @@ def create_adr(
     adr_id, path = _create_governance_artifact(
       _ADR_SPEC, registry, options, sync_registry=sync_registry
     )
-  except _AlreadyExists as exc:
+  except _AlreadyExistsError as exc:
     raise ADRAlreadyExistsError(str(exc)) from exc
   return ADRCreationResult(adr_id=adr_id, path=path, filename=path.name)
 
@@ -121,7 +120,7 @@ def create_adr(
 
 def generate_next_adr_id(registry: DecisionRegistry) -> str:
   """Generate the next available ADR ID."""
-  from supekku.scripts.lib.core.ids import next_sequential_id
+  from supekku.scripts.lib.core.ids import next_sequential_id  # noqa: PLC0415
 
   return next_sequential_id(registry.collect(), "ADR")
 
@@ -136,7 +135,9 @@ def build_adr_frontmatter(
   """Build frontmatter dictionary for ADR (legacy signature)."""
   return _build_adr_frontmatter(
     adr_id,
-    ADRCreationOptions(title=title, status=status, author=author, author_email=author_email),
+    ADRCreationOptions(
+      title=title, status=status, author=author, author_email=author_email
+    ),
   )
 
 

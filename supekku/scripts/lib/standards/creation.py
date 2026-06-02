@@ -15,12 +15,11 @@ from pathlib import Path
 from typing import Any
 
 from supekku.scripts.lib.creation import (
-  _AlreadyExists,
-  _GovernanceArtifactSpec,
+  _AlreadyExistsError,
   _create_governance_artifact,
+  _GovernanceArtifactSpec,
 )
 from supekku.scripts.lib.standards.registry import StandardRegistry
-
 
 # ── Public surface (preserved verbatim) ────────────────────────────────────
 
@@ -113,7 +112,7 @@ def create_standard(
     standard_id, path = _create_governance_artifact(
       _STANDARD_SPEC, registry, options, sync_registry=sync_registry
     )
-  except _AlreadyExists as exc:
+  except _AlreadyExistsError as exc:
     raise StandardAlreadyExistsError(str(exc)) from exc
   return StandardCreationResult(standard_id=standard_id, path=path, filename=path.name)
 
@@ -123,7 +122,7 @@ def create_standard(
 
 def generate_next_standard_id(registry: StandardRegistry) -> str:
   """Generate the next available standard ID."""
-  from supekku.scripts.lib.core.ids import next_sequential_id
+  from supekku.scripts.lib.core.ids import next_sequential_id  # noqa: PLC0415
 
   return next_sequential_id(registry.collect(), "STD")
 
@@ -138,7 +137,9 @@ def build_standard_frontmatter(
   """Build frontmatter dictionary for standard (legacy signature)."""
   return _build_standard_frontmatter(
     standard_id,
-    StandardCreationOptions(title=title, status=status, author=author, author_email=author_email),
+    StandardCreationOptions(
+      title=title, status=status, author=author, author_email=author_email
+    ),
   )
 
 

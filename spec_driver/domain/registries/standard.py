@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from spec_driver.core.dates import parse_date
 from spec_driver.core.paths import get_standards_dir
 from spec_driver.domain.records.standard import StandardRecord
 from spec_driver.domain.registries.frontmatter import FrontmatterFileRegistry
@@ -41,8 +42,6 @@ class StandardRegistry(FrontmatterFileRegistry[StandardRecord]):
     status: str,
     path: Path,
   ) -> StandardRecord:
-    from spec_driver.core.dates import parse_date
-
     return StandardRecord(
       id=record_id,
       title=title,

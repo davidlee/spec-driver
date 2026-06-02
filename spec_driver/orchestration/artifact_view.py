@@ -417,13 +417,13 @@ def _make_card_registry(root: Path) -> Any:
 
 
 def _make_policy_registry(root: Path) -> Any:
-  from supekku.scripts.lib.policies.registry import PolicyRegistry  # noqa: PLC0415
+  from spec_driver.domain.registries.policy import PolicyRegistry  # noqa: PLC0415
 
   return PolicyRegistry(root=root)
 
 
 def _make_standard_registry(root: Path) -> Any:
-  from supekku.scripts.lib.standards.registry import StandardRegistry  # noqa: PLC0415
+  from spec_driver.domain.registries.standard import StandardRegistry  # noqa: PLC0415
 
   return StandardRegistry(root=root)
 

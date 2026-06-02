@@ -17,7 +17,37 @@ class RegistryProtocol(Protocol[T_co]):
 
 **OQ-1 closed**, OQ-2 already closed, R2 closed. AR-4 magic-strings follow-up remains.
 
-**Ready for P1** — records + base + DecisionRegistry + shims.
+**Ready for P2** — PolicyRegistry + StandardRegistry + Workspace backlink hoist.
+
+## P2 — Policy + Standard registries + Workspace backlink hoist (completed 2026-06-02)
+
+**Outcome**: All 9 tasks complete. 36/36 tests pass. **R is landable.**
+
+### Files created
+- `spec_driver/domain/registries/policy.py` — PolicyRegistry collapsed onto base
+- `spec_driver/domain/registries/standard.py` — StandardRegistry collapsed onto base
+- `spec_driver/domain/registries/test_shim_compat.py` — 18 tests on legacy import paths
+- `spec_driver/domain/registries/test_golden_yaml.py` — 4 tests with fixture corpus
+
+### Files modified
+- `supekku/scripts/lib/policies/registry.py` → re-export shim
+- `supekku/scripts/lib/standards/registry.py` → re-export shim
+- `supekku/scripts/lib/workspace.py` → `_sync_governance` + `_registry_for`; backlink hoist
+- `spec_driver/orchestration/artifact_view.py` → Policy/Standard canonical imports
+
+### Surprises
+- `policies/__init__.py` and `standards/__init__.py` already re-export via registry modules
+  — no change needed.
+- `build_backlinks_multi` works correctly when records are passed pre-mutated. The
+  golden-YAML tests verify backlinks appear in YAML output through Workspace orchestration.
+
+### Gates
+- no-relations: 0 (docstring match only, no actual imports)
+- core-import: 0
+- internal-consumer: 0
+- zero-duplication: 0 (grep for def collect/_parse_file/iter/find/write/sync in decision/policy/standard.py)
+- ty check: 333 (baseline noise, no regression)
+- tests: 36/36 pass
 
 ## P1 — Records + base + DecisionRegistry + shims + internal consumers (completed 2026-06-02)
 

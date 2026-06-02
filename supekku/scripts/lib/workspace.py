@@ -21,6 +21,8 @@ from .requirements.registry import RequirementsRegistry
 from .specs.registry import SpecRegistry
 from .standards.registry import StandardRegistry
 
+from spec_driver.domain.relations.backlinks import build_backlinks_multi
+
 if TYPE_CHECKING:
   from pathlib import Path
 
@@ -123,10 +125,9 @@ class Workspace:
   def sync_policies(self) -> None:
     """Synchronize policy registry to YAML.
 
-    Passes pre-collected decision records so the registry can compute
-    backlinks without instantiating sibling registries.
+    Backlink composition is owned by Workspace (DEC-116-2).
     """
-    self.policies.sync(decision_sources=self.decisions.collect())
+    self._sync_governance(self.policies)
 
   # Standards --------------------------------------------------
   @property
@@ -143,13 +144,40 @@ class Workspace:
   def sync_standards(self) -> None:
     """Synchronize standard registry to YAML.
 
-    Passes pre-collected decision and policy records so the registry can
-    compute backlinks without instantiating sibling registries.
+    Backlink composition is owned by Workspace (DEC-116-2).
     """
-    self.standards.sync(
-      decision_sources=self.decisions.collect(),
-      policy_sources=self.policies.collect(),
-    )
+    self._sync_governance(self.standards)
+
+  # Backlink composition (orchestration layer) -----------------
+
+  def _registry_for(self, category: str):  # type: ignore[no-untyped-def]
+    """Return the registry instance for a governance category name."""
+    return {
+      "decisions": self.decisions,
+      "policies": self.policies,
+      "standards": self.standards,
+    }[category]
+
+  def _sync_governance(self, registry) -> None:  # type: ignore[no-untyped-def]
+    """Collect, compute backlinks from sibling registries, and write.
+
+    Backlink composition is owned by the orchestration layer (DEC-116-2).
+    Registries are pure: they never import domain.relations.
+    """
+    records = registry.collect()
+    groups = [
+      (
+        [
+          (r.id, getattr(r, field))
+          for r in self._registry_for(category).collect().values()
+        ],
+        category,
+      )
+      for category, field in registry.backlink_inputs
+    ]
+    if groups:
+      build_backlinks_multi(records, groups)
+    registry.write(records=records)
 
   # Change registries ------------------------------------------
   @property

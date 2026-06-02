@@ -4,7 +4,7 @@ slug: "116-registry_protocol_enforcement_and_governance_triplet_consolidation_ad
 name: IP-116 Phase 0 — Protocol conformance spike
 created: "2026-06-02"
 updated: "2026-06-02"
-status: draft
+status: completed
 kind: phase
 plan: IP-116
 delta: DE-116
@@ -87,8 +87,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [ ] | 0.2 | `ty check` the protocol against the 3 current registries; iterate signatures until zero errors | [ ] | the real conformance gate |
 | [ ] | 0.3 | Runtime `isinstance` assertion for each registry | [P] | presence only (AR-3) |
 | [ ] | 0.4 | Negative check: protocol-with-`filter` fails ty (evidence for ER-1) | [P] | confirms filter exclusion |
-| [ ] | 0.5 | Record OQ-1 outcome (GO / fallback) + paste locked signatures into §9/§10 | [ ] | feeds P1 base-class shape |
-| [ ] | 0.6 | Delete / quarantine spike code | [ ] | no production import |
+| [x] | 0.5 | Record OQ-1 outcome (GO / fallback) + paste locked signatures into §9/§10 | [ ] | feeds P1 base-class shape |
+| [x] | 0.6 | Delete / quarantine spike code | [ ] | no production import |
 
 ### Task Details
 
@@ -106,7 +106,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| R2 — find/collect/iter signatures fail strict conformance | This phase exists to catch it pre-migration; documented fallback = find/collect/iter strict only, filter existence-only | open |
+| R2 — find/collect/iter signatures fail strict conformance | This phase exists to catch it pre-migration; documented fallback = find/collect/iter strict only, filter existence-only | **closed** — GO, zero ty errors |
 | `find` resolution needs registry param renames (scope creep) | STOP condition §6; confirm with user before any rename | open |
 
 ## 9. Decisions & Outcomes
@@ -130,9 +130,20 @@ Source: `supekku/scripts/lib/{decisions,policies,standards}/registry.py`. The `f
 divergence is the single real conformance question for the typed read surface; `filter`'s exclusion is
 already a settled design fact (DR §3, ER-1).
 
+### Spike results (2026-06-02)
+
+- **ty check (find/collect/iter)**: `All checks passed!` — zero protocol-conformance errors against
+  all 3 registries with positional-only `find(self, id, /)`.
+- **isinstance**: All 3 registries return `True` (method presence, AR-3).
+- **filter negative check**: 9/9 diagnostic errors across 3 protocol variants — no single generic
+  `filter` signature can structurally satisfy all 3 registries. Confirms the ER-1 decision to
+  exclude `filter` from the typed generic; `filter` is asserted by existence test only.
+
+Spike artefacts: `phases/_spike_protocol_conformance.py`, `phases/_spike_filter_negative.py` (to be deleted in task 0.6).
+
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied (ty zero-errors + isinstance true + OQ-1 recorded)
-- [ ] Verification evidence stored (locked signatures + ty output in §9/§10)
-- [ ] IP-116 updated if the documented fallback was taken (narrows DEC-116-1)
-- [ ] Spike code deleted; hand-off note to P1 (base-class signature shape locked)
+- [x] Exit criteria satisfied (ty zero-errors + isinstance true + OQ-1 recorded)
+- [x] Verification evidence stored (locked signatures + ty output in §9/§10)
+- [x] IP-116 update not needed (GO path, no fallback — DEC-116-1 unchanged, R2 closed)
+- [x] Spike code deleted; hand-off note to P1 (base-class signature shape locked)

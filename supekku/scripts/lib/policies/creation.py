@@ -1,4 +1,8 @@
-"""Policy creation utilities."""
+"""Policy creation — thin wrapper around _create_governance_artifact.
+
+Public surface preserved: PolicyCreationOptions, PolicyCreationResult,
+PolicyAlreadyExistsError, create_policy.
+"""
 
 from __future__ import annotations
 
@@ -7,15 +11,15 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import yaml
-from jinja2 import Template
-
-from supekku.scripts.lib.core import slugify
-from supekku.scripts.lib.core.events import record_artifact
-from supekku.scripts.lib.core.ids import next_sequential_id
-from supekku.scripts.lib.core.paths import get_templates_dir
-from supekku.scripts.lib.core.templates import extract_template_body
+from supekku.scripts.lib.creation import (
+  _AlreadyExists,
+  _GovernanceArtifactSpec,
+  _create_governance_artifact,
+)
 from supekku.scripts.lib.policies.registry import PolicyRegistry
+
+
+# ── Public surface (preserved verbatim) ────────────────────────────────────
 
 
 @dataclass
@@ -41,54 +45,26 @@ class PolicyAlreadyExistsError(Exception):
   """Raised when attempting to create a policy file that already exists."""
 
 
-def generate_next_policy_id(registry: PolicyRegistry) -> str:
-  """Generate the next available policy ID.
-
-  Args:
-    registry: Policy registry to scan for existing IDs.
-
-  Returns:
-    Next available policy ID (e.g., "POL-001").
-  """
-  return next_sequential_id(registry.collect(), "POL")
+# ── Per-kind frontmatter builder (Policy-specific fields) ──────────────────
 
 
-def build_policy_frontmatter(
-  policy_id: str,
-  title: str,
-  status: str,
-  author: str | None = None,
-  author_email: str | None = None,
-) -> dict:
-  """Build frontmatter dictionary for policy.
-
-  Args:
-    policy_id: Policy identifier (e.g., "POL-001").
-    title: Human-readable title.
-    status: Status value (e.g., "draft", "required", "deprecated").
-    author: Optional author name.
-    author_email: Optional author email.
-
-  Returns:
-    Dictionary containing policy frontmatter.
-  """
+def _build_policy_frontmatter(policy_id: str, options: PolicyCreationOptions) -> dict[str, Any]:
+  """Build frontmatter dictionary for policy."""
   today = date.today().isoformat()
   frontmatter: dict[str, Any] = {
     "id": policy_id,
-    "title": f"{policy_id}: {title}",
-    "status": status,
+    "title": f"{policy_id}: {options.title}",
+    "status": options.status,
     "created": today,
     "updated": today,
     "reviewed": today,
   }
 
-  # Add author to owners if provided
-  if author:
-    frontmatter["owners"] = [author]
+  if options.author:
+    frontmatter["owners"] = [options.author]
   else:
     frontmatter["owners"] = []
 
-  # Add other empty fields for the schema
   frontmatter.update(
     {
       "supersedes": [],
@@ -103,8 +79,19 @@ def build_policy_frontmatter(
       "summary": "",
     },
   )
-
   return frontmatter
+
+
+_POLICY_SPEC = _GovernanceArtifactSpec(
+  prefix="POL",
+  label="Policy",
+  template_name="policy-template.md",
+  render_var="policy_id",
+  build_frontmatter=_build_policy_frontmatter,
+)
+
+
+# ── Public creation function ───────────────────────────────────────────────
 
 
 def create_policy(
@@ -113,63 +100,37 @@ def create_policy(
   *,
   sync_registry: bool = True,
 ) -> PolicyCreationResult:
-  """Create a new policy with the next available ID.
+  """Create a new policy with the next available ID."""
+  try:
+    policy_id, path = _create_governance_artifact(
+      _POLICY_SPEC, registry, options, sync_registry=sync_registry
+    )
+  except _AlreadyExists as exc:
+    raise PolicyAlreadyExistsError(str(exc)) from exc
+  return PolicyCreationResult(policy_id=policy_id, path=path, filename=path.name)
 
-  Args:
-    registry: Policy registry for finding next ID and storing policy.
-    options: Policy creation options (title, status, author, etc.).
-    sync_registry: Whether to sync the registry after creation.
 
-  Returns:
-    PolicyCreationResult with ID, path, and filename.
+# ── Legacy helpers (kept for backward compat) ──────────────────────────────
 
-  Raises:
-    PolicyAlreadyExistsError: If policy file already exists at computed path.
-  """
-  # Generate next ID
-  policy_id = generate_next_policy_id(registry)
-  record_artifact(policy_id)
 
-  # Create filename
-  title_slug = slugify(options.title)
-  filename = f"{policy_id}-{title_slug}.md"
-  policy_path = registry.directory / filename
+def generate_next_policy_id(registry: PolicyRegistry) -> str:
+  """Generate the next available policy ID."""
+  from supekku.scripts.lib.core.ids import next_sequential_id
 
-  # Check if file already exists
-  if policy_path.exists():
-    msg = f"Policy file already exists: {policy_path}"
-    raise PolicyAlreadyExistsError(msg)
+  return next_sequential_id(registry.collect(), "POL")
 
-  # Build frontmatter
-  frontmatter = build_policy_frontmatter(
+
+def build_policy_frontmatter(
+  policy_id: str,
+  title: str,
+  status: str,
+  author: str | None = None,
+  author_email: str | None = None,
+) -> dict[str, Any]:
+  """Build frontmatter dictionary for policy (legacy signature)."""
+  return _build_policy_frontmatter(
     policy_id,
-    options.title,
-    options.status,
-    options.author,
-    options.author_email,
-  )
-
-  # Load template body and render with Jinja2
-  template_path = get_templates_dir(registry.root) / "policy-template.md"
-  template_body = extract_template_body(template_path)
-  template = Template(template_body)
-  content = template.render(policy_id=policy_id, title=options.title)
-
-  # Write file
-  frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)
-  full_content = f"---\n{frontmatter_yaml}---\n\n{content}"
-
-  policy_path.parent.mkdir(parents=True, exist_ok=True)
-  policy_path.write_text(full_content, encoding="utf-8")
-
-  # Sync registry if requested
-  if sync_registry:
-    registry.sync()
-
-  return PolicyCreationResult(
-    policy_id=policy_id,
-    path=policy_path,
-    filename=filename,
+    PolicyCreationOptions(title=title, status=status, author=author, author_email=author_email),
   )
 
 

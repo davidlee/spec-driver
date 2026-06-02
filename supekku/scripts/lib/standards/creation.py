@@ -1,4 +1,11 @@
-"""Standard creation utilities."""
+"""Standard creation — thin wrapper around _create_governance_artifact.
+
+Public surface preserved: StandardCreationOptions, StandardCreationResult,
+StandardAlreadyExistsError, create_standard.
+
+OQ-2 resolved (accept): record_artifact() now called unconditionally (was
+previously missing — the lone omission among governance creators).
+"""
 
 from __future__ import annotations
 
@@ -7,14 +14,15 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import yaml
-from jinja2 import Template
-
-from supekku.scripts.lib.core import slugify
-from supekku.scripts.lib.core.ids import next_sequential_id
-from supekku.scripts.lib.core.paths import get_templates_dir
-from supekku.scripts.lib.core.templates import extract_template_body
+from supekku.scripts.lib.creation import (
+  _AlreadyExists,
+  _GovernanceArtifactSpec,
+  _create_governance_artifact,
+)
 from supekku.scripts.lib.standards.registry import StandardRegistry
+
+
+# ── Public surface (preserved verbatim) ────────────────────────────────────
 
 
 @dataclass
@@ -40,54 +48,28 @@ class StandardAlreadyExistsError(Exception):
   """Raised when attempting to create a standard file that already exists."""
 
 
-def generate_next_standard_id(registry: StandardRegistry) -> str:
-  """Generate the next available standard ID.
-
-  Args:
-    registry: Standard registry to scan for existing IDs.
-
-  Returns:
-    Next available standard ID (e.g., "STD-001").
-  """
-  return next_sequential_id(registry.collect(), "STD")
+# ── Per-kind frontmatter builder (Standard-specific fields) ────────────────
 
 
-def build_standard_frontmatter(
-  standard_id: str,
-  title: str,
-  status: str,
-  author: str | None = None,
-  author_email: str | None = None,
-) -> dict:
-  """Build frontmatter dictionary for standard.
-
-  Args:
-    standard_id: Standard identifier (e.g., "STD-001").
-    title: Human-readable title.
-    status: Status value (e.g., "draft", "required", "default", "deprecated").
-    author: Optional author name.
-    author_email: Optional author email.
-
-  Returns:
-    Dictionary containing standard frontmatter.
-  """
+def _build_standard_frontmatter(
+  standard_id: str, options: StandardCreationOptions
+) -> dict[str, Any]:
+  """Build frontmatter dictionary for standard."""
   today = date.today().isoformat()
   frontmatter: dict[str, Any] = {
     "id": standard_id,
-    "title": f"{standard_id}: {title}",
-    "status": status,
+    "title": f"{standard_id}: {options.title}",
+    "status": options.status,
     "created": today,
     "updated": today,
     "reviewed": today,
   }
 
-  # Add author to owners if provided
-  if author:
-    frontmatter["owners"] = [author]
+  if options.author:
+    frontmatter["owners"] = [options.author]
   else:
     frontmatter["owners"] = []
 
-  # Add other empty fields for the schema
   frontmatter.update(
     {
       "supersedes": [],
@@ -102,8 +84,19 @@ def build_standard_frontmatter(
       "summary": "",
     },
   )
-
   return frontmatter
+
+
+_STANDARD_SPEC = _GovernanceArtifactSpec(
+  prefix="STD",
+  label="Standard",
+  template_name="standard-template.md",
+  render_var="standard_id",
+  build_frontmatter=_build_standard_frontmatter,
+)
+
+
+# ── Public creation function ───────────────────────────────────────────────
 
 
 def create_standard(
@@ -114,60 +107,38 @@ def create_standard(
 ) -> StandardCreationResult:
   """Create a new standard with the next available ID.
 
-  Args:
-    registry: Standard registry for finding next ID and storing standard.
-    options: Standard creation options (title, status, author, etc.).
-    sync_registry: Whether to sync the registry after creation.
-
-  Returns:
-    StandardCreationResult with ID, path, and filename.
-
-  Raises:
-    StandardAlreadyExistsError: If standard file already exists at computed path.
+  record_artifact() is now called unconditionally (OQ-2: accept).
   """
-  # Generate next ID
-  standard_id = generate_next_standard_id(registry)
+  try:
+    standard_id, path = _create_governance_artifact(
+      _STANDARD_SPEC, registry, options, sync_registry=sync_registry
+    )
+  except _AlreadyExists as exc:
+    raise StandardAlreadyExistsError(str(exc)) from exc
+  return StandardCreationResult(standard_id=standard_id, path=path, filename=path.name)
 
-  # Create filename
-  title_slug = slugify(options.title)
-  filename = f"{standard_id}-{title_slug}.md"
-  standard_path = registry.directory / filename
 
-  # Check if file already exists
-  if standard_path.exists():
-    msg = f"Standard file already exists: {standard_path}"
-    raise StandardAlreadyExistsError(msg)
+# ── Legacy helpers (kept for backward compat) ──────────────────────────────
 
-  # Build frontmatter
-  frontmatter = build_standard_frontmatter(
+
+def generate_next_standard_id(registry: StandardRegistry) -> str:
+  """Generate the next available standard ID."""
+  from supekku.scripts.lib.core.ids import next_sequential_id
+
+  return next_sequential_id(registry.collect(), "STD")
+
+
+def build_standard_frontmatter(
+  standard_id: str,
+  title: str,
+  status: str,
+  author: str | None = None,
+  author_email: str | None = None,
+) -> dict[str, Any]:
+  """Build frontmatter dictionary for standard (legacy signature)."""
+  return _build_standard_frontmatter(
     standard_id,
-    options.title,
-    options.status,
-    options.author,
-    options.author_email,
-  )
-
-  # Load template body and render with Jinja2
-  template_path = get_templates_dir(registry.root) / "standard-template.md"
-  template_body = extract_template_body(template_path)
-  template = Template(template_body)
-  content = template.render(standard_id=standard_id, title=options.title)
-
-  # Write file
-  frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)
-  full_content = f"---\n{frontmatter_yaml}---\n\n{content}"
-
-  standard_path.parent.mkdir(parents=True, exist_ok=True)
-  standard_path.write_text(full_content, encoding="utf-8")
-
-  # Sync registry if requested
-  if sync_registry:
-    registry.sync()
-
-  return StandardCreationResult(
-    standard_id=standard_id,
-    path=standard_path,
-    filename=filename,
+    StandardCreationOptions(title=title, status=status, author=author, author_email=author_email),
   )
 
 

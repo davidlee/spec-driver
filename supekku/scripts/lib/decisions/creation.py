@@ -1,4 +1,8 @@
-"""Shared logic for creating architecture decision records (ADRs)."""
+"""ADR creation — thin wrapper around _create_governance_artifact.
+
+Public surface preserved: ADRCreationOptions, ADRCreationResult,
+ADRAlreadyExistsError, create_adr.
+"""
 
 from __future__ import annotations
 
@@ -7,15 +11,15 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import yaml
-from jinja2 import Template
-
-from supekku.scripts.lib.core import slugify
-from supekku.scripts.lib.core.events import record_artifact
-from supekku.scripts.lib.core.ids import next_sequential_id
-from supekku.scripts.lib.core.paths import get_templates_dir
-from supekku.scripts.lib.core.templates import extract_template_body
+from supekku.scripts.lib.creation import (
+  _AlreadyExists,
+  _GovernanceArtifactSpec,
+  _create_governance_artifact,
+)
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
+
+
+# ── Public surface (preserved verbatim) ────────────────────────────────────
 
 
 @dataclass
@@ -41,57 +45,29 @@ class ADRAlreadyExistsError(Exception):
   """Raised when attempting to create an ADR file that already exists."""
 
 
-def generate_next_adr_id(registry: DecisionRegistry) -> str:
-  """Generate the next available ADR ID.
-
-  Args:
-    registry: Decision registry to scan for existing IDs.
-
-  Returns:
-    Next available ADR ID (e.g., "ADR-042").
-  """
-  return next_sequential_id(registry.collect(), "ADR")
+# ── Per-kind frontmatter builder (ADR-specific fields) ─────────────────────
 
 
-def build_adr_frontmatter(
-  adr_id: str,
-  title: str,
-  status: str,
-  author: str | None = None,
-  author_email: str | None = None,
-) -> dict:
-  """Build frontmatter dictionary for ADR.
-
-  Args:
-    adr_id: ADR identifier (e.g., "ADR-001").
-    title: Human-readable title.
-    status: Status value (e.g., "draft", "accepted").
-    author: Optional author name.
-    author_email: Optional author email.
-
-  Returns:
-    Dictionary containing ADR frontmatter.
-  """
+def _build_adr_frontmatter(adr_id: str, options: ADRCreationOptions) -> dict[str, Any]:
+  """Build frontmatter dictionary for ADR."""
   today = date.today().isoformat()
   frontmatter: dict[str, Any] = {
     "id": adr_id,
-    "title": f"{adr_id}: {title}",
-    "status": status,
+    "title": f"{adr_id}: {options.title}",
+    "status": options.status,
     "created": today,
     "updated": today,
     "reviewed": today,
   }
 
-  # Add author info if provided
-  if author or author_email:
-    author_info = {}
-    if author:
-      author_info["name"] = author
-    if author_email:
-      author_info["contact"] = f"mailto:{author_email}"
+  if options.author or options.author_email:
+    author_info: dict[str, str] = {}
+    if options.author:
+      author_info["name"] = options.author
+    if options.author_email:
+      author_info["contact"] = f"mailto:{options.author_email}"
     frontmatter["authors"] = [author_info]
 
-  # Add other empty fields for the new schema
   frontmatter.update(
     {
       "owners": [],
@@ -109,8 +85,19 @@ def build_adr_frontmatter(
       "summary": "",
     },
   )
-
   return frontmatter
+
+
+_ADR_SPEC = _GovernanceArtifactSpec(
+  prefix="ADR",
+  label="ADR",
+  template_name="ADR.md",
+  render_var="adr_id",
+  build_frontmatter=_build_adr_frontmatter,
+)
+
+
+# ── Public creation function ───────────────────────────────────────────────
 
 
 def create_adr(
@@ -119,61 +106,45 @@ def create_adr(
   *,
   sync_registry: bool = True,
 ) -> ADRCreationResult:
-  """Create a new ADR with the next available ID.
+  """Create a new ADR with the next available ID."""
+  try:
+    adr_id, path = _create_governance_artifact(
+      _ADR_SPEC, registry, options, sync_registry=sync_registry
+    )
+  except _AlreadyExists as exc:
+    raise ADRAlreadyExistsError(str(exc)) from exc
+  return ADRCreationResult(adr_id=adr_id, path=path, filename=path.name)
 
-  Args:
-    registry: Decision registry for finding next ID and storing ADR.
-    options: ADR creation options (title, status, author, etc.).
-    sync_registry: Whether to sync the registry after creation.
 
-  Returns:
-    ADRCreationResult with ID, path, and filename.
+# ── Legacy helpers (kept for backward compat — thin wrappers) ──────────────
 
-  Raises:
-    ADRAlreadyExistsError: If ADR file already exists at computed path.
-  """
-  # Generate next ID
-  adr_id = generate_next_adr_id(registry)
-  record_artifact(adr_id)
 
-  # Create filename
-  title_slug = slugify(options.title)
-  filename = f"{adr_id}-{title_slug}.md"
-  adr_path = registry.directory / filename
+def generate_next_adr_id(registry: DecisionRegistry) -> str:
+  """Generate the next available ADR ID."""
+  from supekku.scripts.lib.core.ids import next_sequential_id
 
-  # Check if file already exists
-  if adr_path.exists():
-    msg = f"ADR file already exists: {adr_path}"
-    raise ADRAlreadyExistsError(msg)
+  return next_sequential_id(registry.collect(), "ADR")
 
-  # Build frontmatter
-  frontmatter = build_adr_frontmatter(
+
+def build_adr_frontmatter(
+  adr_id: str,
+  title: str,
+  status: str,
+  author: str | None = None,
+  author_email: str | None = None,
+) -> dict[str, Any]:
+  """Build frontmatter dictionary for ADR (legacy signature)."""
+  return _build_adr_frontmatter(
     adr_id,
-    options.title,
-    options.status,
-    options.author,
-    options.author_email,
+    ADRCreationOptions(title=title, status=status, author=author, author_email=author_email),
   )
 
-  # Load template body and render with Jinja2
-  template_path = get_templates_dir(registry.root) / "ADR.md"
-  template_body = extract_template_body(template_path)
-  template = Template(template_body)
-  content = template.render(adr_id=adr_id, title=options.title)
 
-  # Write file
-  frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)
-  full_content = f"---\n{frontmatter_yaml}---\n\n{content}"
-
-  adr_path.parent.mkdir(parents=True, exist_ok=True)
-  adr_path.write_text(full_content, encoding="utf-8")
-
-  # Sync registry if requested
-  if sync_registry:
-    registry.sync()
-
-  return ADRCreationResult(
-    adr_id=adr_id,
-    path=adr_path,
-    filename=filename,
-  )
+__all__ = [
+  "ADRCreationOptions",
+  "ADRCreationResult",
+  "ADRAlreadyExistsError",
+  "generate_next_adr_id",
+  "build_adr_frontmatter",
+  "create_adr",
+]
